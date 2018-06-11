@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<!--<?import javafx.scene.effect.Light.Distant?>-->
+
+<VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="710.0" prefWidth="1069.0" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="major.Controller">
+  <children>
+    <MenuBar VBox.vgrow="NEVER">
+      <menus>
+        <Menu mnemonicParsing="false" text="File">
+          <items>
+            <MenuItem mnemonicParsing="false" text="New" />
+            <MenuItem mnemonicParsing="false" text="Open" />
+            <MenuItem mnemonicParsing="false" text="Quit" />
+          </items>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+          <items>
+            <MenuItem mnemonicParsing="false" text="About" />
+          </items>
+        </Menu>
+      </menus>
+    </MenuBar>
+    <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+      <children>
+            <TabPane layoutY="6.0" prefHeight="351.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0">
+              <tabs>
+                <Tab text="Manage Account">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="108.0" prefWidth="640.0">
+                           <children>
+                              <AnchorPane layoutX="6.0" layoutY="1.0" maxHeight="1.7976931348623157E308" prefHeight="627.0" prefWidth="191.0" style="-fx-background-color: #1D2026;" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="1.0">
+                                 <children>
+                                    <VBox layoutX="7.0" layoutY="160.0" prefHeight="407.0" prefWidth="174.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="160.0">
+                                       <children>
+                                          <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="180.0" text="Add Account" textFill="#c94949" underline="true" />
+                                          <Button defaultButton="true" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="180.0" text="Account List" textAlignment="CENTER" underline="true" wrapText="true">
+                                             <VBox.margin>
+                                                <Insets top="10.0" />
+                                             </VBox.margin>
+                                          </Button>
+                                       </children>
+                                    </VBox>
+                                    <ImageView fitHeight="109.0" fitWidth="136.0" layoutX="22.0" layoutY="37.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="/download.jpeg" />
+                                       </image>
+                                    </ImageView>
+                                    <Label layoutX="16.0" layoutY="14.0" prefHeight="18.0" prefWidth="162.0" text="WELCOME, ADMIN" textFill="#cd185d">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator layoutX="8.0" layoutY="150.0" prefHeight="3.0" prefWidth="170.0" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </AnchorPane>
+                              <AnchorPane layoutX="195.0" layoutY="41.0" prefHeight="596.0" prefWidth="865.0" AnchorPane.leftAnchor="195.0" AnchorPane.rightAnchor="0.0">
+                                 <children>
+                                    <ScrollPane layoutX="8.0" layoutY="-5.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="0.0">
+                                       <content>
+                                          <TabPane prefHeight="576.0" prefWidth="860.0" tabClosingPolicy="UNAVAILABLE">
+                                            <tabs>
+                                              <Tab text="Add Account">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                                         <children>
+                                                            <VBox layoutX="44.0" layoutY="50.0" prefHeight="493.0" prefWidth="418.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="44.0" AnchorPane.rightAnchor="404.0" AnchorPane.topAnchor="50.0">
+                                                               <children>
+                                                                  <HBox prefHeight="45.0" prefWidth="418.0" spacing="15.0">
+                                                                     <children>
+                                                                        <Label alignment="CENTER" prefHeight="31.0" prefWidth="366.0" text="ADD NEW ACCOUNT" textAlignment="CENTER">
+                                                                           <font>
+                                                                              <Font name="System Bold" size="12.0" />
+                                                                           </font>
+                                                                        </Label>
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox prefHeight="45.0" prefWidth="418.0" spacing="15.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="81.0" text="FirstName:" />
+                                                                        <TextField fx:id="naFirstName" prefHeight="26.0" prefWidth="273.0" promptText="First Name" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="10.0" prefHeight="45.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="LastName:" />
+                                                                        <TextField fx:id="naLastName" minWidth="-Infinity" prefHeight="26.0" prefWidth="273.0" promptText="Last Name" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="55.0" prefHeight="45.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="OtherName:" />
+                                                                        <TextField fx:id="naOtherName" minWidth="-Infinity" prefHeight="26.0" prefWidth="273.0" promptText="Other Name" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="100.0" prefHeight="45.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="PhoneNo:" />
+                                                                        <TextField fx:id="naPhoneNo" minWidth="-Infinity" prefHeight="26.0" prefWidth="273.0" promptText="Phone No" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="190.0" prefHeight="61.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="Address:" />
+                                                                        <TextArea fx:id="naAddress" prefHeight="33.0" prefWidth="273.0" promptText="Address" />
+                                                                     </children>
+                                                                     <VBox.margin>
+                                                                        <Insets bottom="15.0" />
+                                                                     </VBox.margin>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="190.0" prefHeight="45.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="AccountNo:" />
+                                                                        <TextField disable="true" editable="false" minWidth="-Infinity" prefHeight="26.0" prefWidth="273.0" text="Generated Automatically" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <HBox layoutX="10.0" layoutY="311.0" prefHeight="45.0" prefWidth="418.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Label prefHeight="16.0" prefWidth="84.0" text="OpenDate:" />
+                                                                        <DatePicker fx:id="naOpenDate" prefHeight="26.0" prefWidth="273.0" />
+                                                                     </children>
+                                                                  </HBox>
+                                                                  <Button fx:id="naAddButton" alignment="CENTER" mnemonicParsing="false" onAction="#addNewAccount" prefHeight="39.0" prefWidth="342.0" text="Add New Account" textAlignment="CENTER">
+                                                                     <VBox.margin>
+                                                                        <Insets left="26.0" />
+                                                                     </VBox.margin>
+                                                                     <graphic>
+                                                                        <ImageView fitHeight="28.0" fitWidth="44.0" pickOnBounds="true" preserveRatio="true">
+                                                                           <image>
+                                                                              <Image url="/if_user-add_216490.png" />
+                                                                           </image>
+                                                                        </ImageView>
+                                                                     </graphic>
+                                                                  </Button>
+                                                               </children>
+                                                            </VBox>
+                                                         </children>
+                                                      </AnchorPane>
+                                                </content>
+                                              </Tab>
+                                              <Tab text="Account List">
+                                                <content>
+                                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                                </content>
+                                              </Tab>
+                                            </tabs>
+                                          </TabPane>
+                                       </content>
+                                    </ScrollPane>
+                                 </children>
+                              </AnchorPane>
+                          <Label alignment="CENTER" contentDisplay="CENTER" layoutX="202.0" layoutY="4.0" prefHeight="25.0" prefWidth="857.0" style="&#10;" text="Account Management Section" textAlignment="CENTER" textFill="#b20a0a" wrapText="false" AnchorPane.leftAnchor="202.0" AnchorPane.rightAnchor="0.0">
+                            <font>
+                              <Font name="DejaVu Sans Bold" size="20.0" />
+                            </font>
+                          </Label>
+                           </children></AnchorPane>
+                  </content>
+                </Tab>
+                <Tab text="Manage Shares">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+      </children>
+    </AnchorPane>
+      <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0">
+         <children>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
+               <font>
+                  <Font size="11.0" fx:id="x3" />
+               </font>
+               <textFill>
+                  <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+               </textFill>
+            </Label>
+            <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+            <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
+         </children>
+         <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+         </padding>
+      </HBox>
+  </children>
+  <stylesheets>
+    <URL value="@BasicApplication.css" />
+  </stylesheets>
+</VBox>

@@ -1,0 +1,30 @@
+.login_background{
+	-fx-background-color:red;
+	-fx-border-width:2px;
+	-fx-border-color:#467813;
+	/*-fx-background-color: #67b11c url("bg_autumn_leaves.jpg") 20px 50% no-repeat;*/
+	/*-fx-background-color: orange;*/
+	/*-fx-background-image: url("Nice-HD-Background.jpeg")  no-repeat;*/
+	-fx-background-image: url("/1*ZhuqSg8Jmz4p8H6X5U1uzQ.png")  no-repeat;
+	-fx-background-size: cover;
+}
+
+.login_title{
+	-fx-font-size: 2em;
+	-fx-font-family: cursive;
+	-fx-font-style: oblique;
+	-fx-font-family:serif;
+	-fx-color: lightgreen;
+}
+
+.login_button{
+	-fx-background-color:#000;
+}
+
+.login_panel{
+	-fx-background-color: black;
+	-fx-background-image: url("/maxresdefault.jpg")  no-repeat;
+	/*-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 100, 0, 0, 0);*/
+	/*-fx-effect: innershadow(three-pass-box, rgba(0,0,0,0), 100, 0, 0, 0);*/
+	-fx-effect: dropshadow( three-pass-box , black , 8 , 0.0 , 2 , 0 );
+}
