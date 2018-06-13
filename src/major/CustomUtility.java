@@ -2,6 +2,8 @@
 package major;
 
 
+import javafx.scene.control.Alert;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,6 +90,24 @@ public class CustomUtility{
 
         return newAccountNo;
 
+    }
+
+    /**
+     * Alert Helper function
+     * @param title
+     * @param headerText
+     * @param contentText
+     * @param alertType
+     * @return
+     */
+    public Alert AlertHelper(String title, String headerText, String contentText, Alert.AlertType alertType){
+        Alert alert = new Alert(alertType);
+        alert.setTitle("Information Dialog");
+        alert.setHeaderText("Account Information Display Notification");
+        alert.setContentText("");
+
+//        alert.show();//.showAndWait();
+        return alert;//.showAndWait();
     }
     
     
@@ -185,7 +205,7 @@ public class CustomUtility{
     }
 
     private static final String DATABASE_URL = "jdbc:mysql://localhost/sharesdb";
-    static final String USERNAME = "";
+    static final String USERNAME = "root";
     static final String PASSWORD = "";
     private Connection connection = null;
     private Statement statement = null;
