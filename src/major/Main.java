@@ -2,6 +2,8 @@ package major;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -11,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -19,17 +20,73 @@ import java.util.Optional;
 
 public class Main extends Application {
 
+    Button loginButton;
+    TextField userName;
+    PasswordField userPassword;
+    Scene loginScene;
+    Scene dashboardScene;
+    Stage primaryStage;
+    Parent root;
+
+
     @Override
     public void start(Stage primaryStage) throws Exception{
+        this.primaryStage = primaryStage;
 
-//        createCustomDialog();
-        Parent loginRoot = FXMLLoader.load(getClass().getResource("LoginLayout.fxml"));
-        primaryStage.setTitle("Login");
-        Scene loginScene = new Scene(loginRoot, 500, 600);
+        loginScene = new Scene(FXMLLoader.load(getClass().getResource("LoginLayout.fxml")));
+
+        loginButton = (Button) loginScene.lookup("#loginButton");
+        userName  = (TextField) loginScene.lookup("#username");
+        userPassword  = (PasswordField) loginScene.lookup("#userpassword");
+
+        loginButton.setOnAction(event -> {
+
+            ((Button)event.getSource()).setDisable(true);
+
+            Task<Boolean> task = new Task<Boolean>() {
+
+                @Override protected Boolean call() throws Exception {
+
+                    CustomUtility cu = new CustomUtility();
+
+                    boolean outcome =  cu.validateCredentials(userName.getText().toString(), userPassword.getText().toString());
+
+                    if(outcome)
+                        updateMessageA(ActionStates.Succeded);
+                    else
+                        updateMessageA(ActionStates.Failed);
+
+                    return outcome;
+
+                }
+
+                @Override protected void succeeded() {
+                    super.succeeded();
+                }
+
+                @Override protected void cancelled() {
+                    super.cancelled();
+                }
+
+                @Override protected void failed() {
+                    super.failed();
+                }
+            };
+
+            task.run();
+
+
+        });
+
+
+
         primaryStage.setScene(loginScene);
+        primaryStage.setTitle("Login");
         primaryStage.show();
-
-
+        primaryStage.sizeToScene();
+        primaryStage.setMinWidth(primaryStage.getWidth());
+        primaryStage.setMinHeight(primaryStage.getHeight());
+        primaryStage.setResizable(false);
 
 //        Parent root = FXMLLoader.load(getClass().getResource("BasicApplication.fxml"));
 //        primaryStage.setTitle("Hello World");
@@ -38,6 +95,49 @@ public class Main extends Application {
 //
 //        primaryStage.show();
     }
+
+    public void updateMessageA(ActionStates param) throws Exception{
+        if(param == ActionStates.Succeded){
+            loginButton.setDisable(true);
+//            CustomUtility.AlertHelper("Successful Login Message", "Successful Login",
+//                    "Login Was Successful", Alert.AlertType.INFORMATION).show();
+
+            primaryStage.hide();
+            dashboardScene = FXMLLoader.load(getClass().getResource("BasicApplication.fxml"));
+            primaryStage.setScene(dashboardScene);
+            primaryStage.setTitle("Welcome To Dashboard");
+            primaryStage.show();
+            primaryStage.sizeToScene();
+            primaryStage.setMinWidth(primaryStage.getWidth());
+            primaryStage.setMinHeight(primaryStage.getHeight());
+            primaryStage.setMaximized(true);
+//            primaryStage.setResizable(false);
+
+//        primaryStage.setTitle("Hello World");
+//        Scene theScene = new Scene(root, 700, 790);
+//        primaryStage.setScene(theScene);
+//
+//        primaryStage.show();
+
+
+        }else if(param == ActionStates.Failed){
+            loginButton.setDisable(false);
+            CustomUtility.AlertHelper("Unsuccessful Login Message", "Error Login",
+                    "Login Was Unsuccessful", Alert.AlertType.ERROR).show();
+        }
+    }
+
+
+
+    private enum ActionStates {
+        Cancled,
+        Failed,
+        Succeded;
+        ActionStates(){}
+    }
+
+
+
 
 
     public void createCustomDialog(){
@@ -102,5 +202,11 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+
+    @FXML
+    public void checkPassword(ActionEvent actionEvent) {
+
     }
 }

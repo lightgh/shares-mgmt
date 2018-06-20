@@ -31,7 +31,7 @@ public class Controller {
 
     @FXML
     public void checkPassword(ActionEvent actionEvent) {
-
+        
     }
 
     @FXML
