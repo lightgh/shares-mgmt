@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="490.0" prefWidth="700.0" styleClass="login_background" stylesheets="@loginlayout.css"
+            xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="major.AppLoginController">
+   <children>
+      <AnchorPane layoutX="180.0" layoutY="148.0" opacity="0.74" prefHeight="287.0" prefWidth="341.0" styleClass="login_panel">
+         <children>
+            <Button id="loginButton" fx:id="loginButton" layoutX="61.0" layoutY="186.0" mnemonicParsing="false"
+                    prefHeight="34.0" prefWidth="238.0" text="Login" textAlignment="CENTER" textFill="#000302">
+               <font>
+                  <Font name="DejaVu Sans Bold" size="14.0" />
+               </font>
+            </Button>
+         </children>
+      </AnchorPane>
+      <TextField id="username" fx:id="username" layoutX="241.0" layoutY="214.0" prefHeight="34.0" prefWidth="238.0" promptText="Username" />
+      <PasswordField id="userpassword" fx:id="password" layoutX="241.0" layoutY="262.0" prefHeight="34.0" prefWidth="238.0" promptText="**********" />
+      <Label alignment="CENTER" layoutX="35.0" layoutY="16.0" prefHeight="34.0" prefWidth="626.0" style="" styleClass="login_title" text="BAUCHI STATE HADA KAI" textAlignment="RIGHT" textFill="#192c1c" wrapText="true" />
+      <Label alignment="CENTER" layoutX="30.0" layoutY="35.0" prefHeight="50.0" prefWidth="637.0" style="" styleClass="login_title" text="CO-OPERATIVE SOCIETY" textAlignment="RIGHT" textFill="#192c1c" wrapText="true" />
+      <Label alignment="CENTER" layoutX="12.0" layoutY="77.0" prefHeight="34.0" prefWidth="679.0" style="-fx-background-color: chartreuse" styleClass="login_title" text="(BASHAKACS)" textAlignment="RIGHT" textFill="#192c1c" wrapText="false" />
+      <ImageView blendMode="OVERLAY" fitHeight="94.0" fitWidth="117.0" layoutX="305.0" layoutY="111.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@images/co-op-stronger-together.jpg" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
