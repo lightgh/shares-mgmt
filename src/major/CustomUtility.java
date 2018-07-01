@@ -324,10 +324,9 @@ public class CustomUtility{
 
     }
 
-    public static String getAppropriateStringFormat(String dateString, String TYPE){
+    public static String getAppropriateStringFormat(String dateString){
         String formatString = "";
 
-        if(TYPE == "LD"){
             if(dateString.matches("\\d{4}-\\d{2}-\\d{2}")){
                 formatString = "yyyy-MM-dd";
             }else if(dateString.matches("\\d{2}-\\d{2}-\\d{4}")){
@@ -347,59 +346,17 @@ public class CustomUtility{
             }else if(dateString.matches("\\d{4}/\\d{1}/\\d{1}")){
                 formatString = "yyyy/M/d";
             }
-        }else{
-            if(dateString.matches("\\d{4}-\\d{2}-\\d{2}")){
-                formatString = "yyyy-mm-dd";
-            }else if(dateString.matches("\\d{2}-\\d{2}-\\d{4}")){
-                formatString = "dd-mm-yyyy";
-            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{2}")){
-                formatString = "yyyy/mm/dd";
-            }else if(dateString.matches("\\d{2}/\\d{2}/\\d{4}")){
-                formatString = "dd/mm/yyyy";
-            }else if(dateString.matches("\\d{2}/\\d{1}/\\d{4}")){
-                formatString = "dd/m/yyyy";
-            }else if(dateString.matches("\\d{1}/\\d{2}/\\d{4}")){
-                formatString = "d/mm/yyyy";
-            }else if(dateString.matches("\\d{1}/\\d{1}/\\d{4}")){
-                formatString = "d/m/yyyy";
-            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{1}")){
-                formatString = "yyyy/mm/d";
-            }else if(dateString.matches("\\d{4}/\\d{1}/\\d{1}")){
-                formatString = "yyyy/m/d";
-            }
-        }
 
         return formatString;
     }
 
-    /**
-     * @deprecated Please Convert from Date to LocalDate to String
-     *              Or from String to LocalDate to Date not
-     *              Directly from String to Date or Date to String
-     *              1. Use getLocalDateFromString(String date)
-     *              2. The getDateFromLocalDate(LocalDate localDate)
-     *              3. Then LocalDateFromDate(Date date)
-     *              4. then getStringFromLocalDate(LocalDate date)
-     *              and the reverse too
-     * @param date
-     * @return
-     */
-    public static Date getDateFromString(String date){
-        Date tempDate = new Date();
-//        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-        DateFormat dateFormat = new SimpleDateFormat(getAppropriateStringFormat(date, "D"));
-        try {
-            tempDate = dateFormat.parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
 
-        return tempDate;
+    public static Date getDateFromString(String date){
+        return getDateFromLocalDate(getLocalDateFromString(date));
     }
 
     public static LocalDate getLocalDateFromString(String date){
-        pln(getAppropriateStringFormat(date, "LD"));
-        DateTimeFormatter dateTimeformatter = DateTimeFormatter.ofPattern(getAppropriateStringFormat(date, "LD"));
+        DateTimeFormatter dateTimeformatter = DateTimeFormatter.ofPattern(getAppropriateStringFormat(date));
 
         dateTimeformatter.toString();
         pln(dateTimeformatter.toString());
@@ -407,27 +364,16 @@ public class CustomUtility{
         return localDate;
     }
 
+
+    public static String getStringFromDate(Date date){
+        return getStringFromLocalDate(getLocalDateFromDate(date));
+    }
+
     /**
-     * @deprecated Please Convert from Date to LocalDate to String
-     *              Or from String to LocalDate to Date not
-     *              Directly from String to Date or Date to String
-     *              1. Use getLocalDateFromString(String date)
-     *              2. The getDateFromLocalDate(LocalDate localDate)
-     *              3. Then LocalDateFromDate(Date date)
-     *              4. then getStringFromLocalDate(LocalDate date)
-     *              and the reverse too
+     * Convert LocalDate to String format
      * @param date
      * @return
      */
-    public static String getStringFromDate(Date date){
-        StringBuilder tempDateString = new StringBuilder();
-        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
-
-        tempDateString.append(dateFormat.format(date));
-
-        return tempDateString.toString();
-    }
-
     public static String getStringFromLocalDate(LocalDate date){
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
