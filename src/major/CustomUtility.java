@@ -10,16 +10,23 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
-import org.hibernate.query.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Date;
-import java.util.logging.Level;
 
 public class CustomUtility{
 
@@ -102,7 +109,15 @@ public class CustomUtility{
         System.out.print(string);
     }
 
+    public static void p(String string){
+        System.out.print(string);
+    }
+
     public static void println(String string){
+        System.out.println(string);
+    }
+
+    public static void pln(String string){
         System.out.println(string);
     }
 
@@ -220,6 +235,20 @@ public class CustomUtility{
     private ResultSet resultSet = null;
 
     public static void main(String args [] ){
+
+//        LocalDate dt = getLocalDateFromString("12-06-2018");
+//        LocalDate dt = getLocalDateFromString("2018-06-12");
+        LocalDate dt = getLocalDateFromString("2018/12/6");
+//        pln(dt.toString());
+        pln(getStringFromLocalDate(dt));
+
+        Date td2 = getDateFromLocalDate(dt);
+        pln(td2.toString());
+        LocalDate dt2 = getLocalDateFromDate(td2);
+        pln("STR_FROM_LD: "+getStringFromLocalDate(dt2));
+
+        System.exit(0);
+
 //        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
         AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
         SessionFactory sessionFactory = CustomUtility.getSessionFactory();
@@ -240,45 +269,54 @@ public class CustomUtility{
         CustomUtility.println("Successfully inserted");
         sessionFactory.close();*/
 
+        String hql = "FROM MembershipAccount M WHERE M.accountNo='3501697105'";
+//        String hql = "FROM MembershipAccount M WHERE M.firstName LIKE 'Chinaka'";
+
         Transaction transactionA = session.beginTransaction();
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<MembershipAccount> query = builder.createQuery(MembershipAccount.class);
-        query.from(MembershipAccount.class);
+//        query.from(MembershipAccount.class);
+        Root<MembershipAccount> root = query.from(MembershipAccount.class);
+//        query.select(builder.construct(MembershipAccount.class, root.get("accountNo")));
 
-        CriteriaQuery<Long> queryCount = builder.createQuery(Long.class);
-        /*
-        List memberAccountList = session.createQuery(query).getResultList();
+        Query<MembershipAccount> memQ = session.createQuery(hql, MembershipAccount.class);
+//        List memberAccountList = session.createQuery(query).getResultList();
+        List<MembershipAccount> memberAccountList = memQ.list();
         MembershipAccount membershipAccount;
+
+        println("ACCOUNT_LISTING");
         for (Object memberAccount:
              memberAccountList) {
-            println("ACCOUNT_LISTING");
             membershipAccount = (MembershipAccount)memberAccount;
-            println(membershipAccount.getId() + " ");
-            println(membershipAccount.getAccountNo() + " ");
+            print(membershipAccount.getId() + " ");
+            print(membershipAccount.getAccountNo() + " ");
             println(membershipAccount.getFullName() + " ");
-        }*/
+        }
 
-        Root<MembershipAccount> root = query.from(MembershipAccount.class);
 
-        /*query.select(root).where(builder.equal(root.get("accountNo"), "3501697105"))
-                .where(builder.);
 
-        org.hibernate.query.Query<MembershipAccount> q= session.createQuery(query);
+//        query.select(root).where(builder.equal(root.get("accountNo"), "3501697105"));
+//                .where(builder.);
+
+
+
+        /*org.hibernate.query.Query<MembershipAccount> q= session.createQuery(query);
         MembershipAccount membershipAccountNow = q.getSingleResult();
         println(membershipAccountNow.getAccountNo());
         println(membershipAccountNow.getFullName());
         println(membershipAccountNow.getAddress());*/
 
-        queryCount.select(builder.count(root));
 
 //        Query<Long> longQuery = session.createQuery(queryCount);
 
 //        long count = queryCount..getSingleResult();
-        List<Object[]> countObj = session.createNativeQuery(
+        /*List<Object[]> countObj = session.createNativeQuery(
                 "SELECT count(*) as number FROM account_info" )
                 .list();
 
-        println("Count = "+(countObj.get(0) ));
+        println("Count = "+(countObj.get(0) ));*/
+
+//        List<MembershipAccount> =
 
         transactionA.commit();
 
@@ -286,4 +324,135 @@ public class CustomUtility{
 
     }
 
+    public static String getAppropriateStringFormat(String dateString, String TYPE){
+        String formatString = "";
+
+        if(TYPE == "LD"){
+            if(dateString.matches("\\d{4}-\\d{2}-\\d{2}")){
+                formatString = "yyyy-MM-dd";
+            }else if(dateString.matches("\\d{2}-\\d{2}-\\d{4}")){
+                formatString = "dd-MM-yyyy";
+            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{2}")){
+                formatString = "yyyy/MM/dd";
+            }else if(dateString.matches("\\d{2}/\\d{2}/\\d{4}")){
+                formatString = "dd/MM/yyyy";
+            }else if(dateString.matches("\\d{2}/\\d{1}/\\d{4}")){
+                formatString = "dd/M/yyyy";
+            }else if(dateString.matches("\\d{1}/\\d{2}/\\d{4}")){
+                formatString = "d/MM/yyyy";
+            }else if(dateString.matches("\\d{1}/\\d{1}/\\d{4}")){
+                formatString = "d/M/yyyy";
+            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{1}")){
+                formatString = "yyyy/MM/d";
+            }else if(dateString.matches("\\d{4}/\\d{1}/\\d{1}")){
+                formatString = "yyyy/M/d";
+            }
+        }else{
+            if(dateString.matches("\\d{4}-\\d{2}-\\d{2}")){
+                formatString = "yyyy-mm-dd";
+            }else if(dateString.matches("\\d{2}-\\d{2}-\\d{4}")){
+                formatString = "dd-mm-yyyy";
+            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{2}")){
+                formatString = "yyyy/mm/dd";
+            }else if(dateString.matches("\\d{2}/\\d{2}/\\d{4}")){
+                formatString = "dd/mm/yyyy";
+            }else if(dateString.matches("\\d{2}/\\d{1}/\\d{4}")){
+                formatString = "dd/m/yyyy";
+            }else if(dateString.matches("\\d{1}/\\d{2}/\\d{4}")){
+                formatString = "d/mm/yyyy";
+            }else if(dateString.matches("\\d{1}/\\d{1}/\\d{4}")){
+                formatString = "d/m/yyyy";
+            }else if(dateString.matches("\\d{4}/\\d{2}/\\d{1}")){
+                formatString = "yyyy/mm/d";
+            }else if(dateString.matches("\\d{4}/\\d{1}/\\d{1}")){
+                formatString = "yyyy/m/d";
+            }
+        }
+
+        return formatString;
+    }
+
+    /**
+     * @deprecated Please Convert from Date to LocalDate to String
+     *              Or from String to LocalDate to Date not
+     *              Directly from String to Date or Date to String
+     *              1. Use getLocalDateFromString(String date)
+     *              2. The getDateFromLocalDate(LocalDate localDate)
+     *              3. Then LocalDateFromDate(Date date)
+     *              4. then getStringFromLocalDate(LocalDate date)
+     *              and the reverse too
+     * @param date
+     * @return
+     */
+    public static Date getDateFromString(String date){
+        Date tempDate = new Date();
+//        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+        DateFormat dateFormat = new SimpleDateFormat(getAppropriateStringFormat(date, "D"));
+        try {
+            tempDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return tempDate;
+    }
+
+    public static LocalDate getLocalDateFromString(String date){
+        pln(getAppropriateStringFormat(date, "LD"));
+        DateTimeFormatter dateTimeformatter = DateTimeFormatter.ofPattern(getAppropriateStringFormat(date, "LD"));
+
+        dateTimeformatter.toString();
+        pln(dateTimeformatter.toString());
+        LocalDate localDate = LocalDate.parse(date, dateTimeformatter);
+        return localDate;
+    }
+
+    /**
+     * @deprecated Please Convert from Date to LocalDate to String
+     *              Or from String to LocalDate to Date not
+     *              Directly from String to Date or Date to String
+     *              1. Use getLocalDateFromString(String date)
+     *              2. The getDateFromLocalDate(LocalDate localDate)
+     *              3. Then LocalDateFromDate(Date date)
+     *              4. then getStringFromLocalDate(LocalDate date)
+     *              and the reverse too
+     * @param date
+     * @return
+     */
+    public static String getStringFromDate(Date date){
+        StringBuilder tempDateString = new StringBuilder();
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd");
+
+        tempDateString.append(dateFormat.format(date));
+
+        return tempDateString.toString();
+    }
+
+    public static String getStringFromLocalDate(LocalDate date){
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String dateString = date.format(formatter);
+
+        return dateString;
+    }
+
+    public static Date getDateFromLocalDate(LocalDate localDate){
+        Instant instant = localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
+        Date date = Date.from(instant);
+        return date;
+    }
+
+    public static LocalDate getLocalDateFromDate(Date date){
+        Instant instant = Instant.ofEpochMilli(date.getTime());
+        LocalDate localDate = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDate();
+        return localDate;
+    }
+
+    public static Alert AlertHelperTest(){
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Testing functionality such as working confirmation");
+        alert.setHeaderText("Test Heading");
+        alert.setContentText("Heading content");
+        return alert;
+    }
 }
