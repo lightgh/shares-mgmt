@@ -52,6 +52,11 @@ public class AccountNumberGenerator {
             return getNewAccountNo(length);
         }
 
+        // Ensure that the Generated Account Number is Unique and doesn't exists
+        if(ManageMembershipAccount.exists(newAccountNo)){
+            return getNewAccountNo(length);
+        }
+
         return newAccountNo;
 
     }
