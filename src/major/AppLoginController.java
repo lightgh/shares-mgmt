@@ -13,6 +13,7 @@ public class AppLoginController {
     @FXML private TextField username;
     @FXML private TextField password;
     @FXML private Button loginButton;
+
     private AppLoginManager appLoginManager;
 
     public void initialize() {}

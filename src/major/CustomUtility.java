@@ -239,8 +239,7 @@ public class CustomUtility{
 //        LocalDate dt = getLocalDateFromString("12-06-2018");
 //        LocalDate dt = getLocalDateFromString("2018-06-12");
         LocalDate dt = getLocalDateFromString("2018/12/6");
-//        pln(dt.toString());
-        pln(getStringFromLocalDate(dt));
+
 
         Date td2 = getDateFromLocalDate(dt);
         pln(td2.toString());
@@ -359,7 +358,7 @@ public class CustomUtility{
         DateTimeFormatter dateTimeformatter = DateTimeFormatter.ofPattern(getAppropriateStringFormat(date));
 
         dateTimeformatter.toString();
-        pln(dateTimeformatter.toString());
+
         LocalDate localDate = LocalDate.parse(date, dateTimeformatter);
         return localDate;
     }
