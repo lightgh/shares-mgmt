@@ -3,29 +3,37 @@ package major;
 /**
  * Created by chinakalight on 6/20/18.
  *
- * Main View Dashboard Controller
+ * MainViewDashboard Controller
  *
  */
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javafx.util.converter.LocalDateStringConverter;
 import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import sun.java2d.pipe.hw.AccelDeviceEventNotifier;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -68,6 +76,7 @@ public class MainViewDashboardController implements Initializable {
 
     TableFilter.Builder<TableMemberAccount> tableFilterBuilder;
     TableFilter<TableMemberAccount> tableFilter;
+    FilteredList<TableMemberAccount> filteredList;
 
     ObservableList<TableMemberAccount> observeMemberAccountListData = FXCollections.observableArrayList();
 
@@ -75,6 +84,10 @@ public class MainViewDashboardController implements Initializable {
     Session session = sessionFactory.openSession();
 
     AppLoginManager loginManager;
+
+
+    TableMemberAccount currentTableMemberAccount;
+    MembershipAccount currentMembershipAccount;
 
 
 
@@ -113,6 +126,14 @@ public class MainViewDashboardController implements Initializable {
 
     @FXML
     private Button updateCloseAccountButton;
+
+
+    @FXML
+    private Button buttonPrintAccountList;
+
+
+    @FXML
+    private TextField searchTextFieldAccountNumber;
 
 
 
@@ -169,8 +190,6 @@ public class MainViewDashboardController implements Initializable {
 
         naAddButton.setDisable(true);
 
-        LocalDateStringConverter localDateStringConverter = new LocalDateStringConverter();
-                String dateString = localDateStringConverter.toString(openDate);
         Task<MembershipAccount> task = new Task<MembershipAccount>() {
             String otherName = naOtherName.getText().toString().equals(null)? " ": naOtherName.getText();
             @Override protected MembershipAccount call() throws Exception {
@@ -186,7 +205,7 @@ public class MainViewDashboardController implements Initializable {
                 membA.setOtherName(otherName);
                 membA.setAddress(address);
                 membA.setClosing_date(new Date());
-                membA.setOpening_date(Date.from(openDate.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                membA.setOpening_date(CustomUtility.getDateFromLocalDate(openDate));
                 membA.setPhoneNo(phoneNo);
                 membA.setStatus(statusSelect.getSelectionModel().getSelectedItem().equals("Active")? 1 : 0);
                 session.save(membA);
@@ -248,7 +267,6 @@ public class MainViewDashboardController implements Initializable {
     public void updateTableAccountListDisplay(){
 
         Task<Boolean> task = new Task<Boolean>() {
-
 
             @Override protected Boolean call() throws Exception {
                 observeMemberAccountListData.clear();
@@ -372,16 +390,6 @@ public class MainViewDashboardController implements Initializable {
         tableViewAccountList.setTooltip(new Tooltip("Click On Any Of the Account List To Update Information"));
 
         tableViewAccountList.setItems(observeMemberAccountListData);
-        /*tableFilterBuilder = TableFilter.forTableView(tableViewAccountList);
-        tableFilter = tableFilterBuilder.apply();
-
-        tableFilter.setSearchStrategy((input,target) -> {
-            try {
-                return target.matches(input);
-            } catch (Exception e) {
-                return false;
-            }
-        });*/
 
 
         statusSelect1.getItems().addAll(
@@ -401,30 +409,33 @@ public class MainViewDashboardController implements Initializable {
         tableViewAccountList.setOnMouseClicked(event -> {
 
             if(event.getClickCount() == 2) {
-                TableMemberAccount tableMemberAccount = tableViewAccountList.getSelectionModel().getSelectedItem();
-                MembershipAccount membershipAccount = ManageMembershipAccount.getMemberAccountFromTableMemberAccount(tableMemberAccount);
-                showUpdateView(membershipAccount);
+                currentTableMemberAccount = tableViewAccountList.getSelectionModel().getSelectedItem();
+                currentMembershipAccount = ManageMembershipAccount.getMemberAccountFromTableMemberAccount(currentTableMemberAccount);
+                showUpdateView();
             }
         });
 
     }
 
-    public void showUpdateView(MembershipAccount membershipAccount){
+    public void showUpdateView(){
+
+        if(this.currentMembershipAccount == null || this.currentTableMemberAccount == null) return;
+
         accountMgmtSection.getSelectionModel().select(addAccountTabSection1);
         addAccountTabSection.setDisable(true);
         accountListTabSection.setDisable(true);
         addAccountTabSection1.setDisable(false);
 
-        naFirstName1.setText(membershipAccount.getFirstName());
-        naLastName1.setText(membershipAccount.getLastName());
-        naOtherName1.setText(membershipAccount.getOtherName());
-        naPhoneNo1.setText(membershipAccount.getPhoneNo());
-        naAddress1.setText(membershipAccount.getAddress());
-        naAccountNo1.setText(membershipAccount.getAccountNo());
-        LocalDate localDateOpening = CustomUtility.getLocalDateFromDate(membershipAccount.getOpening_date());
+        naFirstName1.setText(currentMembershipAccount.getFirstName());
+        naLastName1.setText(currentMembershipAccount.getLastName());
+        naOtherName1.setText(currentMembershipAccount.getOtherName());
+        naPhoneNo1.setText(currentMembershipAccount.getPhoneNo());
+        naAddress1.setText(currentMembershipAccount.getAddress());
+        naAccountNo1.setText(currentMembershipAccount.getAccountNo());
+        LocalDate localDateOpening = CustomUtility.getLocalDateFromDate(currentMembershipAccount.getOpening_date());
         naOpenDate1.setValue(localDateOpening);
         naOpenDate1.setEditable(false);
-        statusSelect1.getSelectionModel().select(membershipAccount.getStatus()==1? "Active" : "InActive");
+        statusSelect1.getSelectionModel().select(currentMembershipAccount.getStatus()==1? "Active" : "InActive");
 
         //Button To Update the Record
         updateAccountButton.setOnAction(event -> {
@@ -456,14 +467,14 @@ public class MainViewDashboardController implements Initializable {
 
             Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
             Transaction transactionA = session.beginTransaction();
-            membershipAccount.setAddress(address);
-            membershipAccount.setFirstName(firstName);
-            membershipAccount.setLastName(lastName);
-            membershipAccount.setOtherName(otherName);
-            membershipAccount.setAccountNo(naAccountNo1.getText());
-            membershipAccount.setPhoneNo(phoneNo);
-            session.saveOrUpdate(membershipAccount);
-            membershipAccount.setStatus(statusSelect1.getSelectionModel().getSelectedItem()=="Active"? 1 : 0);
+            currentMembershipAccount.setAddress(address);
+            currentMembershipAccount.setFirstName(firstName);
+            currentMembershipAccount.setLastName(lastName);
+            currentMembershipAccount.setOtherName(otherName);
+            currentMembershipAccount.setAccountNo(naAccountNo1.getText());
+            currentMembershipAccount.setPhoneNo(phoneNo);
+            session.saveOrUpdate(currentMembershipAccount);
+            currentMembershipAccount.setStatus(statusSelect1.getSelectionModel().getSelectedItem()=="Active"? 1 : 0);
             transactionA.commit();
 
             CustomUtility.AlertHelper("Update Account Information", "Account Update Information",
@@ -501,5 +512,121 @@ public class MainViewDashboardController implements Initializable {
 
     public void viewRegisteredAccount(KeyEvent keyEvent) {
         CustomUtility.println(tableViewAccountList.getSelectionModel().getTableView().getItems().getClass().getName());
+    }
+
+
+    @FXML
+    public void searchRecordsHere(KeyEvent keyEvent) {
+        filteredList = new FilteredList<TableMemberAccount>(observeMemberAccountListData, p->true);
+        searchTextFieldAccountNumber.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredList.setPredicate(pere -> {
+                if(newValue == null || newValue.isEmpty()){
+                    return true;
+                }
+                String typedText = newValue.toLowerCase();
+
+                if(pere.getAccountNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getFirstName().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getLastName().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getOtherName().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getPhoneNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                return false;
+            });
+
+            SortedList<TableMemberAccount> sortedList = new SortedList<TableMemberAccount>(filteredList);
+            sortedList.comparatorProperty().bind(tableViewAccountList.comparatorProperty());
+            tableViewAccountList.setItems(sortedList);
+        });
+    }
+
+
+    @FXML
+    public void makeDepositAction(ActionEvent actionEvent) throws Exception {
+
+        if(this.currentTableMemberAccount==null  || this.currentMembershipAccount == null) return;
+
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("MakeDepositView.fxml")
+        );
+
+        Scene scene = new Scene((Parent) loader.load(), 1000, 950);
+
+        Stage makeDepositScene = new Stage();
+
+        makeDepositScene.setScene(scene);
+        makeDepositScene.setTitle("Make Deposit");
+        makeDepositScene.initModality(Modality.APPLICATION_MODAL);
+
+        makeDepositScene.setMaximized(true);
+
+        makeDepositScene.setOnCloseRequest(e->{
+            e.consume();
+        });
+
+
+        VBox makeDepositVBox = (VBox) loader.getNamespace().get("makeDepositVBox");
+
+        Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");;
+        Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");;
+        Label  labelID = (Label)loader.getNamespace().get("labelID");;
+
+        //use this to set the values displayed in the FXML file
+        fullNameDisplay.setText(this.currentMembershipAccount.getFullName());
+        accountNumberDisplay.setText(this.currentMembershipAccount.getAccountNo());
+        // set but hidden
+        labelID.setId(String.valueOf(this.currentMembershipAccount.getId()));
+
+
+        // reference to the table
+        TableView<AccountTransaction> tableViewDeposits = (TableView) loader.getNamespace().get("tableViewDeposits");
+        TableColumn<AccountTransaction, String> colID =  (TableColumn)loader.getNamespace().get("colID");
+        TableColumn<AccountTransaction, String> colSN = (TableColumn)loader.getNamespace().get("colSN");
+        TableColumn<AccountTransaction, BigDecimal> colAmount = (TableColumn)loader.getNamespace().get("colAmount");
+        TableColumn<AccountTransaction, String> colType = (TableColumn)loader.getNamespace().get("colType");
+        TableColumn<AccountTransaction, String> colComment = (TableColumn)loader.getNamespace().get("colComment");
+        TableColumn<AccountTransaction, Date> colDate = (TableColumn)loader.getNamespace().get("colDate");
+        TableColumn<AccountTransaction, String> colAccountNo = (TableColumn)loader.getNamespace().get("colAccountNo");
+
+
+        colID.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colSN.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colType.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("transaction_type"));
+        colAmount.setCellValueFactory(new PropertyValueFactory<AccountTransaction, BigDecimal>("amount"));
+        colComment.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("description"));
+        colDate.setCellValueFactory(new PropertyValueFactory<AccountTransaction, Date>("transaction_date"));
+        colAccountNo.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("accountNo"));
+
+        colID.setVisible(false);
+        colSN.setVisible(false);
+
+        tableViewDeposits.getColumns().setAll(colID, colSN, colAmount, colType, colComment, colDate);
+
+        tableViewDeposits.setItems(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo()));
+
+
+        Button closeButton = (Button)loader.getNamespace().get("closeButton");
+
+        closeButton.setOnAction(event -> {
+            makeDepositScene.close();
+        });
+
+        makeDepositScene.showAndWait();
+
+
     }
 }

@@ -92,6 +92,7 @@ public class AppLoginManager {
             this.stage.sizeToScene();
             this.stage.setMaximized(true);
             this.stage.setTitle("Shares Application Dashboard");
+
         } catch (IOException ex) {
             Logger.getLogger(AppLoginManager.class.getName()).log(Level.SEVERE, null, ex);
         }

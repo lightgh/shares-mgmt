@@ -21,6 +21,25 @@ public class SharesManagementApplication extends Application {
 //            appLoginManager.showLoginScreen();
             appLoginManager.authenticated("");
 
+
+            stage.setOnCloseRequest(e-> {
+                e.consume();
+                boolean answer = false;
+
+                try {
+
+                    answer = CustomUtility.ConfirmationAlertHelper("Close Application Confirmation",
+                            "Are You Sure that you want to Exit this Application");
+
+                    if(answer){
+                        stage.close();
+                        System.exit(0);
+                    }
+
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            });
             stage.setScene(scene);
             stage.show();
 

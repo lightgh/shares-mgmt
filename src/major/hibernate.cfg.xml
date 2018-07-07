@@ -29,6 +29,7 @@
 
         <!-- Mapping classes -->
         <mapping class="major.MembershipAccount" />
+        <mapping class="major.AccountTransaction" />
 
     </session-factory>
 </hibernate-configuration>

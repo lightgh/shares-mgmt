@@ -28,7 +28,7 @@
 
 <!--<?import javafx.scene.effect.Light.Distant?>-->
 
-<VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="710.0" prefWidth="1281.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="major.MainViewDashboardController">
+<VBox minHeight="-Infinity" minWidth="-Infinity" prefHeight="857.0" prefWidth="1281.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="major.MainViewDashboardController">
         <children>
           <MenuBar VBox.vgrow="NEVER">
             <menus>
@@ -80,11 +80,11 @@
                                           <Insets bottom="10.0" right="10.0" top="10.0" />
                                        </padding>
                                     </AnchorPane>
-                                    <AnchorPane layoutX="195.0" layoutY="41.0" prefHeight="596.0" prefWidth="905.0" AnchorPane.leftAnchor="195.0" AnchorPane.rightAnchor="0.0">
+                                    <AnchorPane layoutX="195.0" layoutY="41.0" prefHeight="596.0" prefWidth="1081.0" AnchorPane.bottomAnchor="-9.0" AnchorPane.leftAnchor="195.0" AnchorPane.rightAnchor="-49.0" AnchorPane.topAnchor="41.0">
                                        <children>
-                                          <ScrollPane layoutX="8.0" layoutY="-5.0" prefHeight="578.0" prefWidth="927.0" AnchorPane.leftAnchor="8.0" AnchorPane.rightAnchor="0.0">
+                                          <ScrollPane layoutX="8.0" layoutY="-5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="8.0" AnchorPane.topAnchor="0.0">
                                              <content>
-                                                <TabPane fx:id="accountMgmtSection" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="576.0" prefWidth="1035.0" tabClosingPolicy="UNAVAILABLE">
+                                                <TabPane fx:id="accountMgmtSection" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="576.0" prefWidth="1125.0" tabClosingPolicy="UNAVAILABLE">
                                                   <tabs>
                                                     <Tab fx:id="addAccountTabSection" text="Add Account">
                                                       <content>
@@ -170,11 +170,11 @@
                                                             </AnchorPane>
                                                       </content>
                                                     </Tab>
-                                                    <Tab fx:id="accountListTabSection" disable="true" text="Account List">
+                                                    <Tab fx:id="accountListTabSection" text="Account List">
                                                       <content>
-                                                        <AnchorPane fx:id="accountListTab" minHeight="0.0" minWidth="0.0" prefHeight="543.0" prefWidth="966.0">
+                                                        <AnchorPane fx:id="accountListTab" minHeight="0.0" minWidth="0.0" prefHeight="674.0" prefWidth="1125.0">
                                                                <children>
-                                                                   <TableView fx:id="tableViewAccountList" layoutX="20.0" layoutY="51.0" onKeyReleased="#viewRegisteredAccount" prefHeight="485.0" prefWidth="821.0" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="51.0">
+                                                                   <TableView fx:id="tableViewAccountList" layoutX="20.0" layoutY="90.0" onKeyReleased="#viewRegisteredAccount" prefHeight="502.0" prefWidth="1050.0" AnchorPane.bottomAnchor="-49.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="55.0" AnchorPane.topAnchor="90.0">
                                                                        <columns>
                                                                            <TableColumn fx:id="raclFirstName" prefWidth="105.0" text="First Name" />
                                                                            <TableColumn fx:id="raclLastName" prefWidth="45.0" text="Last Name" />
@@ -195,15 +195,35 @@
                                                                      </font>
                                                                   </Label>
                                                             <Button fx:id="buttonPrintAccountList" layoutX="561.0" layoutY="11.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="164.0" text="Print Account List" />
+                                                            <HBox layoutX="21.0" layoutY="43.0" prefHeight="36.0" prefWidth="998.0" spacing="5.0">
+                                                               <children>
+                                                                  <Label text="Search Record:">
+                                                                     <HBox.margin>
+                                                                        <Insets left="10.0" right="5.0" top="5.0" />
+                                                                     </HBox.margin>
+                                                                  </Label>
+                                                                  <TextField fx:id="searchTextFieldAccountNumber" onKeyTyped="#searchRecordsHere" prefHeight="26.0" prefWidth="255.0" promptText="Search/Filter Records Here">
+                                                                     <HBox.margin>
+                                                                        <Insets left="10.0" top="5.0" />
+                                                                     </HBox.margin>
+                                                                  </TextField>
+                                                               </children>
+                                                               <opaqueInsets>
+                                                                  <Insets right="5.0" top="5.0" />
+                                                               </opaqueInsets>
+                                                               <padding>
+                                                                  <Insets right="5.0" />
+                                                               </padding>
+                                                            </HBox>
                                                                </children>
                                                             </AnchorPane>
                                                       </content>
                                                     </Tab>
-                                                <Tab fx:id="addAccountTabSection1" disable="true" text="Update Account">
+                                                <Tab fx:id="addAccountTabSection1" text="Update Account">
                                                    <content>
                                                       <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                                          <children>
-                                                            <VBox layoutX="44.0" layoutY="20.0" prefHeight="523.0" prefWidth="587.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="44.0" AnchorPane.rightAnchor="404.0" AnchorPane.topAnchor="20.0">
+                                                            <VBox layoutX="23.0" layoutY="20.0" prefHeight="523.0" prefWidth="437.0" style="-fx-border-width: 2px; -fx-border-color: #eee;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="23.0" AnchorPane.rightAnchor="665.0" AnchorPane.topAnchor="20.0">
                                                                <children>
                                                                   <HBox prefHeight="31.0" prefWidth="587.0" spacing="15.0">
                                                                      <children>
@@ -242,6 +262,9 @@
                                                                         <Label prefHeight="16.0" prefWidth="84.0" text="PhoneNo:" />
                                                                         <TextField fx:id="naPhoneNo1" minWidth="-Infinity" prefHeight="26.0" prefWidth="273.0" promptText="Phone No" />
                                                                      </children>
+                                                                     <padding>
+                                                                        <Insets left="5.0" />
+                                                                     </padding>
                                                                   </HBox>
                                                                   <HBox layoutX="10.0" layoutY="190.0" prefHeight="61.0" prefWidth="418.0" spacing="10.0">
                                                                      <children>
@@ -283,6 +306,49 @@
                                                                      </graphic>
                                                                   </Button>
                                                                </children>
+                                                               <padding>
+                                                                  <Insets left="10.0" />
+                                                               </padding>
+                                                            </VBox>
+                                                            <VBox layoutX="551.0" layoutY="46.0" prefHeight="293.0" prefWidth="312.0">
+                                                               <children>
+                                                                  <HBox layoutX="15.0" layoutY="15.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Button fx:id="btnMakeDeposit" mnemonicParsing="false" onAction="#makeDepositAction" prefHeight="48.0" prefWidth="151.0" text="Make Deposit" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnViewDeposits" mnemonicParsing="false" prefHeight="47.0" prefWidth="141.0" text="View Deposit" textAlignment="CENTER" />
+                                                                     </children>
+                                                                     <VBox.margin>
+                                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                                     </VBox.margin>
+                                                                  </HBox>
+                                                                  <HBox prefHeight="56.0" prefWidth="253.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Button fx:id="btnBuyShares" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Buy Shares" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnViewShares" mnemonicParsing="false" prefHeight="47.0" prefWidth="138.0" text="View Shares" textAlignment="CENTER" />
+                                                                     </children>
+                                                                     <VBox.margin>
+                                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                                     </VBox.margin>
+                                                                  </HBox>
+                                                                  <HBox layoutX="15.0" layoutY="81.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Button fx:id="btnMakeWithdrawal" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Make Withdrawals" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnViewWithdrawals" mnemonicParsing="false" prefHeight="47.0" prefWidth="142.0" text="View Withdrawals" textAlignment="CENTER" />
+                                                                     </children>
+                                                                     <VBox.margin>
+                                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                                     </VBox.margin>
+                                                                  </HBox>
+                                                                  <HBox layoutX="15.0" layoutY="148.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
+                                                                     <children>
+                                                                        <Button fx:id="btnTakeLoan" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Take Loan" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnReturnLoan" mnemonicParsing="false" prefHeight="47.0" prefWidth="142.0" text="Return Loan" textAlignment="CENTER" />
+                                                                     </children>
+                                                                     <padding>
+                                                                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                                     </padding>
+                                                                  </HBox>
+                                                               </children>
                                                             </VBox>
                                                          </children>
                                                       </AnchorPane>
@@ -294,7 +360,7 @@
                                           </ScrollPane>
                                        </children>
                                     </AnchorPane>
-                                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="202.0" layoutY="4.0" prefHeight="25.0" prefWidth="857.0" style="&#10;" text="Account Management Section" textAlignment="CENTER" textFill="#b20a0a" wrapText="false">
+                                <Label alignment="CENTER" contentDisplay="CENTER" layoutX="202.0" layoutY="4.0" prefHeight="25.0" prefWidth="1057.0" style="&#10;" text="Account Management Section" textAlignment="CENTER" textFill="#b20a0a" wrapText="false" AnchorPane.leftAnchor="202.0" AnchorPane.rightAnchor="22.0">
                                   <font>
                                     <Font name="DejaVu Sans Bold" size="20.0" />
                                   </font>
@@ -309,11 +375,11 @@
                            <children>
                               <Pane layoutX="2.0" layoutY="2.0" prefHeight="80.0" prefWidth="1275.0" style="-fx-background-color: #2F40DA;" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="2.0">
                                  <children>
-                                    <Button layoutX="549.0" layoutY="27.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="116.0" text="Add Shares" />
+                                    <Button layoutX="553.0" layoutY="20.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="116.0" text="Add Shares" />
                                     <Button contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="89.0" text="Home" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="14.0" layoutY="90.0" prefHeight="518.0" prefWidth="1257.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="90.0" />
+                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="1063.0" AnchorPane.topAnchor="84.0" />
                            </children></AnchorPane>
                         </content>
                       </Tab>
@@ -321,7 +387,7 @@
                   </TabPane>
             </children>
           </AnchorPane>
-            <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0">
+            <HBox id="HBox" alignment="CENTER_LEFT" prefHeight="8.0" prefWidth="1281.0" spacing="5.0">
                <children>
                   <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Left status" HBox.hgrow="ALWAYS">
                      <font>
@@ -331,7 +397,7 @@
                         <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
                      </textFill>
                   </Label>
-                  <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS" />
+                  <Pane prefHeight="91.0" prefWidth="1139.0" HBox.hgrow="ALWAYS" />
                   <Label font="$x3" maxWidth="-1.0" text="Right status" textFill="$x4" HBox.hgrow="NEVER" />
                </children>
                <padding>

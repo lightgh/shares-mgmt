@@ -2,7 +2,18 @@
 package major;
 
 
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -16,6 +27,7 @@ import org.hibernate.service.ServiceRegistry;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.io.IOException;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -32,6 +44,7 @@ public class CustomUtility{
 
 
     private static final SessionFactory sessionFactory;
+    private static boolean okAnswer = false;
 
     private static ServiceRegistry serviceRegistry;
 
@@ -102,6 +115,66 @@ public class CustomUtility{
         alert.setContentText(contentText);
 
         return alert;
+    }
+
+
+    public static Alert AlertHelper(String title, String headerText, String contentText, String E){
+        Alert.AlertType alertType = Alert.AlertType.INFORMATION;
+
+        Alert alert = new Alert(alertType);
+
+        if(E == "E"){
+             alertType = Alert.AlertType.ERROR;
+
+        }else if(E == "C"){
+            alertType = Alert.AlertType.CONFIRMATION;
+        }
+
+
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+
+        return alert;
+    }
+
+
+    public static boolean ConfirmationAlertHelper(String title, String content) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                CustomUtility.class.getResource("ConfirmAlert.fxml")
+        );
+
+        Scene scene = new Scene((Parent) loader.load(), 363, 234);
+
+        Stage dialogStage = new Stage();
+
+        dialogStage.setScene(scene);
+        dialogStage.setTitle("Alert " + title);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+        Label labelTitle = (Label)loader.getNamespace().get("alertTitleLabel");
+        Label labelContent = (Label)loader.getNamespace().get("alertContentLabel");
+
+        labelTitle.setText(title);
+        labelContent.setText(content);
+
+        Button btn_ok = (Button)loader.getNamespace().get("btnConfirmOk");
+        Button btn_cancel = (Button)loader.getNamespace().get("btnConfirmCancel");
+
+        btn_ok.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okAnswer = true;
+        });
+
+        btn_cancel.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okAnswer = false;
+        });
+
+        dialogStage.showAndWait();
+
+        return okAnswer;
     }
 
 
