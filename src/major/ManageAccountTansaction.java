@@ -14,7 +14,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -87,7 +89,30 @@ public class ManageAccountTansaction {
 
     }
 
+    public static BigDecimal getTotal(ObservableList<AccountTransaction> accountTransactions){
 
+        CustomUtility.pln("TE-ST-1: " +accountTransactions.size());
+
+        BigDecimal sum = BigDecimal.ZERO;
+
+        if(accountTransactions == null)
+            return sum;
+
+        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
+        /*accountTransactions.forEach((temp)->{
+            sum = sum.add(temp.getAmount());
+        });*/
+
+        Iterator<AccountTransaction> iterator =  accountTransactions.iterator();
+        while (iterator.hasNext()){
+            sum = sum.add(iterator.next().getAmount());
+        }
+
+        CustomUtility.pln("SUMATION: " + sum.toString());
+        CustomUtility.pln("TE-ST-3: " +accountTransactions.size());
+
+        return sum;
+    }
 
 
     public static ObservableList<AccountTransaction> getAllAccountTransactionList(){

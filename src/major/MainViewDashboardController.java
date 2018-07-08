@@ -581,9 +581,11 @@ public class MainViewDashboardController implements Initializable {
 
         VBox makeDepositVBox = (VBox) loader.getNamespace().get("makeDepositVBox");
 
-        Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");;
-        Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");;
-        Label  labelID = (Label)loader.getNamespace().get("labelID");;
+        Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");
+        Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");
+        Label  labelID = (Label)loader.getNamespace().get("labelID");
+        Label totalLabelSumDeposit = (Label)loader.getNamespace().get("totalLabelSumDeposit");
+        Label accountBalance = (Label)loader.getNamespace().get("accountBalance");
 
         //use this to set the values displayed in the FXML file
         fullNameDisplay.setText(this.currentMembershipAccount.getFullName());
@@ -615,9 +617,17 @@ public class MainViewDashboardController implements Initializable {
         colSN.setVisible(false);
 
         tableViewDeposits.getColumns().setAll(colID, colSN, colAmount, colType, colComment, colDate);
+        ObservableList<AccountTransaction> observableListCredit = FXCollections.observableArrayList();
+        ObservableList<AccountTransaction> observableListDebit = FXCollections.observableArrayList();
+                observableListCredit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo(), ManageAccountTansaction.CREDIT));
+                observableListDebit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo(), ManageAccountTansaction.DEBIT));
+        tableViewDeposits.setItems(observableListCredit);
+        CustomUtility.pln(observableListCredit.size() + "");
+        BigDecimal totalCredited = ManageAccountTansaction.getTotal(observableListCredit);
+        BigDecimal totalDebited = ManageAccountTansaction.getTotal(observableListDebit);
+        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", totalCredited.doubleValue()));
 
-        tableViewDeposits.setItems(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo()));
-
+        accountBalance.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", (totalCredited.doubleValue()-totalDebited.doubleValue())));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 

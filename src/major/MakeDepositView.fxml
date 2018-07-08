@@ -210,7 +210,7 @@
                                                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                          </columnResizePolicy>
                                                       </TableView>
-                                                      <Label alignment="CENTER" prefHeight="26.0" prefWidth="495.0" text="TOTAL DEPOSITED SUM IS: " />
+                                                      <Label fx:id="totalLabelSumDeposit" alignment="CENTER" prefHeight="26.0" prefWidth="495.0" text="TOTAL DEPOSITED SUM IS: " />
                                                    </children>
                                                 </VBox>
                                              </children>
