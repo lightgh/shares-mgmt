@@ -627,7 +627,7 @@ public class MainViewDashboardController implements Initializable {
         BigDecimal totalDebited = ManageAccountTansaction.getTotal(observableListDebit);
         totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", totalCredited.doubleValue()));
 
-        accountBalance.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", (totalCredited.doubleValue()-totalDebited.doubleValue())));
+        accountBalance.setText(String.format("%s%.3f","", (totalCredited.doubleValue()-totalDebited.doubleValue())));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 

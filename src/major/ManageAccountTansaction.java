@@ -59,9 +59,9 @@ public class ManageAccountTansaction {
     public static ObservableList<AccountTransaction> getAccountTransactionsForAccountNo(String accountNo, int type) throws Exception {
         String hql = "";
         if(type == ManageAccountTansaction.DEBIT ){
-            hql = "FROM AccountTransaction A WHERE A.accountNo='"+accountNo+"'";
+            hql = "FROM AccountTransaction A WHERE A.accountNo='"+accountNo+"' AND A.transaction_type='DEBIT'";
         }else if(type == ManageAccountTansaction.CREDIT ){
-            hql = "FROM AccountTransaction A WHERE A.accountNo='"+accountNo+"'";
+            hql = "FROM AccountTransaction A WHERE A.accountNo='"+accountNo+"' AND A.transaction_type='CREDIT'";
         }else if(type == ManageAccountTansaction.BOTH){
             hql = "FROM AccountTransaction A WHERE A.accountNo='"+accountNo+"'";
         }else{
