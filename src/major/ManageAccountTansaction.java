@@ -10,13 +10,8 @@ import org.hibernate.query.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigDecimal;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 /**
@@ -28,28 +23,6 @@ public class ManageAccountTansaction {
     public static int CREDIT = 1;
     public static int DEBIT = 2;
     public static int BOTH = 3;
-
-    public static boolean exists(String accountNo){
-
-        CustomUtility customUtility = new CustomUtility();
-        ResultSet rs = customUtility.queryDB("SELECT `id`, `first_name`, `last_name`, `other_name`, `phone_no`, `address`, " +
-                " `account_no`, `opening_date`, `closing_date`, `status` FROM `account_info` WHERE `account_no`='"+accountNo+"'");
-        int count = 0;
-
-        try {
-            while (rs.next()){
-                count++;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if(count == 0)
-            return false;
-        else
-            return true;
-    }
-
 
 
     public static ObservableList<AccountTransaction> getAccountTransactionsForAccountNo(String accountNo) throws Exception {
