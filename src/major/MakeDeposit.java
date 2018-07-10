@@ -7,8 +7,12 @@ import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.print.Printer;
+import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -350,4 +354,31 @@ public class MakeDeposit {
         this.naAmount.setText("");
     }
 
+    public void btnPrintAccountDeposit(ActionEvent actionEvent) {
+        Printer printer = Printer.getDefaultPrinter();
+        Stage dialogStage = new Stage(StageStyle.DECORATED);
+        PrinterJob printerJob = PrinterJob.createPrinterJob();
+
+        if (printerJob != null) {
+            boolean showDialog = printerJob.showPageSetupDialog(dialogStage);
+            if (showDialog) {
+                tableViewDeposits.setScaleX(0.60);
+                tableViewDeposits.setScaleY(0.60);
+                tableViewDeposits.setTranslateX(-220);
+                tableViewDeposits.setTranslateY(-70);
+                boolean success = printerJob.showPrintDialog(dialogStage);
+//                boolean success = printerJob.printPage(tableViewDeposits);
+                if (success) {
+                    printerJob.endJob();
+                    printerJob.showPrintDialog(dialogStage);
+//                    printerJob.
+                }
+                tableViewDeposits.setTranslateX(0);
+                tableViewDeposits.setTranslateY(0);
+                tableViewDeposits.setScaleX(1.0);
+                tableViewDeposits.setScaleY(1.0);
+            }
+        }
+
+    }
 }
