@@ -6,11 +6,13 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.print.Printer;
 import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.hibernate.Session;
@@ -53,6 +55,9 @@ public class MakeDeposit {
     private Label accountBalance;
 
     @FXML
+    private Label totalLabelSumDeposit;
+
+    @FXML
     private TextField naAmount;
 
     @FXML
@@ -72,6 +77,9 @@ public class MakeDeposit {
 
     @FXML
     private TableView<AccountTransaction> tableViewDeposits;
+
+    @FXML
+    private TableView<AccountTransaction> tableViewWithdrawals;
 
     @FXML
     private TableColumn<AccountTransaction, String> colID;
@@ -94,8 +102,71 @@ public class MakeDeposit {
     @FXML
     private TableColumn<AccountTransaction, Date> colDate;
 
-    ObservableList<AccountTransaction> observeAccountTransactionListData = FXCollections.observableArrayList();
+    @FXML
+    private TableColumn<AccountTransaction, String> colID1;
 
+    @FXML
+    private TableColumn<AccountTransaction, String> colSN1;
+
+    @FXML
+    private TableColumn<AccountTransaction, String> colAccountNo1;
+
+    @FXML
+    private TableColumn<AccountTransaction, BigDecimal> colAmount1;
+
+    @FXML
+    private TableColumn<AccountTransaction, String> colType1;
+
+    @FXML
+    private TableColumn<AccountTransaction, String> colComment1;
+
+    @FXML
+    private TableColumn<AccountTransaction, Date> colDate1;
+
+    //Track Credit Transactions
+    ObservableList<AccountTransaction> observeAccountCreditTransactionListData = FXCollections.observableArrayList();
+
+    //Track Debit Transactions
+    ObservableList<AccountTransaction> observeAccountDebitTransactionListData = FXCollections.observableArrayList();
+
+    @FXML
+    private TextField naAmount1;
+
+    @FXML
+    private TextArea textAreaTransDescription1;
+
+    @FXML
+    private TextField naAccountNo1;
+
+    @FXML
+    private DatePicker naTransactionDate1;
+
+    @FXML
+    private Button naAddButton1;
+
+    @FXML
+    private TabPane tabpaneActionSection;
+
+    @FXML
+    private Tab makeDepostActionTab;
+
+    @FXML
+    private Tab makeWithdrawalActionTab;
+
+    @FXML
+    private TabPane tabpaneViewSection;
+
+    @FXML
+    private Tab makeDepostViewTab;
+
+    @FXML
+    private Tab makeWithdrawalViewTab;
+
+    @FXML
+    private Label totalLabelSumWithdrawn;
+
+    @FXML
+    private TextField filterWithdrawalList;
 
 
     @FXML
@@ -105,16 +176,18 @@ public class MakeDeposit {
     private Label labelID;
 
     private FilteredList<AccountTransaction> filteredList;
+    private FilteredList<AccountTransaction> filteredListWithdrawal;
 
 
     private SortedList<AccountTransaction> sortedList;
+    private SortedList<AccountTransaction> sortedListWithdrawal;
 
 
 
-    private boolean error = false;
-    private BigDecimal amount = null;
-    private LocalDate transactionDate = null;
-    private String trasactionDescription = "";
+    private boolean error = false, errorDebit;
+    private BigDecimal amount = null, amountDebit = null;
+    private LocalDate transactionDate = null, transactionDebitDate = null;
+    private String trasactionDescription = "", transactionDebitDescription = "";
 
 
     @FXML
@@ -128,7 +201,7 @@ public class MakeDeposit {
     public void UpdateView(){
 
         prepareAccountTransactionListTable();
-        updateAccountTrasactionList(accountNumberDisplay.getText());
+        updateAccountTransactionList(accountNumberDisplay.getText());
         CustomUtility.pln("TESTING - TESTING-AccountNo-: " + accountNumberDisplay.getText());
     }
 
@@ -143,15 +216,14 @@ public class MakeDeposit {
             transactionDate = naTransactionDate.getValue();
 
             if (
-                    amount.equals(null) ||
-                            amount.equals(0) ||
-                            amount.doubleValue() < 100 ||
-                            trasactionDescription.equals(null) ||
-                            trasactionDescription.trim() == "" ||
-                            transactionDate == null ||
-                            transactionDate.toString().trim() == ""
-
-                    ) {
+               amount.equals(null) ||
+               amount.equals(0) ||
+               amount.doubleValue() < ManageAccountTansaction.MINIMUM_AMOUNT_TO_WITHDRAW_DEPOSIT ||
+               trasactionDescription.equals(null) ||
+               trasactionDescription.trim() == "" ||
+               transactionDate == null ||
+               transactionDate.toString().trim() == ""
+                    ){
 
                 error = true;
 
@@ -162,13 +234,17 @@ public class MakeDeposit {
                 error = true;
         }
 
+        naAddButton.setDisable(true);
+
         if(error){
             CustomUtility.AlertHelper("Deposit Information", "Error:\nPlease Recheck the Amount and details And DATE of Transaction you wish to deposit",
                     "Please The Form Fields Are Required", "I").show();
+
+            naAddButton.setDisable(true);
         }
 
 
-        naAddButton.setDisable(true);
+
 
         Task<AccountTransaction> task = new Task<AccountTransaction>() {
 
@@ -196,7 +272,7 @@ public class MakeDeposit {
 
                 boolean outcome = true;
 
-                updateTableView(accountTransaction);
+                updateTableView(accountTransaction, "CREDIT");
 
                 return null;
 
@@ -219,20 +295,155 @@ public class MakeDeposit {
 
     }
 
-    private void updateTableView(AccountTransaction accountTransaction) {
+
+    @FXML
+    void addNewWithdrawalRecord(ActionEvent event) throws Exception {
+        error = false;
+
+
+            amountDebit = new BigDecimal(naAmount1.getText().trim());
+            transactionDebitDescription = textAreaTransDescription1.getText();
+            transactionDebitDate = naTransactionDate1.getValue();
+
+            BigDecimal currentAvailableAmount = ManageAccountTansaction.getAccountBalance(accountNumberDisplay.getText());
+
+            if (
+               amountDebit.equals(null) ||
+               amountDebit.equals(0) ||
+               amountDebit.doubleValue() < ManageAccountTansaction.MINIMUM_AMOUNT_TO_WITHDRAW_DEPOSIT ||
+               transactionDebitDescription.equals(null) ||
+               transactionDebitDescription.trim() == "" ||
+               transactionDebitDate == null ||
+               transactionDebitDate.toString().trim() == ""
+                    ){
+                    error = true;
+
+                    CustomUtility.AlertHelper("Withdrawal Information", "Error:\nPlease Recheck the Amount and details And DATE of Transaction you wish to withdraw",
+                            "Please The Form Fields Are Required", "I").show();
+
+               return;
+
+            }
+
+        if(amountDebit.doubleValue() > currentAvailableAmount.doubleValue()){
+                    CustomUtility.AlertHelper("Withdrawal Information", "Error:\nINSUFFICIENT FUNDS CURRENTLY AVAILABLE. CAN'T EXCEED ",
+                            "Error:\nINSUFFICIENT FUNDS CURRENTLY AVAILABLE. CAN'T EXCEED " + String.format("N %.2f ", currentAvailableAmount.doubleValue()), "I").show();
+                    return;
+        }
+
+
+        if(error){
+            CustomUtility.AlertHelper("Withdrawal Information", "Error:\nPlease Recheck the Amount and details And DATE of Transaction you wish to withdraw",
+                    "Please The Form Fields Are Required", "I").show();
+
+            CustomUtility.pln("EXECUTED-HERE");
+
+        }
+
+        naAddButton1.setDisable(true);
+
+        Task<AccountTransaction> task = new Task<AccountTransaction>() {
+
+            @Override protected AccountTransaction call() throws Exception {
+
+                SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+
+                Session session = sessionFactory.openSession();
+
+                Transaction transaction = session.beginTransaction();
+
+                println("STAGE_START");
+                AccountTransaction accountTransaction = new AccountTransaction();
+                accountTransaction.setAccountNo(accountNumberDisplay.getText());
+                accountTransaction.setDescription(transactionDebitDescription);
+                accountTransaction.setAmount(amountDebit);
+                accountTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(transactionDebitDate));
+                accountTransaction.setTransaction_type("DEBIT");
+
+                println("STAGE_PROCESSING-1");
+                accountTransaction.setStatus(1);
+
+                session.save(accountTransaction);
+                println("STAGE_PROCESSING-2");
+                transaction.commit();
+                println("STAGE_PROCESSING-3");
+
+                println("Successfully inserted");
+
+                boolean outcome = true;
+                updateTableView(accountTransaction, "DEBIT");
+
+                return null;
+
+            }
+
+            @Override protected void succeeded() {
+                super.succeeded();
+            }
+
+            @Override protected void cancelled() {
+                super.cancelled();
+            }
+
+            @Override protected void failed() {
+                super.failed();
+            }
+        };
+
+        task.run();
+
+    }
+
+    private void updateTableView(AccountTransaction accountTransaction, String type) throws Exception {
+        String title;
+        String headerText;
+        String contentText;
+
+        if(type == null){
+            throw new TypeNotPresentException("Please Specify The Transaction Type", new Exception("Type Must Be Present."));
+        }
 
         if(accountTransaction != null){
-            CustomUtility.AlertHelper("Amount Deposited Sccessfully", "Successfully Deposited",
-                    "Successfully Created", Alert.AlertType.INFORMATION).show();
-            clearAllButton();
-            naAddButton.setDisable(false);
+
+            if(type.equalsIgnoreCase("DEBIT")){
+                title = "Amount Withdrawn Successfully";
+                headerText = "Successfully Withdrawn";
+                contentText = "Withdrawal Transaction Completed Successfully";
+            }else{ //(type.equals("CREDIT")){
+                title = "Amount Deposited/Credited Successfully";
+                headerText = "Successfully Deposited/Credited";
+                contentText = "Deposit/Credit Transaction Completed Successfully";
+            }
+
+            clearAllButton(type);
+
             prepareAccountTransactionListTable();
-            updateAccountTrasactionList(accountTransaction.getAccountNo());
+            updateAccountTransactionList(accountTransaction.getAccountNo());
         }else{
-            CustomUtility.AlertHelper("Error Creating New Account", "New Account was UnSuccessfully",
-                    "New Account was Not Successfully Created", Alert.AlertType.ERROR).show();
-            naAddButton.setDisable(false);
+
+            if(type.equalsIgnoreCase("DEBIT")){
+                title = "Error Making Withdrawals";
+                headerText = "UnSuccessfully Withdrawn";
+                contentText = "Withdrawal Transaction Was UnSuccessfully";
+            }else{ //(type.equals("CREDIT")){
+                title = "Depositing/Crediting Account Was UnSuccessfully";
+                headerText = "Successfully Deposited/Credited";
+                contentText = "Deposit/Credit Transaction Was UnSuccessful";
+            }
+
         }
+
+        CustomUtility.AlertHelper(title, headerText,
+                contentText, Alert.AlertType.INFORMATION).show();
+
+        naAddButton1.setDisable(false);
+        naAddButton.setDisable(false);
+
+
+        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", ManageAccountTansaction.getTotalCredited(accountTransaction.getAccountNo()).doubleValue()));
+        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL SUM WITHDRAWN IS: ", ManageAccountTansaction.getTotalDebited(accountTransaction.getAccountNo()).doubleValue()));
+        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(accountTransaction.getAccountNo()).doubleValue()));
+
 
     }
 
@@ -254,21 +465,41 @@ public class MakeDeposit {
 
         tableViewDeposits.getColumns().setAll(colID, colSN, colAccountNo, colAmount, colType, colComment, colDate);
 
-        tableViewDeposits.setItems(observeAccountTransactionListData);
+        tableViewDeposits.setItems(observeAccountCreditTransactionListData);
+
+        
+        colID1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colSN1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colType1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("transaction_type"));
+        colAmount1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, BigDecimal>("amount"));
+        colComment1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("description"));
+        colDate1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, Date>("transaction_date"));
+        colAccountNo1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("accountNo"));
+
+        colID1.setVisible(false);
+        colSN1.setVisible(false);
+
+        tableViewWithdrawals.getColumns().setAll(colID1, colSN1, colAccountNo1, colAmount1, colType1, colComment1, colDate1);
+
+        tableViewWithdrawals.setItems(observeAccountDebitTransactionListData);
 
     }
 
-    public void updateAccountTrasactionList(String accountNo){
+
+    public void updateAccountTransactionList(String accountNo){
 
         Task<Boolean> task = new Task<Boolean>() {
 
             @Override protected Boolean call() throws Exception {
-                observeAccountTransactionListData.clear();
+                observeAccountCreditTransactionListData.clear();
+                observeAccountDebitTransactionListData.clear();
                 boolean outcome;
 
-                observeAccountTransactionListData = getAccountTransactionList(accountNo);
+                observeAccountCreditTransactionListData = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNo, ManageAccountTansaction.CREDIT);
+                observeAccountDebitTransactionListData = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNo, ManageAccountTansaction.DEBIT);
 
-                tableViewDeposits.setItems(observeAccountTransactionListData);
+                tableViewDeposits.setItems(observeAccountCreditTransactionListData);
+                tableViewWithdrawals.setItems(observeAccountDebitTransactionListData);
 
                 outcome = true;
 
@@ -295,29 +526,13 @@ public class MakeDeposit {
 
     }
 
-    public ObservableList<AccountTransaction> getAccountTransactionList(String accountNumber) throws Exception{
-
-        ObservableList<AccountTransaction> currentObserveAccountTransactionList = FXCollections.observableArrayList();
-
-        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-        Session session = sessionFactory.openSession();
-
-        if(accountNumber == null){
-            currentObserveAccountTransactionList = ManageAccountTansaction.getAllAccountTransactionList();
-        }else{
-            currentObserveAccountTransactionList = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNumber);
-        }
-
-
-        return currentObserveAccountTransactionList;
-    }
 
     @FXML
-    public void setFilterTransactionList() throws Exception{
+    public void setFilterDepositTransactionList() throws Exception{
 
-        this.observeAccountTransactionListData = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNumberDisplay.getText());
+        this.observeAccountCreditTransactionListData = ManageAccountTansaction.getCreditTransactions(accountNumberDisplay.getText());
 
-        filteredList = new FilteredList<AccountTransaction>(observeAccountTransactionListData, p->true);
+        filteredList = new FilteredList<AccountTransaction>(observeAccountCreditTransactionListData, p->true);
         filterTransactionList.textProperty().addListener((observable, oldValue, newValue) -> {
             filteredList.setPredicate(pere -> {
                 if(newValue == null || newValue.isEmpty()){
@@ -347,11 +562,18 @@ public class MakeDeposit {
         });
     }
 
-    public void clearAllButton(){
-        this.naTransactionDate.setValue(null);
-        this.textAreaTransDescription.setText("");
-        this.naAccountNo.setText("");
-        this.naAmount.setText("");
+    public void clearAllButton(String type){
+        if(type.equals("DEBIT")){
+            this.naTransactionDate1.setValue(null);
+            this.textAreaTransDescription1.setText("Debit Account");
+            this.naAccountNo1.setText("");
+            this.naAmount1.setText("");
+        }else {
+            this.naTransactionDate.setValue(null);
+            this.textAreaTransDescription.setText("Credit Account");
+            this.naAccountNo.setText("");
+            this.naAmount.setText("");
+        }
     }
 
     public void btnPrintAccountDeposit(ActionEvent actionEvent) {
@@ -380,5 +602,69 @@ public class MakeDeposit {
             }
         }
 
+    }
+
+    public void makeWithdrawalSelection(Event event) {
+
+        tabpaneViewSection.getSelectionModel().select(1);
+
+/*        tabpaneActionSection;
+
+        makeDepostActionTab;
+
+        makeWithdrawalActionTab;
+
+        tabpaneViewSection;
+
+        makeDepostViewTab;
+
+        makeWithdrawalViewTab;*/
+
+    }
+
+    @FXML
+    public void makeDepositSelection(Event event){
+        tabpaneViewSection.getSelectionModel().select(0);
+    }
+
+    @FXML
+    public void changeActionViewTab(Event event){}
+
+    @FXML
+    public void changeDisplayViewTab(Event event){
+        tabpaneActionSection.getSelectionModel().select(tabpaneViewSection.getSelectionModel().getSelectedIndex());
+    }
+
+    @FXML
+    public void setFilterWithdrawalTransactionList(KeyEvent keyEvent) throws Exception {
+        this.observeAccountCreditTransactionListData = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNumberDisplay.getText());
+
+        filteredListWithdrawal = new FilteredList<AccountTransaction>(observeAccountDebitTransactionListData, p->true);
+        filterWithdrawalList.textProperty().addListener((observable, oldValue, newValue) -> {
+            filteredListWithdrawal.setPredicate(filteredParam -> {
+
+                if(newValue == null || newValue.isEmpty()){return true;}
+
+                String typedText = newValue.toLowerCase();
+
+                if(filteredParam.getAccountNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(filteredParam.getTransaction_date().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(filteredParam.getAmount().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                return false;
+            });
+
+            sortedListWithdrawal = new SortedList<AccountTransaction>(filteredListWithdrawal);
+            sortedListWithdrawal.comparatorProperty().bind(tableViewWithdrawals.comparatorProperty());
+            tableViewWithdrawals.setItems(sortedListWithdrawal);
+        });
     }
 }

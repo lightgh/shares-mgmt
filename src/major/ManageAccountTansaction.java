@@ -23,6 +23,7 @@ public class ManageAccountTansaction {
     public static int CREDIT = 1;
     public static int DEBIT = 2;
     public static int BOTH = 3;
+    public static int MINIMUM_AMOUNT_TO_WITHDRAW_DEPOSIT = 100;
 
 
     public static ObservableList<AccountTransaction> getAccountTransactionsForAccountNo(String accountNo) throws Exception {
@@ -62,16 +63,54 @@ public class ManageAccountTansaction {
 
     }
 
+    public static BigDecimal getAccountBalance(String accountNo) throws Exception {
+
+        BigDecimal totalDebited =  getTotalDebited(accountNo);
+        BigDecimal totalCredited = getTotalCredited(accountNo);
+        return totalCredited.subtract(totalDebited);
+    }
+
+    public static BigDecimal getTotalDebited(String accountNo) throws Exception {
+
+        BigDecimal totalCredited = getTotal(getDebitTransactions(accountNo));
+        return totalCredited;
+    }
+
+    public static ObservableList<AccountTransaction> getDebitTransactions(String accountNo) throws Exception{
+        ObservableList<AccountTransaction> observableListDebit = FXCollections.observableArrayList();
+        observableListDebit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNo, ManageAccountTansaction.DEBIT));
+        return  observableListDebit;
+    }
+
+    /**
+     * Gets the total amount credited to the user
+     * @param accountNo
+     * @return
+     * @throws Exception
+     */
+    public static BigDecimal getTotalCredited(String accountNo) throws Exception {
+
+        BigDecimal totalCredited = getTotal(getCreditTransactions(accountNo));
+        return totalCredited;
+    }
+
+    public static ObservableList<AccountTransaction> getCreditTransactions(String accountNo) throws Exception{
+        ObservableList<AccountTransaction> observableListCredit = FXCollections.observableArrayList();
+        observableListCredit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNo, ManageAccountTansaction.CREDIT));
+        return observableListCredit;
+    }
+
+
     public static BigDecimal getTotal(ObservableList<AccountTransaction> accountTransactions){
 
-        CustomUtility.pln("TE-ST-1: " +accountTransactions.size());
+//        CustomUtility.pln("TE-ST-1: " +accountTransactions.size());
 
         BigDecimal sum = BigDecimal.ZERO;
 
         if(accountTransactions == null)
             return sum;
 
-        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
+//        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
         /*accountTransactions.forEach((temp)->{
             sum = sum.add(temp.getAmount());
         });*/
@@ -81,8 +120,8 @@ public class ManageAccountTansaction {
             sum = sum.add(iterator.next().getAmount());
         }
 
-        CustomUtility.pln("SUMATION: " + sum.toString());
-        CustomUtility.pln("TE-ST-3: " +accountTransactions.size());
+//        CustomUtility.pln("SUMATION: " + sum.toString());
+//        CustomUtility.pln("TE-ST-3: " +accountTransactions.size());
 
         return sum;
     }

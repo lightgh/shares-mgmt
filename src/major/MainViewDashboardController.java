@@ -564,7 +564,7 @@ public class MainViewDashboardController implements Initializable {
                 getClass().getResource("MakeDepositView.fxml")
         );
 
-        Scene scene = new Scene((Parent) loader.load(), 1000, 950);
+        Scene scene = new Scene(loader.load(), 1000, 950);
 
         Stage makeDepositScene = new Stage();
 
@@ -579,12 +579,12 @@ public class MainViewDashboardController implements Initializable {
         });
 
 
-        VBox makeDepositVBox = (VBox) loader.getNamespace().get("makeDepositVBox");
 
         Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");
         Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");
         Label  labelID = (Label)loader.getNamespace().get("labelID");
         Label totalLabelSumDeposit = (Label)loader.getNamespace().get("totalLabelSumDeposit");
+        Label totalLabelSumWithdrawn = (Label)loader.getNamespace().get("totalLabelSumWithdrawn");
         Label accountBalance = (Label)loader.getNamespace().get("accountBalance");
 
         //use this to set the values displayed in the FXML file
@@ -594,7 +594,7 @@ public class MainViewDashboardController implements Initializable {
         labelID.setId(String.valueOf(this.currentMembershipAccount.getId()));
 
 
-        // reference to the table
+        // reference to the crediting/depositing table
         TableView<AccountTransaction> tableViewDeposits = (TableView) loader.getNamespace().get("tableViewDeposits");
         TableColumn<AccountTransaction, String> colID =  (TableColumn)loader.getNamespace().get("colID");
         TableColumn<AccountTransaction, String> colSN = (TableColumn)loader.getNamespace().get("colSN");
@@ -603,7 +603,6 @@ public class MainViewDashboardController implements Initializable {
         TableColumn<AccountTransaction, String> colComment = (TableColumn)loader.getNamespace().get("colComment");
         TableColumn<AccountTransaction, Date> colDate = (TableColumn)loader.getNamespace().get("colDate");
         TableColumn<AccountTransaction, String> colAccountNo = (TableColumn)loader.getNamespace().get("colAccountNo");
-
 
         colID.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
         colSN.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
@@ -616,18 +615,42 @@ public class MainViewDashboardController implements Initializable {
         colID.setVisible(false);
         colSN.setVisible(false);
 
-        tableViewDeposits.getColumns().setAll(colID, colSN, colAmount, colType, colComment, colDate);
-        ObservableList<AccountTransaction> observableListCredit = FXCollections.observableArrayList();
-        ObservableList<AccountTransaction> observableListDebit = FXCollections.observableArrayList();
-                observableListCredit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo(), ManageAccountTansaction.CREDIT));
-                observableListDebit.setAll(ManageAccountTansaction.getAccountTransactionsForAccountNo(this.currentMembershipAccount.getAccountNo(), ManageAccountTansaction.DEBIT));
-        tableViewDeposits.setItems(observableListCredit);
-        CustomUtility.pln(observableListCredit.size() + "");
-        BigDecimal totalCredited = ManageAccountTansaction.getTotal(observableListCredit);
-        BigDecimal totalDebited = ManageAccountTansaction.getTotal(observableListDebit);
-        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", totalCredited.doubleValue()));
+        
+        // reference to the debiting/withdrawals table
+        TableView<AccountTransaction> tableViewWithdrawals = (TableView) loader.getNamespace().get("tableViewWithdrawals");
+        TableColumn<AccountTransaction, String> colID1 =  (TableColumn)loader.getNamespace().get("colID1");
+        TableColumn<AccountTransaction, String> colSN1= (TableColumn)loader.getNamespace().get("colSN1");
+        TableColumn<AccountTransaction, BigDecimal> colAmount1= (TableColumn)loader.getNamespace().get("colAmount1");
+        TableColumn<AccountTransaction, String> colType1 = (TableColumn)loader.getNamespace().get("colType1");
+        TableColumn<AccountTransaction, String> colComment1 = (TableColumn)loader.getNamespace().get("colComment1");
+        TableColumn<AccountTransaction, Date> colDate1 = (TableColumn)loader.getNamespace().get("colDate1");
+        TableColumn<AccountTransaction, String> colAccountNo1 = (TableColumn)loader.getNamespace().get("colAccountNo1");
 
-        accountBalance.setText(String.format("%s%.3f","", (totalCredited.doubleValue()-totalDebited.doubleValue())));
+
+
+        colID1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colSN1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("Id"));
+        colType1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("transaction_type"));
+        colAmount1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, BigDecimal>("amount"));
+        colComment1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("description"));
+        colDate1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, Date>("transaction_date"));
+        colAccountNo1.setCellValueFactory(new PropertyValueFactory<AccountTransaction, String>("accountNo"));
+
+        colID1.setVisible(false);
+        colSN1.setVisible(false);
+
+        tableViewDeposits.getColumns().setAll(colID, colSN, colAmount, colType, colComment, colDate);
+        tableViewWithdrawals.getColumns().setAll(colID1, colSN1, colAmount1, colType1, colComment1, colDate1);
+        
+        tableViewDeposits.setItems(ManageAccountTansaction.getCreditTransactions(this.currentMembershipAccount.getAccountNo()));
+
+        tableViewWithdrawals.setItems(ManageAccountTansaction.getDebitTransactions(this.currentMembershipAccount.getAccountNo()));
+
+
+        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", ManageAccountTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL WITHDRAWN SUM IS: ", ManageAccountTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+
+        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 
@@ -636,7 +659,6 @@ public class MainViewDashboardController implements Initializable {
         });
 
         makeDepositScene.showAndWait();
-
 
     }
 }
