@@ -314,8 +314,7 @@
                                                                <children>
                                                                   <HBox layoutX="15.0" layoutY="15.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
                                                                      <children>
-                                                                        <Button fx:id="btnMakeDeposit" mnemonicParsing="false" onAction="#makeDepositAction" prefHeight="48.0" prefWidth="151.0" text="Make Deposit" textAlignment="CENTER" />
-                                                                        <Button fx:id="btnViewDeposits" mnemonicParsing="false" prefHeight="47.0" prefWidth="141.0" text="View Deposit" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnMakeDeposit" mnemonicParsing="false" onAction="#makeDepositAction" prefHeight="48.0" prefWidth="302.0" text="Make/View Deposit &amp; Withdrawals" textAlignment="CENTER" />
                                                                      </children>
                                                                      <VBox.margin>
                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -323,14 +322,13 @@
                                                                   </HBox>
                                                                   <HBox prefHeight="56.0" prefWidth="253.0" spacing="10.0">
                                                                      <children>
-                                                                        <Button fx:id="btnBuyShares" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Buy Shares" textAlignment="CENTER" />
-                                                                        <Button fx:id="btnViewShares" mnemonicParsing="false" prefHeight="47.0" prefWidth="138.0" text="View Shares" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnBuyShares" mnemonicParsing="false" onAction="#buySellSharesAction" prefHeight="48.0" prefWidth="301.0" text="Buy/View &amp; Sell Shares" textAlignment="CENTER" />
                                                                      </children>
                                                                      <VBox.margin>
                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                                      </VBox.margin>
                                                                   </HBox>
-                                                                  <HBox layoutX="15.0" layoutY="81.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
+                                                                  <HBox layoutX="15.0" layoutY="81.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0" visible="false">
                                                                      <children>
                                                                         <Button fx:id="btnMakeWithdrawal" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Make Withdrawals" textAlignment="CENTER" />
                                                                         <Button fx:id="btnViewWithdrawals" mnemonicParsing="false" prefHeight="47.0" prefWidth="142.0" text="View Withdrawals" textAlignment="CENTER" />
@@ -341,8 +339,7 @@
                                                                   </HBox>
                                                                   <HBox layoutX="15.0" layoutY="148.0" prefHeight="57.0" prefWidth="263.0" spacing="10.0">
                                                                      <children>
-                                                                        <Button fx:id="btnTakeLoan" mnemonicParsing="false" prefHeight="48.0" prefWidth="151.0" text="Take Loan" textAlignment="CENTER" />
-                                                                        <Button fx:id="btnReturnLoan" mnemonicParsing="false" prefHeight="47.0" prefWidth="142.0" text="Return Loan" textAlignment="CENTER" />
+                                                                        <Button fx:id="btnTakeLoan" mnemonicParsing="false" onAction="#manageLoanAction" prefHeight="47.0" prefWidth="309.0" text="Take/View &amp; Return Loan" textAlignment="CENTER" />
                                                                      </children>
                                                                      <padding>
                                                                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

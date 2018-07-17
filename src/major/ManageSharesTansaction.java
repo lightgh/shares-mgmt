@@ -109,7 +109,7 @@ public class ManageSharesTansaction {
 
 //        CustomUtility.pln("TE-ST-2: " +sharesTransactions.size());
         /*sharesTransactions.forEach((temp)->{
-            sum = sum.add(temp.getAmount());
+            sum = sum.add(temp.getCollectedAmount());
         });*/
 
         Iterator<SharesTransaction> iterator =  sharesTransactions.iterator();

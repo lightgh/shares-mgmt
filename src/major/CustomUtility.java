@@ -2,41 +2,30 @@
 package major;
 
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.Date;
 
@@ -309,9 +298,15 @@ public class CustomUtility{
 
     public static void main(String args [] ){
 
+        BigDecimal amount = new BigDecimal(5000);
+        pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
+        pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
+
+        return;
+
 //        LocalDate dt = getLocalDateFromString("12-06-2018");
 //        LocalDate dt = getLocalDateFromString("2018-06-12");
-        LocalDate dt = getLocalDateFromString("2018/12/6");
+       /* LocalDate dt = getLocalDateFromString("2018/12/6");
 
 
         Date td2 = getDateFromLocalDate(dt);
@@ -319,12 +314,12 @@ public class CustomUtility{
         LocalDate dt2 = getLocalDateFromDate(td2);
         pln("STR_FROM_LD: "+getStringFromLocalDate(dt2));
 
-        System.exit(0);
+        System.exit(0);*/
 
 //        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-        AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
+        /*AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
         SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
+        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();*/
         /*Transaction transaction = session.beginTransaction();
         MembershipAccount membA = new MembershipAccount();
         membA.setAccountNo(accountNumberGenerator.getNewAccountNo(10));
@@ -341,8 +336,10 @@ public class CustomUtility{
         CustomUtility.println("Successfully inserted");
         sessionFactory.close();*/
 
+
+/*
         String hql = "FROM MembershipAccount M WHERE M.accountNo='3501697105'";
-//        String hql = "FROM MembershipAccount M WHERE M.firstName LIKE 'Chinaka'";
+        String hql = "FROM MembershipAccount M WHERE M.firstName LIKE 'Chinaka'";
 
         Transaction transactionA = session.beginTransaction();
         CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -364,6 +361,7 @@ public class CustomUtility{
             print(membershipAccount.getAccountNo() + " ");
             println(membershipAccount.getFullName() + " ");
         }
+*/
 
 
 
@@ -390,7 +388,7 @@ public class CustomUtility{
 
 //        List<MembershipAccount> =
 
-        transactionA.commit();
+//        transactionA.commit();
 
 
 
@@ -472,5 +470,16 @@ public class CustomUtility{
         alert.setHeaderText("Test Heading");
         alert.setContentText("Heading content");
         return alert;
+    }
+
+    public static String getUniqueLedgerNoString() {
+        AccountNumberGenerator acng = new AccountNumberGenerator();
+        return "ledgno"+CustomUtility.shuffleString(acng.getNewAccountNo(5) + CustomUtility.randIntegerBetween(10, 99));
+    }
+
+    public static int daysDiff(LocalDate firstDate, LocalDate secondDate){
+
+        return (int)ChronoUnit.DAYS.between(firstDate, secondDate);
+
     }
 }
