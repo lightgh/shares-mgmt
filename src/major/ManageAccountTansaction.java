@@ -43,7 +43,9 @@ public class ManageAccountTansaction {
         }
 
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+
 //        Session session = sessionFactory.getCurrentSession();
+
             Session session = sessionFactory.openSession();
 
             Transaction transactionA = session.beginTransaction();
@@ -112,7 +114,7 @@ public class ManageAccountTansaction {
 
 //        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
         /*accountTransactions.forEach((temp)->{
-            sum = sum.add(temp.getAmount());
+            sum = sum.add(temp.getCollectedAmount());
         });*/
 
         Iterator<AccountTransaction> iterator =  accountTransactions.iterator();

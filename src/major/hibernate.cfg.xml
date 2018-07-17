@@ -30,6 +30,9 @@
         <!-- Mapping classes -->
         <mapping class="major.MembershipAccount" />
         <mapping class="major.AccountTransaction" />
+        <mapping class="major.SharesTransaction" />
+        <mapping class="major.TakeLoanTransaction" />
+        <mapping class="major.ReturnLoanTransaction" />
 
     </session-factory>
 </hibernate-configuration>

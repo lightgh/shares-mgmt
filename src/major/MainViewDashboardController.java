@@ -569,7 +569,7 @@ public class MainViewDashboardController implements Initializable {
         Stage makeDepositScene = new Stage();
 
         makeDepositScene.setScene(scene);
-        makeDepositScene.setTitle("Make Deposit");
+        makeDepositScene.setTitle("Make & View Deposits As Well As Initiate And Track Withdrawals");
         makeDepositScene.initModality(Modality.APPLICATION_MODAL);
 
         makeDepositScene.setMaximized(true);
@@ -659,6 +659,237 @@ public class MainViewDashboardController implements Initializable {
         });
 
         makeDepositScene.showAndWait();
+
+    }
+
+    public void buySellSharesAction(ActionEvent actionEvent) throws Exception {
+        if(this.currentTableMemberAccount==null  || this.currentMembershipAccount == null) return;
+
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("BuySellSharesView.fxml")
+        );
+
+        Scene scene = new Scene(loader.load(), 1000, 950);
+
+        Stage buySellSharesScene = new Stage();
+
+        buySellSharesScene.setScene(scene);
+        buySellSharesScene.setTitle("Make Deposit");
+        buySellSharesScene.initModality(Modality.APPLICATION_MODAL);
+
+        buySellSharesScene.setMaximized(true);
+
+        buySellSharesScene.setOnCloseRequest(e->{
+            e.consume();
+        });
+
+
+
+        Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");
+        Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");
+        Label  labelID = (Label)loader.getNamespace().get("labelID");
+        Label totalLabelSumDeposit = (Label)loader.getNamespace().get("totalLabelSumDeposit");
+        Label totalLabelSumWithdrawn = (Label)loader.getNamespace().get("totalLabelSumWithdrawn");
+        Label accountBalance = (Label)loader.getNamespace().get("accountBalance");
+        Label shareBalance = (Label)loader.getNamespace().get("accountBalance1");
+
+        //use this to set the values displayed in the FXML file
+        fullNameDisplay.setText(this.currentMembershipAccount.getFullName());
+        accountNumberDisplay.setText(this.currentMembershipAccount.getAccountNo());
+        // set but hidden
+        labelID.setId(String.valueOf(this.currentMembershipAccount.getId()));
+
+
+        // reference to the crediting/depositing table
+        TableView<SharesTransaction> tableViewDeposits = (TableView) loader.getNamespace().get("tableViewDeposits");
+        TableColumn<SharesTransaction, String> colID =  (TableColumn)loader.getNamespace().get("colID");
+        TableColumn<SharesTransaction, String> colSN = (TableColumn)loader.getNamespace().get("colSN");
+        TableColumn<SharesTransaction, BigDecimal> colAmount = (TableColumn)loader.getNamespace().get("colAmount");
+        TableColumn<SharesTransaction, String> colType = (TableColumn)loader.getNamespace().get("colType");
+        TableColumn<SharesTransaction, String> colComment = (TableColumn)loader.getNamespace().get("colComment");
+        TableColumn<SharesTransaction, Date> colDate = (TableColumn)loader.getNamespace().get("colDate");
+        TableColumn<SharesTransaction, String> colAccountNo = (TableColumn)loader.getNamespace().get("colAccountNo");
+
+        colID.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("Id"));
+        colSN.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("Id"));
+        colType.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("transaction_type"));
+        colAmount.setCellValueFactory(new PropertyValueFactory<SharesTransaction, BigDecimal>("amount"));
+        colComment.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("description"));
+        colDate.setCellValueFactory(new PropertyValueFactory<SharesTransaction, Date>("transaction_date"));
+        colAccountNo.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("accountNo"));
+
+        colID.setVisible(false);
+        colSN.setVisible(false);
+
+
+        // reference to the debiting/withdrawals table
+        TableView<SharesTransaction> tableViewWithdrawals = (TableView) loader.getNamespace().get("tableViewWithdrawals");
+        TableColumn<SharesTransaction, String> colID1 =  (TableColumn)loader.getNamespace().get("colID1");
+        TableColumn<SharesTransaction, String> colSN1= (TableColumn)loader.getNamespace().get("colSN1");
+        TableColumn<SharesTransaction, BigDecimal> colAmount1= (TableColumn)loader.getNamespace().get("colAmount1");
+        TableColumn<SharesTransaction, String> colType1 = (TableColumn)loader.getNamespace().get("colType1");
+        TableColumn<SharesTransaction, String> colComment1 = (TableColumn)loader.getNamespace().get("colComment1");
+        TableColumn<SharesTransaction, Date> colDate1 = (TableColumn)loader.getNamespace().get("colDate1");
+        TableColumn<SharesTransaction, String> colAccountNo1 = (TableColumn)loader.getNamespace().get("colAccountNo1");
+
+
+        colID1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("Id"));
+        colSN1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("Id"));
+        colType1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("transaction_type"));
+        colAmount1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, BigDecimal>("amount"));
+        colComment1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("description"));
+        colDate1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, Date>("transaction_date"));
+        colAccountNo1.setCellValueFactory(new PropertyValueFactory<SharesTransaction, String>("accountNo"));
+
+        colID1.setVisible(false);
+        colSN1.setVisible(false);
+
+        tableViewDeposits.getColumns().setAll(colID, colSN, colAmount, colType, colComment, colDate);
+        tableViewWithdrawals.getColumns().setAll(colID1, colSN1, colAmount1, colType1, colComment1, colDate1);
+
+        tableViewDeposits.setItems(ManageSharesTansaction.getCreditTransactions(this.currentMembershipAccount.getAccountNo()));
+
+        tableViewWithdrawals.setItems(ManageSharesTansaction.getSharesSellsTransactions(this.currentMembershipAccount.getAccountNo()));
+
+
+        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL SHARES BOUGHT SUM IS: ", ManageSharesTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageSharesTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+
+        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        shareBalance.setText(String.format("%s%.3f","", ManageSharesTansaction.getSharesBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+
+        Button closeButton = (Button)loader.getNamespace().get("closeButton");
+
+        closeButton.setOnAction(event -> {
+            buySellSharesScene.close();
+        });
+
+        buySellSharesScene.showAndWait();
+    }
+
+    @FXML
+    public void manageLoanAction(ActionEvent actionEvent) throws Exception {
+        if(this.currentTableMemberAccount==null  || this.currentMembershipAccount == null) return;
+
+        FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("TakeLoanGiveLoan.fxml")
+        );
+
+        Scene scene = new Scene(loader.load(), 1000, 950);
+
+        Stage takeAndReturnLoanScene = new Stage();
+
+        takeAndReturnLoanScene.setScene(scene);
+        takeAndReturnLoanScene.setTitle("Take Loan Or Return Loan");
+        takeAndReturnLoanScene.initModality(Modality.APPLICATION_MODAL);
+
+        takeAndReturnLoanScene.setMaximized(true);
+
+        takeAndReturnLoanScene.setOnCloseRequest(e->{
+            e.consume();
+        });
+
+
+        Label fullNameDisplay = (Label)loader.getNamespace().get("fullnameDisplay");
+        Label accountNumberDisplay = (Label)loader.getNamespace().get("accountNumberDisplay");
+        Label labelID = (Label)loader.getNamespace().get("labelID");
+        Label totalLoanTakenLabel = (Label)loader.getNamespace().get("totalLoanTakenLabel");
+        Label totalLoanReturnedLabel = (Label)loader.getNamespace().get("totalLoanReturnedLabel");
+        Label accountBalance = (Label)loader.getNamespace().get("accountBalance");
+        Label totalCollectedLoanBalance = (Label)loader.getNamespace().get("totalCollectedLoanBalance");
+
+        TextField nLoanLedgerNo = (TextField)loader.getNamespace().get("nLoanLedgerNo");
+        TextField nLoanAccountNo = (TextField)loader.getNamespace().get("nLoanAccountNo");
+
+
+        //use this to set the values displayed in the FXML file
+        fullNameDisplay.setText(this.currentMembershipAccount.getFullName());
+        accountNumberDisplay.setText(this.currentMembershipAccount.getAccountNo());
+        nLoanAccountNo.setText(this.currentMembershipAccount.getAccountNo());
+        // set but hidden
+        labelID.setId(String.valueOf(this.currentMembershipAccount.getId()));
+
+
+        String uLegNo = CustomUtility.getUniqueLedgerNoString();
+        // set unique ledger no
+        nLoanLedgerNo.setText(uLegNo);
+
+        // reference to the crediting/depositing table
+        TableView<TakeLoanTransaction> tableViewTakeLoans = (TableView) loader.getNamespace().get("tableViewTakeLoans");
+        TableColumn<TakeLoanTransaction, String> colId =  (TableColumn)loader.getNamespace().get("colId");
+        TableColumn<TakeLoanTransaction, String> colSN = (TableColumn)loader.getNamespace().get("colSN");
+        TableColumn<TakeLoanTransaction, String> colAccountNo = (TableColumn)loader.getNamespace().get("colAccountNo");
+        TableColumn<TakeLoanTransaction, String> colLedgerNo = (TableColumn)loader.getNamespace().get("colLedgerNo");
+        TableColumn<TakeLoanTransaction, BigDecimal> colLoanAmount = (TableColumn)loader.getNamespace().get("colLoanAmount");
+        TableColumn<TakeLoanTransaction, Integer> colInterestRate = (TableColumn)loader.getNamespace().get("colInterestRate");
+        TableColumn<TakeLoanTransaction, Integer> colLoanPeriod = (TableColumn)loader.getNamespace().get("colLoanPeriod");
+        TableColumn<TakeLoanTransaction, Date> colCollectedDate = (TableColumn)loader.getNamespace().get("colCollectedDate");
+        TableColumn<TakeLoanTransaction, Date> colRepayDate = (TableColumn)loader.getNamespace().get("colRepayDate");
+        TableColumn<TakeLoanTransaction, String> colLoanDescription = (TableColumn)loader.getNamespace().get("colLoanDescription");
+
+
+        colId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        colSN.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        colAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+        colLedgerNo.setCellValueFactory(new PropertyValueFactory<>("ledgerNo"));
+        colLoanAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colInterestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+        colLoanPeriod.setCellValueFactory(new PropertyValueFactory<>("loanPeriod"));
+        colCollectedDate.setCellValueFactory(new PropertyValueFactory<>("dateCollected"));
+        colRepayDate.setCellValueFactory(new PropertyValueFactory<>("repayDate"));
+        colLoanDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+
+        colId.setVisible(false);
+        colSN.setVisible(false);
+
+        // reference to the returned loan table
+        TableView<ReturnLoanTransaction> tableViewReturnedLoans             = (TableView) loader.getNamespace().get("tableViewReturnedLoans");
+        TableColumn<ReturnLoanTransaction, String>      colRLId             =  (TableColumn)loader.getNamespace().get("colRLId");
+        TableColumn<ReturnLoanTransaction, String>      colRLSn             =  (TableColumn)loader.getNamespace().get("colRLSn");
+        TableColumn<ReturnLoanTransaction, String>      colRLAccountNo      = (TableColumn)loader.getNamespace().get("colRLAccountNo");
+        TableColumn<ReturnLoanTransaction, BigDecimal>  colRLLedgerNo       = (TableColumn)loader.getNamespace().get("colRLLedgerNo");
+        TableColumn<ReturnLoanTransaction, String>      colRLLoanAmount     = (TableColumn)loader.getNamespace().get("colRLLoanAmount");
+        TableColumn<ReturnLoanTransaction, String>      colRLInterestRate   = (TableColumn)loader.getNamespace().get("colRLInterestRate");
+        TableColumn<ReturnLoanTransaction, Date>        colRLLoanPeriod     = (TableColumn)loader.getNamespace().get("colRLLoanPeriod");
+        TableColumn<ReturnLoanTransaction, String>      colRLCollectedDate  = (TableColumn)loader.getNamespace().get("colRLCollectedDate");
+        TableColumn<ReturnLoanTransaction, String>      colRLRepayDate      = (TableColumn)loader.getNamespace().get("colRLRepayDate");
+
+
+        colRLId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        colRLSn.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        colRLAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+        colRLLedgerNo.setCellValueFactory(new PropertyValueFactory<>("ledgerNo"));
+        colRLLoanAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+        colRLInterestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+        colRLLoanPeriod.setCellValueFactory(new PropertyValueFactory<>("loanPeriod"));
+        colRLRepayDate.setCellValueFactory(new PropertyValueFactory<>("datePaid"));
+        colRLCollectedDate.setCellValueFactory(new PropertyValueFactory<>("dateCollected"));
+
+        colRLId.setVisible(false);
+        colRLSn.setVisible(false);
+
+        tableViewTakeLoans.getColumns().setAll(colId, colSN, colAccountNo, colLedgerNo, colLoanAmount, colInterestRate, colLoanPeriod, colCollectedDate, colRepayDate, colLoanDescription);
+
+        tableViewReturnedLoans.getColumns().setAll(colRLId, colRLSn, colRLAccountNo, colRLLedgerNo, colRLLoanAmount, colRLCollectedDate, colRLRepayDate, colRLLoanPeriod, colRLInterestRate);
+
+        tableViewTakeLoans.setItems(ManageLoanTransaction.getTakenLoanTransactionsForAccount(this.currentMembershipAccount.getAccountNo()));
+
+//        tableViewWithdrawals.setItems(ManageSharesTansaction.getSharesSellsTransactions(this.currentMembershipAccount.getAccountNo()));
+
+
+        totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLoanReturnedLabel.setText(String.format("%s%.3f","TOTAL LOAN RETURNED IS: ", ManageLoanTransaction.getTotalReturnedLoanTransactions(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+
+        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageLoanTransaction.getCurrentLoanBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+
+        Button closeButton = (Button)loader.getNamespace().get("closeButton");
+
+        closeButton.setOnAction(event -> {
+            takeAndReturnLoanScene.close();
+        });
+
+        takeAndReturnLoanScene.showAndWait();
 
     }
 }
