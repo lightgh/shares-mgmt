@@ -874,7 +874,7 @@ public class MainViewDashboardController implements Initializable {
 
         tableViewTakeLoans.setItems(ManageLoanTransaction.getTakenLoanTransactionsForAccount(this.currentMembershipAccount.getAccountNo()));
 
-//        tableViewWithdrawals.setItems(ManageSharesTansaction.getSharesSellsTransactions(this.currentMembershipAccount.getAccountNo()));
+        tableViewReturnedLoans.setItems(ManageLoanTransaction.getReturnedLoanTransactionsForAccount(this.currentMembershipAccount.getAccountNo()));
 
 
         totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(this.currentMembershipAccount.getAccountNo()).doubleValue()));

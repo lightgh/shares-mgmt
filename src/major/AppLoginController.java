@@ -24,9 +24,9 @@ public class AppLoginController {
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override public void handle(ActionEvent event) {
                 String sessionID = authorize();
-//                if (sessionID != null) {
-//                    appLoginManager.authenticated(sessionID);
-//                }
+                if (sessionID != null) {
+                    appLoginManager.authenticated(sessionID);
+                }
             }
         });
     }
