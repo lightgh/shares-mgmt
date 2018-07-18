@@ -48,7 +48,7 @@
           </MenuBar>
           <AnchorPane maxHeight="-1.0" maxWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
             <children>
-                  <TabPane layoutY="6.0" prefHeight="351.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0">
+                  <TabPane fx:id="mainAppTabPane" layoutY="6.0" prefHeight="351.0" prefWidth="640.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0">
                     <tabs>
                       <Tab fx:id="manageAccountTab" text="Manage Account">
                         <content>
@@ -60,7 +60,7 @@
                                              <children>
                                                 <Button mnemonicParsing="false" onAction="#addAccountTabTrigger" prefHeight="52.0" prefWidth="174.0" text="Add Account" />
                                                 <Button defaultButton="false" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#accountListTabTrigger" prefHeight="53.0" prefWidth="174.0" text="Account List" wrapText="true" />
-                                          <Button fx:id="btnManageShares" mnemonicParsing="false" prefHeight="45.0" prefWidth="174.0" text="Manage Shares" />
+                                          <Button fx:id="btnManageShares" mnemonicParsing="false" onAction="#showSharesTabAction" prefHeight="45.0" prefWidth="174.0" text="Manage Shares" />
                                                  <Button fx:id="logoutButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="53.0" prefWidth="174.0" text="Logout" wrapText="true" />
                                              </children>
                                           </VBox>
@@ -372,11 +372,11 @@
                            <children>
                               <Pane layoutX="2.0" layoutY="2.0" prefHeight="80.0" prefWidth="1275.0" style="-fx-background-color: #2F40DA;" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="2.0">
                                  <children>
-                                    <Button layoutX="553.0" layoutY="20.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="116.0" text="Add Shares" />
-                                    <Button contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="89.0" text="Home" />
+                                    <Button layoutX="128.0" layoutY="24.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="110.0" text="Add Shares" />
+                                    <Button fx:id="goMainSectionButton" contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" onAction="#goHomeMgmtAccountButtonAction" prefHeight="29.0" prefWidth="89.0" text="Home" />
                                  </children>
                               </Pane>
-                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="7.0" AnchorPane.rightAnchor="1063.0" AnchorPane.topAnchor="84.0" />
+                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0" />
                            </children></AnchorPane>
                         </content>
                       </Tab>

@@ -56,9 +56,17 @@ public class MainViewDashboardController implements Initializable {
     @FXML private TextField naAccountNo;
     @FXML private DatePicker naOpenDate;
 
+    @FXML private TabPane mainAppTabPane;
+    @FXML private Tab manageSharesTab;
+    @FXML private Tab manageAccountTab;
+
+    @FXML private Button goMainSectionButton;
+
+
     @FXML private Tab accountListTabSection;
     @FXML private Tab addAccountTabSection;
     @FXML private TabPane accountMgmtSection;
+
 
     @FXML private TableView<TableMemberAccount> tableViewAccountList;
 
@@ -891,5 +899,15 @@ public class MainViewDashboardController implements Initializable {
 
         takeAndReturnLoanScene.showAndWait();
 
+    }
+
+    public void showSharesTabAction(ActionEvent actionEvent) {
+
+        mainAppTabPane.getSelectionModel().select(1);
+
+    }
+
+    public void goHomeMgmtAccountButtonAction(ActionEvent actionEvent) {
+        mainAppTabPane.getSelectionModel().select(0);
     }
 }
