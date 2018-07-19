@@ -10,6 +10,8 @@ import org.hibernate.query.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
 
@@ -24,10 +26,111 @@ public class ManageSharesTansaction {
     public static int DEBIT = 2;
     public static int BOTH = 3;
     public static int MINIMUM_AMOUNT_TO_WITHDRAW_DEPOSIT = 100;
+    public static String DEBIT_ACC = "DEBIT";
+    public static String CREDIT_ACC = "CREDIT";
+
+    public static int AUTO_RENEW_SHARES = 1;
+    public static int MANUAL_RENEW_SHARES = 2;
 
 
     public static ObservableList<SharesTransaction> getSharesTransactionsForAccountNo(String accountNo) throws Exception {
         return getSharesTransactionsForAccountNo(accountNo, ManageSharesTansaction.BOTH);
+    }
+
+
+    public static boolean distributeSharesAmongThese(ObservableList<SharesTransaction> sharesTransactionObservableList, BigDecimal monthlySharesTotal, BigDecimal profit, LocalDate creditLocalDate, int DISTRIBUTION_TYPE) throws Exception{
+        boolean complete = false;
+        BigDecimal calculateAccountSharesBenefit, sum = BigDecimal.ZERO;
+        if(sharesTransactionObservableList.isEmpty() || creditLocalDate == null){
+            return complete;
+        }else{
+
+            Iterator<SharesTransaction> iterator =  sharesTransactionObservableList.iterator();
+            while (iterator.hasNext()){
+                MathContext mathCntxt = new MathContext(7);
+                calculateAccountSharesBenefit = iterator.next().getAmount().divide(monthlySharesTotal, mathCntxt).multiply(profit, mathCntxt);
+                SharesTransaction tempST = iterator.next();
+                if(DISTRIBUTION_TYPE == AUTO_RENEW_SHARES){
+                    // TODO CREDIT ACCOUNT NO -- SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
+                    // TODO CREDIT SHARES WITH SAME ACCOUNT NO -- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC);
+
+                }else{
+                    // TODO ONLY CREDIT ACCOUNT NO - SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
+                }
+
+                CustomUtility.pln(String.format("SHARED: %s to AccountNo: %s", sum, iterator.next().getAccountNo()));
+                sum = sum.add(calculateAccountSharesBenefit);
+            }
+
+            //TODO - TRACK THE SHARE DISTRIBUTED FOR THIS MONTH AND DISPLAY IT ON THE SIDE TABLE
+            ManageSharesDistribution.addNewDistributedShares(monthlySharesTotal, profit, creditLocalDate.getMonth().name() + " Of " +creditLocalDate.getYear(), creditLocalDate, sharesTransactionObservableList.size());
+
+            CustomUtility.pln("TOTAL-SUMMED: " + sum);
+
+        }
+        return complete;
+    }
+
+    private static void buySharesForAccounNoOfAmount(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType) throws Exception {
+
+        if(!transType.equalsIgnoreCase(CREDIT_ACC) && !transType.equalsIgnoreCase(DEBIT_ACC))
+            throw new IllegalArgumentException("Transaction TYPE MUST BE CREDIT OR DEBIT");
+
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
+        Transaction transactionA = session.beginTransaction();
+
+        if(transType == CREDIT_ACC) {
+            BigDecimal currentAccountBalance = ManageAccountTansaction.getAccountBalance(accountNo);
+            if (currentAccountBalance.doubleValue() < calculateAccountSharesBenefit.doubleValue()) {
+                CustomUtility.AlertHelper("INSUFFICIENT ACCOUNT BALANCE", "Insuffucient Account Balance", "Your Account Has Insuffucient Amount To Peform This Operation", "I").show();
+                return;
+            }
+            AccountTransaction newAccountTransaction = new AccountTransaction();
+            newAccountTransaction.setAccountNo(accountNo);
+            newAccountTransaction.setAmount(calculateAccountSharesBenefit);
+            newAccountTransaction.setDescription(transactionDesc);
+            newAccountTransaction.setTransaction_type(DEBIT_ACC);
+            newAccountTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
+            newAccountTransaction.setStatus(1);
+
+            session.save(newAccountTransaction);
+
+            SharesTransaction sharesTransaction = new SharesTransaction();
+            sharesTransaction.setAccountNo(accountNo);
+            sharesTransaction.setDescription(transactionDesc);
+            sharesTransaction.setAmount(calculateAccountSharesBenefit);
+            sharesTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
+            sharesTransaction.setTransaction_type(CREDIT_ACC);
+            sharesTransaction.setStatus(1);
+
+            session.save(sharesTransaction);
+            transactionA.commit();
+        }else if(transType == DEBIT_ACC){
+            AccountTransaction newAccountTransaction = new AccountTransaction();
+            newAccountTransaction.setAccountNo(accountNo);
+            newAccountTransaction.setAmount(calculateAccountSharesBenefit);
+            newAccountTransaction.setDescription(transactionDesc);
+            newAccountTransaction.setTransaction_type(CREDIT_ACC);
+            newAccountTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
+            newAccountTransaction.setStatus(1);
+
+            session.save(newAccountTransaction);
+
+            SharesTransaction sharesTransaction = new SharesTransaction();
+            sharesTransaction.setAccountNo(accountNo);
+            sharesTransaction.setDescription(transactionDesc);
+            sharesTransaction.setAmount(calculateAccountSharesBenefit);
+            sharesTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
+            sharesTransaction.setTransaction_type(DEBIT_ACC);
+            sharesTransaction.setStatus(1);
+
+            session.save(sharesTransaction);
+            transactionA.commit();
+        }
     }
 
     public static ObservableList<SharesTransaction> getSharesTransactionsForAccountNo(String accountNo, int type) throws Exception {
@@ -56,6 +159,35 @@ public class ManageSharesTansaction {
             ObservableList<SharesTransaction> currentObserveAccountTransactionList = FXCollections.observableArrayList();
             currentObserveAccountTransactionList.setAll(memQ.getResultList());
             transactionA.commit();
+
+            return currentObserveAccountTransactionList;
+
+    }
+
+    public static ObservableList<SharesTransaction> getSharesTransactionsForMonth(LocalDate localDate) throws Exception {
+        int month = localDate.getMonthValue();
+        int year = localDate.getYear();
+        String hql = "";
+
+            hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year;
+            CustomUtility.pln("ST: "+hql);
+
+            SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+//        Session session = sessionFactory.getCurrentSession();
+            Session session = sessionFactory.openSession();
+
+            Transaction transactionA = session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<SharesTransaction> query = builder.createQuery(SharesTransaction.class);
+
+            Query<SharesTransaction> memQ = session.createQuery(hql, SharesTransaction.class);
+
+            ObservableList<SharesTransaction> currentObserveAccountTransactionList = FXCollections.observableArrayList();
+            currentObserveAccountTransactionList.setAll(memQ.getResultList());
+            transactionA.commit();
+
+//        CustomUtility.pln("ST: "+currentObserveAccountTransactionList.size());
 
             return currentObserveAccountTransactionList;
 

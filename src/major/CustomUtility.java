@@ -33,7 +33,13 @@ public class CustomUtility{
 
 
     private static final SessionFactory sessionFactory;
+
+    public static final int OK = 1;
+    public static final int OK_PLUS = 2;
+    public static final int CANCEL = 0;
+
     private static boolean okAnswer = false;
+    private static int okMultiAnswer = CANCEL;
 
     private static ServiceRegistry serviceRegistry;
 
@@ -164,6 +170,50 @@ public class CustomUtility{
         dialogStage.showAndWait();
 
         return okAnswer;
+    }
+
+    public static int ConfirmationWithOptionsAlertHelper(String title, String content) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                CustomUtility.class.getResource("MultiConfirmAlert.fxml")
+        );
+
+        Scene scene = new Scene((Parent) loader.load(), 363, 234);
+
+        Stage dialogStage = new Stage();
+
+        dialogStage.setScene(scene);
+        dialogStage.setTitle("Alert " + title);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+        Label labelTitle = (Label)loader.getNamespace().get("alertTitleLabel");
+        Label labelContent = (Label)loader.getNamespace().get("alertContentLabel");
+
+        labelTitle.setText(title);
+        labelContent.setText(content);
+
+        Button btn_ok = (Button)loader.getNamespace().get("btnConfirmOk");
+        Button btn_ok_plus = (Button)loader.getNamespace().get("btnConfirmOkPlus");
+        Button btn_cancel = (Button)loader.getNamespace().get("btnConfirmCancel");
+
+        btn_ok.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = OK;
+        });
+
+        btn_ok_plus.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = OK_PLUS;
+        });
+
+        btn_cancel.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = CANCEL;
+        });
+
+        dialogStage.showAndWait();
+
+        return okMultiAnswer;
     }
 
 

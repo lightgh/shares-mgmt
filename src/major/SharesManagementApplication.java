@@ -18,8 +18,9 @@ public class SharesManagementApplication extends Application {
 
             AppLoginManager appLoginManager = new AppLoginManager(scene, stage);
 
-            appLoginManager.showLoginScreen();
-//            appLoginManager.authenticated("");
+//TODO uncomment this line
+//            appLoginManager.showLoginScreen();
+            appLoginManager.authenticated("");
 
 
             stage.setOnCloseRequest(e-> {

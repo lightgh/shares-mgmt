@@ -16,15 +16,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.util.converter.LocalDateStringConverter;
 import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -34,13 +33,14 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import static major.CustomUtility.getLocalDateFromDate;
 import static major.CustomUtility.println;
 
 /** Controls the main application screen */
@@ -143,13 +143,29 @@ public class MainViewDashboardController implements Initializable {
     @FXML
     private TextField searchTextFieldAccountNumber;
 
+    // SHARES TABLE SECTION
+    @FXML Label displayMonthShareTotalLabel;
+    FilteredList<SharesTransaction> sharesAccountFilterList;
+    @FXML TextField filterAllShareDisplayListTextField;
+    @FXML Label filteredSharedSumLabel;
+    private SortedList<SharesTransaction> sharesSortedList;
+    @FXML Button buttonAddSharesTrigger;
+    @FXML
+    private DatePicker shareMonthDatePicker;
+    @FXML
+    private DatePicker sharesDistributedLocalDate;
+    @FXML private TextField sharesProfitAmountTextField;
+    @FXML private TableView<SharesTransaction> shareslisttableview;
+    ObservableList<SharesTransaction> observeSharesTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
+    private BigDecimal sharesMonthTotalAmount = BigDecimal.ZERO;
+    //END OF SHARES TABLE SECTION
+
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
     }
-
 
     public void initialize() {}
 
@@ -852,8 +868,8 @@ public class MainViewDashboardController implements Initializable {
 
         // reference to the returned loan table
         TableView<ReturnLoanTransaction> tableViewReturnedLoans             = (TableView) loader.getNamespace().get("tableViewReturnedLoans");
-        TableColumn<ReturnLoanTransaction, String>      colRLId             =  (TableColumn)loader.getNamespace().get("colRLId");
-        TableColumn<ReturnLoanTransaction, String>      colRLSn             =  (TableColumn)loader.getNamespace().get("colRLSn");
+        TableColumn<ReturnLoanTransaction, String>      colRLId             = (TableColumn)loader.getNamespace().get("colRLId");
+        TableColumn<ReturnLoanTransaction, String>      colRLSn             = (TableColumn)loader.getNamespace().get("colRLSn");
         TableColumn<ReturnLoanTransaction, String>      colRLAccountNo      = (TableColumn)loader.getNamespace().get("colRLAccountNo");
         TableColumn<ReturnLoanTransaction, BigDecimal>  colRLLedgerNo       = (TableColumn)loader.getNamespace().get("colRLLedgerNo");
         TableColumn<ReturnLoanTransaction, String>      colRLLoanAmount     = (TableColumn)loader.getNamespace().get("colRLLoanAmount");
@@ -910,4 +926,168 @@ public class MainViewDashboardController implements Initializable {
     public void goHomeMgmtAccountButtonAction(ActionEvent actionEvent) {
         mainAppTabPane.getSelectionModel().select(0);
     }
+
+    public void buttonExportDatabaseAction(ActionEvent actionEvent) {
+    }
+
+    public void buttonBackupDataAction(ActionEvent actionEvent) {
+    }
+
+    public void buttonAddSharesTriggerAction(ActionEvent actionEvent) throws IOException{
+        //get the revenue
+        BigDecimal revenueAmount;
+        LocalDate localsharesDistributedLocalDate = sharesDistributedLocalDate.getValue() ;
+
+        try {
+            revenueAmount = new BigDecimal(sharesProfitAmountTextField.getText());
+
+            if(revenueAmount.doubleValue() < sharesMonthTotalAmount.doubleValue()){
+                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Total Revenue", "Cannot Distribute Your Revenue Cannot Be Less Than Shares For the Month", "E").show();
+                return;
+            }
+
+            if(localsharesDistributedLocalDate == null || localsharesDistributedLocalDate.isBefore(getLocalDateFromDate(this.observeSharesTransactionSpecifiedAccountListData.get(0).getTransaction_date()))){
+                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Shares Date", "Please SElECT Valid Date After Shares Were Bought. Not Before Shares Were Bought", "E").show();
+                return;
+            }
+
+            BigDecimal profit = revenueAmount.subtract(sharesMonthTotalAmount);
+
+            int ans = CustomUtility.ConfirmationWithOptionsAlertHelper("Shares Distribution Proceed Confirmation", "Are You Sure You Want To PROCEED? With Distributing the Profit Of "+ profit.setScale(2, RoundingMode.DOWN));
+
+            if(ans == CustomUtility.OK)
+                ManageSharesTansaction.distributeSharesAmongThese(this.observeSharesTransactionSpecifiedAccountListData, sharesMonthTotalAmount, profit, localsharesDistributedLocalDate,  ManageSharesTansaction.AUTO_RENEW_SHARES);
+            else if(ans == CustomUtility.OK_PLUS)
+                ManageSharesTansaction.distributeSharesAmongThese(this.observeSharesTransactionSpecifiedAccountListData, sharesMonthTotalAmount, profit, localsharesDistributedLocalDate, ManageSharesTansaction.MANUAL_RENEW_SHARES);
+
+
+        }catch (NumberFormatException ex){
+
+        }
+
+    }
+
+    public void buttonPrintSharesTriggerAction(ActionEvent actionEvent) {
+    }
+
+    public void getAllSharesAction(ActionEvent actionEvent) {
+
+        prepareSharesDisplayTable();
+
+        shareslisttableview.setItems(observeSharesTransactionSpecifiedAccountListData);
+
+        observeSharesTransactionSpecifiedAccountListData.setAll(ManageSharesTansaction.getAllSharesTransactionList());
+        String totalSum =String.format("%,.2f",ManageSharesTansaction.getTotal(ManageSharesTansaction.getAllSharesTransactionList()).setScale(2, RoundingMode.DOWN));
+        displayMonthShareTotalLabel.setText(totalSum);
+        filteredSharedSumLabel.setText("FILTERED SUM: " +totalSum);
+        filteredSharedSumLabel.setFont(Font.font("arial", FontWeight.EXTRA_BOLD,20 ));
+
+    }
+
+    public void buttonFindAllMonthlyLoanAction(ActionEvent actionEvent) {
+    }
+
+    public void getAllLoansAction(ActionEvent actionEvent) {
+    }
+
+    public void buttonAddSharesFindMonthlyAction(ActionEvent actionEvent) throws Exception{
+
+        if(shareMonthDatePicker.getValue() == null){
+            CustomUtility.AlertHelper("Error Getting Monthly Shares", "Error Getting Shares Transaction:", "Please SELECT Shares Date Before Clicking This Button", "I").show();
+            return;
+        }
+
+        LocalDate localDateMonth = shareMonthDatePicker.getValue();
+
+        prepareSharesDisplayTable();
+
+        shareslisttableview.setItems(observeSharesTransactionSpecifiedAccountListData);
+
+        observeSharesTransactionSpecifiedAccountListData.setAll(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth));
+        sharesMonthTotalAmount = ManageSharesTansaction.getTotal(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth));
+        String sumTotal = String.format("%,.2f",sharesMonthTotalAmount.setScale(2, RoundingMode.DOWN));
+        displayMonthShareTotalLabel.setText(sumTotal);
+        filteredSharedSumLabel.setText("FILTERED SUM: " + sumTotal);
+        filteredSharedSumLabel.setFont(Font.font("arial", FontWeight.EXTRA_BOLD,20 ));
+
+        if(observeSharesTransactionSpecifiedAccountListData.isEmpty()) {
+            CustomUtility.AlertHelper("Shares Date Alert", "Shares Display Information", "No SHARES RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
+            buttonAddSharesTrigger.setDisable(true);
+        }else{
+            buttonAddSharesTrigger.setDisable(false);
+
+            CustomUtility.AlertHelper("Shares Date Alert", "Shares Distribution Enabled Information", "YOU CAN NOW DISTRIBUTE SHARES AMONG ALL PARTICIPANTS FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
+        }
+
+    }
+
+    private void prepareSharesDisplayTable(){
+
+        if(!shareslisttableview.getColumns().isEmpty()) return;
+
+        TableColumn<SharesTransaction, String> sColId = new TableColumn<>("Id");
+        TableColumn<SharesTransaction, String> sColDesc = new TableColumn<>("Description") ;
+        TableColumn<SharesTransaction, String> sColTransactionDate = new TableColumn<>("Transaction Date");
+        TableColumn<SharesTransaction, String> sColTransactionType = new TableColumn<>("Transaction Type");
+        TableColumn<SharesTransaction, String> sColStatus = new TableColumn<>("Status");
+        TableColumn<SharesTransaction, String> sColAmount = new TableColumn<>("Shares Amount");
+        TableColumn<SharesTransaction, String> sColAccountNo = new TableColumn<>("Account No");
+
+        sColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+        sColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+        sColTransactionDate.setCellValueFactory(new PropertyValueFactory<>("transaction_date"));
+        sColTransactionType.setCellValueFactory(new PropertyValueFactory<>("transaction_type"));
+        sColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        sColAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+        sColAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+
+        sColId.setVisible(false);
+
+        shareslisttableview.getColumns().setAll(sColId, sColAccountNo, sColAmount, sColTransactionType,  sColTransactionDate, sColDesc, sColStatus);
+    }
+
+    public void setFilterMonthlySharesList(KeyEvent keyEvent) {
+
+        if(this.observeSharesTransactionSpecifiedAccountListData.isEmpty()){
+            return;
+        }
+
+        sharesAccountFilterList = new FilteredList<SharesTransaction>(observeSharesTransactionSpecifiedAccountListData, p->true);
+        filterAllShareDisplayListTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            sharesAccountFilterList.setPredicate(pere -> {
+                if(newValue == null || newValue.isEmpty()){
+                    return true;
+                }
+
+                String typedText = newValue.toLowerCase();
+
+                if(pere.getAccountNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getTransaction_date().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getAmount().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                return false;
+            });
+
+            sharesSortedList = new SortedList<>(sharesAccountFilterList);
+            sharesSortedList.comparatorProperty().bind(shareslisttableview.comparatorProperty());
+            shareslisttableview.setItems(sharesSortedList);
+            tempSumVal = BigDecimal.ZERO;
+            sharesSortedList.getSource().forEach(e ->{
+                tempSumVal = tempSumVal.add(e.getAmount());
+                filteredSharedSumLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+            });
+
+        });
+    }
+
+
+    public BigDecimal tempSumVal = BigDecimal.ZERO;
 }
