@@ -933,7 +933,7 @@ public class MainViewDashboardController implements Initializable {
     public void buttonBackupDataAction(ActionEvent actionEvent) {
     }
 
-    public void buttonAddSharesTriggerAction(ActionEvent actionEvent) throws IOException{
+    public void buttonAddSharesTriggerAction(ActionEvent actionEvent) throws Exception{
         //get the revenue
         BigDecimal revenueAmount;
         LocalDate localsharesDistributedLocalDate = sharesDistributedLocalDate.getValue() ;
