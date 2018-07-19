@@ -51,13 +51,10 @@ public class ManageSharesTansaction {
                 calculateAccountSharesBenefit = iterator.next().getAmount().divide(monthlySharesTotal, mathCntxt).multiply(profit, mathCntxt);
                 SharesTransaction tempST = iterator.next();
                 if(DISTRIBUTION_TYPE == AUTO_RENEW_SHARES){
-                    // TODO CREDIT ACCOUNT NO -- SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
                     ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
-                    // TODO CREDIT SHARES WITH SAME ACCOUNT NO -- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
                     ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC);
 
                 }else{
-                    // TODO ONLY CREDIT ACCOUNT NO - SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
                     ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
                 }
 
@@ -65,7 +62,6 @@ public class ManageSharesTansaction {
                 sum = sum.add(calculateAccountSharesBenefit);
             }
 
-            //TODO - TRACK THE SHARE DISTRIBUTED FOR THIS MONTH AND DISPLAY IT ON THE SIDE TABLE
             ManageSharesDistribution.addNewDistributedShares(monthlySharesTotal, profit, creditLocalDate.getMonth().name() + " Of " +creditLocalDate.getYear(), creditLocalDate, sharesTransactionObservableList.size());
 
             CustomUtility.pln("TOTAL-SUMMED: " + sum);
