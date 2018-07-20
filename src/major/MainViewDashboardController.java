@@ -1,11 +1,5 @@
 package major;
 
-/**
- * Created by chinakalight on 6/20/18.
- *
- * MainViewDashboard Controller
- *
- */
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -43,7 +37,13 @@ import static major.CustomUtility.getLocalDateFromDate;
 import static major.CustomUtility.println;
 import static major.ManageSharesTansaction.ALL_SHARES;
 
-/** Controls the main application screen */
+/**
+ * @author: Chinaka Light
+ * Created On: 6/20/18.
+ * Purpose: To Handle the Main View Of This Application
+ * MainViewDashboard Controller
+ *
+ * Controls the main application screen */
 public class MainViewDashboardController implements Initializable {
     @FXML private Button logoutButton;
     @FXML private Button naAddButton;
@@ -82,20 +82,18 @@ public class MainViewDashboardController implements Initializable {
     @FXML private TableColumn<TableMemberAccount, String> raclAction;
     @FXML private TableColumn<TableMemberAccount, String> raclAddress;
 
-    TableFilter.Builder<TableMemberAccount> tableFilterBuilder;
-    TableFilter<TableMemberAccount> tableFilter;
-    FilteredList<TableMemberAccount> filteredList;
+    private FilteredList<TableMemberAccount> filteredList;
 
-    ObservableList<TableMemberAccount> observeMemberAccountListData = FXCollections.observableArrayList();
+    private ObservableList<TableMemberAccount> observeMemberAccountListData = FXCollections.observableArrayList();
 
     SessionFactory sessionFactory = CustomUtility.getSessionFactory();
     Session session = sessionFactory.openSession();
 
-    AppLoginManager loginManager;
+    private AppLoginManager loginManager;
 
 
-    TableMemberAccount currentTableMemberAccount;
-    MembershipAccount currentMembershipAccount;
+    private TableMemberAccount currentTableMemberAccount;
+    private MembershipAccount currentMembershipAccount;
 
 
 
@@ -145,8 +143,9 @@ public class MainViewDashboardController implements Initializable {
 
     // SHARES TABLE SECTION
     @FXML Label displayMonthShareTotalLabel;
-    FilteredList<SharesTransaction> sharesAccountFilterList;
-    @FXML TextField filterAllShareDisplayListTextField;
+    private FilteredList<SharesTransaction> sharesAccountFilterList;
+    @FXML
+    private TextField filterAllShareDisplayListTextField;
     @FXML Label filteredSharedSumLabel;
     private SortedList<SharesTransaction> sharesSortedList;
     @FXML Button buttonAddSharesTrigger;
@@ -157,8 +156,8 @@ public class MainViewDashboardController implements Initializable {
     @FXML private TextField sharesProfitAmountTextField;
     @FXML private TableView<SharesTransaction> shareslisttableview;
     @FXML private TableView<SharesDistributionTransaction> sharedMonthlyAmountTableView;
-    ObservableList<SharesTransaction> observeSharesTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
-    ObservableList<SharesDistributionTransaction> observeSharesDistributedTransactionListData = FXCollections.observableArrayList();
+    private ObservableList<SharesTransaction> observeSharesTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
+    private ObservableList<SharesDistributionTransaction> observeSharesDistributedTransactionListData = FXCollections.observableArrayList();
     private BigDecimal sharesMonthTotalAmount = BigDecimal.ZERO;
 
 
@@ -1035,9 +1034,14 @@ public class MainViewDashboardController implements Initializable {
             CustomUtility.AlertHelper("Shares Date Alert", "Shares Display Information", "No SHARES RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
             buttonAddSharesTrigger.setDisable(true);
         }else{
-            if(sharesCategory == ALL_PENDING_SHARES_CAT)
+
+
+            if(sharesCategory == ALL_PENDING_SHARES_CAT) {
+
                 buttonAddSharesTrigger.setDisable(false);
-            CustomUtility.AlertHelper("Shares Date Alert", "Shares Distribution Enabled Information", "DISTRIBUTING SHARES AMONG ALL PARTICIPANTS FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
+
+                CustomUtility.AlertHelper("Shares Date Alert", "Shares Distribution Enabled Information", "DISTRIBUTING SHARES AMONG ALL PARTICIPANTS FOR " + localDateMonth.getMonth().toString() + " OF " + localDateMonth.getYear(), "I").show();
+            }
 
         }
     }

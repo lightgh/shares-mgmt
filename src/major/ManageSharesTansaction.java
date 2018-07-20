@@ -72,13 +72,13 @@ public class ManageSharesTansaction {
                     //CREDIT ACCOUNT NO -- SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
                     ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
                     //CREDIT SHARES WITH SAME ACCOUNT NO (SHARED PROFIT)-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
-                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
+                    ManageSharesTansaction.buySellSharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
 
                     //SELL or DEBIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
-                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Sell For Transfer To The Specified New Month", DEBIT_ACC, SHARES_REWARD_PENDING);
+                    ManageSharesTansaction.buySellSharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Sell For Transfer To The Specified New Month", DEBIT_ACC, SHARES_REWARD_SUCCESSFUL);
 
                     //BUY or CREDIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
-                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
+                    ManageSharesTansaction.buySellSharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
 
                 }else if(DISTRIBUTION_TYPE == MANUAL_RENEW_SHARES){
 
@@ -86,7 +86,7 @@ public class ManageSharesTansaction {
                     ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Manual Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
 
                     //DEBIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
-                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), DEBIT_ACC, SHARES_REWARD_PENDING);
+                    ManageSharesTansaction.buySellSharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), DEBIT_ACC, SHARES_REWARD_PENDING);
 
                 }
 
@@ -116,7 +116,7 @@ public class ManageSharesTansaction {
 
     }
 
-    private static void buySharesForAccounNoOfAmount(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType, int sharesRewardStatus) throws Exception {
+    private static void buySellSharesForAccounNoOfAmount(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType, int sharesRewardStatus) throws Exception {
 
         if(!transType.equalsIgnoreCase(CREDIT_ACC) && !transType.equalsIgnoreCase(DEBIT_ACC))
             throw new IllegalArgumentException("Transaction TYPE MUST BE CREDIT OR DEBIT");
@@ -223,7 +223,7 @@ public class ManageSharesTansaction {
         if(shareCategoryType == ALL_REWARD_SUCCESSFUL_SHARES)
             hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year + " and A.status= "+SHARES_REWARD_SUCCESSFUL;
         else if(shareCategoryType == ALL_REWARD_PENDING_SHARES)
-            hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year + " and A.status= "+SHARES_REWARD_PENDING;
+            hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year + " and A.status= "+SHARES_REWARD_PENDING + " and A.transaction_type='CREDIT'";
         else
             hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year;
 
