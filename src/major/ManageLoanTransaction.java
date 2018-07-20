@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.Iterator;
 
@@ -170,7 +171,7 @@ public class ManageLoanTransaction {
         BigDecimal percentage = getPercentage(period);
 
 
-        expectedAmount = percentage.divide(ONE_HUNDRED).multiply(loanAmount);
+        expectedAmount = percentage.divide(ONE_HUNDRED, MathContext.DECIMAL64).multiply(loanAmount, MathContext.DECIMAL64);
 
         return expectedAmount;
 
@@ -206,7 +207,7 @@ public class ManageLoanTransaction {
             percentage = percentage + (5 * noOfMonths);
         }
 
-        return new BigDecimal(percentage);
+        return new BigDecimal(String.valueOf(percentage));
     }
 
     public static BigDecimal getCurrentLoanBalance(String accountNo) {
@@ -257,7 +258,7 @@ public class ManageLoanTransaction {
 
         BigDecimal sum = BigDecimal.ZERO;
 
-        if(takenLoanTransactions == null)
+        if(takenLoanTransactions == null | takenLoanTransactions.isEmpty())
             return null;
 
         Iterator<TakeLoanTransaction> iterator =  takenLoanTransactions.iterator();
@@ -271,9 +272,11 @@ public class ManageLoanTransaction {
             return sum;
 
         }else if(sumation_target.equalsIgnoreCase("EXPECTED_RETURNED_AMOUNT")){
+                TakeLoanTransaction tempTLT ; BigDecimal sumProces = BigDecimal.ZERO;
             while (iterator.hasNext()) {
-                sum = sum.add(iterator.next().getAmount().add(ManageLoanTransaction.getIncuredInterest(iterator.next().getAmount(), iterator.next().getLoanPeriod())));
-
+                tempTLT = iterator.next();
+                sumProces = ManageLoanTransaction.getIncuredInterest(tempTLT.getAmount(), tempTLT.getLoanPeriod());
+                sum = sum.add(tempTLT.getAmount().add(sumProces));
             }
 
             return sum;
@@ -305,14 +308,20 @@ public class ManageLoanTransaction {
 
             return sum;
         }else if(sumation_target.equalsIgnoreCase("ACTUAL_RETURNED_AMOUNT")){
+                ReturnLoanTransaction tempRLT ; BigDecimal sumProces = BigDecimal.ZERO;
             while (iterator.hasNext()) {
-                sum = sum.add(iterator.next().getCollectedAmount().add(ManageLoanTransaction.getIncuredInterest(iterator.next().getCollectedAmount(), iterator.next().getLoanPeriod())));
+                tempRLT = iterator.next();
+                sumProces = ManageLoanTransaction.getIncuredInterest(tempRLT.getCollectedAmount(), tempRLT.getLoanPeriod());
+                sum = sum.add(tempRLT.getCollectedAmount().add(sumProces));
             }
 
             return sum;
         }else if(sumation_target.equalsIgnoreCase("PROFIT_EARNED_FROM_RETURNED_AMOUNT")){
+            ReturnLoanTransaction tempRLT ; BigDecimal sumProces = BigDecimal.ZERO;
             while (iterator.hasNext()) {
-                sum = sum.add(ManageLoanTransaction.getIncuredInterest(iterator.next().getCollectedAmount(), iterator.next().getLoanPeriod()));
+                tempRLT = iterator.next();
+                sumProces = ManageLoanTransaction.getIncuredInterest(tempRLT.getCollectedAmount(), tempRLT.getLoanPeriod());
+                sum = sum.add(sumProces);
             }
 
             return sum;

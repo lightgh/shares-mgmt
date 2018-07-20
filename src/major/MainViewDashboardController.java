@@ -1045,7 +1045,8 @@ public class MainViewDashboardController implements Initializable {
         String sumActualReturnProfitTotal = String.format("%,.2f",returnedALoanProfitFromMonthTotalAmount.setScale(2, RoundingMode.DOWN));
         totalMonthTakenLoanAmountLabel.setText(sumTotal);
         totalMonthReturnedLoanAmountLabel.setText(sumActualReturnTotal);
-        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnTotal);
+        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnProfitTotal);
+
 
         if(observeTakeLoanTransactionSpecifiedAccountListData.isEmpty() && observeReturnLoanTransactionSpecifiedAccountListData.isEmpty()) {
             CustomUtility.AlertHelper("Loan Month Date Alert", "Loan Month Display Information", "No LOAN RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
@@ -1070,6 +1071,11 @@ public class MainViewDashboardController implements Initializable {
         totalExpectedMonthReturnLoanAmountLabel.setText(tEmonthTLAL);
         String tMonthRLAL = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactions(), "ACTUAL_RETURNED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
         totalMonthReturnedLoanAmountLabel.setText(tMonthRLAL);
+        BigDecimal returnedALoanProfitFromMonthTotalAmount = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactions(), "PROFIT_EARNED_FROM_RETURNED_AMOUNT");
+
+        String sumActualReturnProfitTotal = String.format("%,.2f",returnedALoanProfitFromMonthTotalAmount.setScale(2, RoundingMode.DOWN));
+        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnProfitTotal);
+
 
         totalFilteredMonthTakenLoanAmountLabel.setText("FILTERED: "+tMonthTLAL);
         totalFilteredMonthReturnLoanAmountLabel.setText("FILTERED: " +tMonthRLAL);
@@ -1296,7 +1302,7 @@ public class MainViewDashboardController implements Initializable {
         getAllSharesTransactionForSpecifiedMonth(ALL_PENDING_SHARES_CAT);
     }
 
-    public void setFilterMonthlyTakenLoanList(ActionEvent actionEvent) {
+    public void setFilterMonthlyTakenLoanList(KeyEvent keyEvent) {
         if(this.observeTakeLoanTransactionSpecifiedAccountListData.isEmpty()){
             return;
         }
@@ -1349,7 +1355,7 @@ public class MainViewDashboardController implements Initializable {
 
     }
 
-    public void setFilterMonthlyReturnLoanList(ActionEvent actionEvent) {
+    public void setFilterMonthlyReturnLoanList(KeyEvent keyEvent) {
         if(this.observeTakeLoanTransactionSpecifiedAccountListData.isEmpty()){
             return;
         }
@@ -1384,6 +1390,10 @@ public class MainViewDashboardController implements Initializable {
                 }
 
                 if(pere.getExpectedAmount().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getCollectedAmount().toString().indexOf(typedText) != -1){
                     return true;
                 }
 
