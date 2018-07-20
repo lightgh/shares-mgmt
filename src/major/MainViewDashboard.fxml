@@ -403,7 +403,7 @@
                                        <tabs>
                                           <Tab closable="false" text="MONTH SHARES LIST ">
                                              <content>
-                                                <TableView fx:id="shareslisttableview" prefHeight="626.0" prefWidth="1038.0">
+                                                <TableView fx:id="shareslisttableview" editable="true" prefHeight="626.0" prefWidth="1038.0">
                                                    <columnResizePolicy>
                                                       <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                                    </columnResizePolicy>
@@ -416,7 +416,7 @@
                                        <tabs>
                                           <Tab text="SHARES SHARED INTEREST AMOUNT INFORMATION">
                                              <content>
-                                                <TableView fx:id="sharedMonthlyAmountTableView" prefHeight="616.0" prefWidth="397.0" />
+                                                <TableView fx:id="sharedMonthlyAmountTableView" editable="true" prefHeight="616.0" prefWidth="397.0" />
                                              </content>
                                           </Tab>
                                        </tabs>
