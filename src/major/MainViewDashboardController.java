@@ -22,6 +22,10 @@ import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.boot.spi.MetadataImplementor;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -29,9 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static major.CustomUtility.getLocalDateFromDate;
 import static major.CustomUtility.println;
@@ -57,10 +59,9 @@ public class MainViewDashboardController implements Initializable {
     @FXML private DatePicker naOpenDate;
 
     @FXML private TabPane mainAppTabPane;
-    @FXML private Tab manageSharesTab;
-    @FXML private Tab manageAccountTab;
 
-    @FXML private Button goMainSectionButton;
+    @FXML private Button buttonBackupData;
+    @FXML private Button buttonExportDatabase;
 
 
     @FXML private Tab accountListTabSection;
@@ -190,7 +191,6 @@ public class MainViewDashboardController implements Initializable {
     @FXML Label totalFilteredMonthReturnLoanAmountLabel;
     @FXML private TextField filterReturnLoanTextField;
     // END RETURN LOAN SECTION TABLE
-
 
 
     @Override
@@ -958,9 +958,62 @@ public class MainViewDashboardController implements Initializable {
     }
 
     public void buttonExportDatabaseAction(ActionEvent actionEvent) {
+        //TODO complete this export Database CODE - NOT WORKING STILL BEING DEVELOPED
+        buttonExportDatabase.setDisable(true);
+
+        try {
+
+            Map<String, String> settings = new HashMap<>();
+            settings.put("connection.driver_class", "com.mysql.jdbc.Driver");
+            settings.put("dialect", "org.hibernate.dialect.MySQL57InnoDBDialect");
+            settings.put("hibernate.connection.url", "jdbc:mysql://localhost/testdb?useSSL=false");
+            settings.put("hibernate.connection.username", "root");
+            settings.put("hibernate.connection.password", "");
+            settings.put("hibernate.hbm2ddl.auto", "create");
+            settings.put("show_sql", "true");
+
+            MetadataSources metadata = new MetadataSources(
+                    new StandardServiceRegistryBuilder()
+                            .applySettings(settings)
+                            .build());
+            metadata.addAnnotatedClass(MembershipAccount.class);
+            metadata.addAnnotatedClass(AccountTransaction.class);
+            metadata.addAnnotatedClass(SharesTransaction.class);
+            metadata.addAnnotatedClass(SharesDistributionTransaction.class);
+            metadata.addAnnotatedClass(TakeLoanTransaction.class);
+            metadata.addAnnotatedClass(ReturnLoanTransaction.class);
+            metadata.addAnnotatedClass(Task.class);
+
+        /*SchemaExport schemaExport = new SchemaExport(
+                (MetadataImplementor) metadata.buildMetadata()
+        );*/
+
+            SchemaExport schemaExport = new SchemaExport();
+//        SchemaExport schemaExport = SchemaExport.buildMetadataFromMainArgs(metadata.);
+            schemaExport.setHaltOnError(true);
+            schemaExport.setFormat(true);
+            schemaExport.setDelimiter(";");
+            schemaExport.setOutputFile(System.getenv("")+"db-schema.sql");
+//        schemaExport.execute(true, true, false, true);
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        buttonExportDatabase.setDisable(false);
+
     }
 
     public void buttonBackupDataAction(ActionEvent actionEvent) {
+        if(CustomUtility.netIsAvailable()){
+            buttonBackupData.setDisable(true);
+
+            //TODO  START A THREAD TASK THAT UPLOADS DATA TO THE INTERNET
+
+
+        }else{
+            buttonBackupData.setDisable(false);
+        }
     }
 
     public void buttonAddSharesTriggerAction(ActionEvent actionEvent) throws Exception{

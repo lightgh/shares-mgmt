@@ -19,6 +19,9 @@ import org.hibernate.service.ServiceRegistry;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.*;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -352,96 +355,6 @@ public class CustomUtility{
         pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
         pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
 
-        return;
-
-//        LocalDate dt = getLocalDateFromString("12-06-2018");
-//        LocalDate dt = getLocalDateFromString("2018-06-12");
-       /* LocalDate dt = getLocalDateFromString("2018/12/6");
-
-
-        Date td2 = getDateFromLocalDate(dt);
-        pln(td2.toString());
-        LocalDate dt2 = getLocalDateFromDate(td2);
-        pln("STR_FROM_LD: "+getStringFromLocalDate(dt2));
-
-        System.exit(0);*/
-
-//        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-        /*AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
-        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();*/
-        /*Transaction transaction = session.beginTransaction();
-        MembershipAccount membA = new MembershipAccount();
-        membA.setAccountNo(accountNumberGenerator.getNewAccountNo(10));
-        membA.setFirstName("MusaJane");
-        membA.setLastName("Saminu");
-        membA.setOtherName("Kenw");
-        membA.setAddress("Opp Sch Of Agric");
-        membA.setClosing_date(new Date());
-        membA.setOpening_date(new Date());
-        membA.setPhoneNo("08031289230");
-        membA.setStatus(1);
-        session.save(membA);
-        transaction.commit();
-        CustomUtility.println("Successfully inserted");
-        sessionFactory.close();*/
-
-
-/*
-        String hql = "FROM MembershipAccount M WHERE M.accountNo='3501697105'";
-        String hql = "FROM MembershipAccount M WHERE M.firstName LIKE 'Chinaka'";
-
-        Transaction transactionA = session.beginTransaction();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<MembershipAccount> query = builder.createQuery(MembershipAccount.class);
-//        query.from(MembershipAccount.class);
-        Root<MembershipAccount> root = query.from(MembershipAccount.class);
-//        query.select(builder.construct(MembershipAccount.class, root.get("accountNo")));
-
-        Query<MembershipAccount> memQ = session.createQuery(hql, MembershipAccount.class);
-//        List memberAccountList = session.createQuery(query).getResultList();
-        List<MembershipAccount> memberAccountList = memQ.list();
-        MembershipAccount membershipAccount;
-
-        println("ACCOUNT_LISTING");
-        for (Object memberAccount:
-             memberAccountList) {
-            membershipAccount = (MembershipAccount)memberAccount;
-            print(membershipAccount.getId() + " ");
-            print(membershipAccount.getAccountNo() + " ");
-            println(membershipAccount.getFullName() + " ");
-        }
-*/
-
-
-
-//        query.select(root).where(builder.equal(root.get("accountNo"), "3501697105"));
-//                .where(builder.);
-
-
-
-        /*org.hibernate.query.Query<MembershipAccount> q= session.createQuery(query);
-        MembershipAccount membershipAccountNow = q.getSingleResult();
-        println(membershipAccountNow.getAccountNo());
-        println(membershipAccountNow.getFullName());
-        println(membershipAccountNow.getAddress());*/
-
-
-//        Query<Long> longQuery = session.createQuery(queryCount);
-
-//        long count = queryCount..getSingleResult();
-        /*List<Object[]> countObj = session.createNativeQuery(
-                "SELECT count(*) as number FROM account_info" )
-                .list();
-
-        println("Count = "+(countObj.get(0) ));*/
-
-//        List<MembershipAccount> =
-
-//        transactionA.commit();
-
-
-
     }
 
     public static String getAppropriateStringFormat(String dateString){
@@ -531,5 +444,19 @@ public class CustomUtility{
 
         return (int)ChronoUnit.DAYS.between(firstDate, secondDate);
 
+    }
+
+    public static boolean netIsAvailable() {
+        try {
+            final URL url = new URL("http://www.google.com");
+            final URLConnection conn = url.openConnection();
+            conn.connect();
+            conn.getInputStream().close();
+            return true;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            return false;
+        }
     }
 }
