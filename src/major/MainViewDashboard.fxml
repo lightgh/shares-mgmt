@@ -384,17 +384,18 @@
                               <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
                                  <children>
                                     <DatePicker fx:id="shareMonthDatePicker" layoutX="7.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
-                                    <Button fx:id="buttonAddSharesTrigger" disable="true" layoutX="6.0" layoutY="389.0" mnemonicParsing="false" onAction="#buttonAddSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Add Shares" />
+                                    <Button fx:id="buttonAddSharesTrigger" disable="true" layoutX="6.0" layoutY="389.0" mnemonicParsing="false" onAction="#buttonAddSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Distribute Shares" />
                                     <TextField fx:id="sharesProfitAmountTextField" layoutX="7.0" layoutY="261.0" prefHeight="41.0" prefWidth="182.0" promptText="Enter Profit Amount" />
-                                    <Label fx:id="displayMonthShareTotalLabel" alignment="CENTER" layoutX="3.0" layoutY="152.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                    <Label fx:id="displayMonthShareTotalLabel" alignment="CENTER" layoutX="5.0" layoutY="198.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
-                                    <Button fx:id="buttonAddSharesFind" layoutX="9.0" layoutY="108.0" mnemonicParsing="false" onAction="#buttonAddSharesFindMonthlyAction" prefHeight="29.0" prefWidth="175.0" text="Find Shares" />
+                                    <Button fx:id="buttonAddSharesFind" layoutX="9.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonAddSharesFindMonthlyAction" prefHeight="43.0" prefWidth="175.0" text="Find Month Total Shares" textAlignment="CENTER" wrapText="true" />
                                     <Button fx:id="buttonAddSharesTrigger2" disable="true" layoutX="6.0" layoutY="351.0" mnemonicParsing="false" onAction="#buttonPrintSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Print Shares" />
                                     <Button layoutX="8.0" layoutY="3.0" mnemonicParsing="false" onAction="#getAllSharesAction" prefHeight="26.0" prefWidth="173.0" text="Get All Shares" />
                                     <DatePicker fx:id="sharesDistributedLocalDate" layoutX="6.0" layoutY="309.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
+                                    <Button fx:id="buttonAddCreditableSharesFind" alignment="CENTER" layoutX="9.0" layoutY="148.0" mnemonicParsing="false" onAction="#buttonAddSharesFindPendingMonthlyAction" prefHeight="43.0" prefWidth="175.0" text="Find Only Pending Month Shares" textAlignment="CENTER" wrapText="true" />
                                  </children></Pane>
                               <SplitPane dividerPositions="0.5" layoutX="223.0" layoutY="135.0" prefHeight="638.0" prefWidth="1738.0" AnchorPane.leftAnchor="223.0" AnchorPane.topAnchor="135.0">
                                  <items>
@@ -439,7 +440,7 @@
                               <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
                                  <children>
                                     <DatePicker fx:id="viewMonthLoanDatePicker" layoutX="7.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Loan Month" />
-                                    <Label fx:id="totalMonthLoanAmountLabel" alignment="CENTER" layoutX="3.0" layoutY="152.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="450000">
+                                    <Label fx:id="totalMonthLoanAmountLabel" alignment="CENTER" layoutX="3.0" layoutY="152.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>

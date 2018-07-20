@@ -32,12 +32,27 @@ public class ManageSharesTansaction {
     public static int AUTO_RENEW_SHARES = 1;
     public static int MANUAL_RENEW_SHARES = 2;
 
+    public static int SHARES_REWARD_PENDING = 1;
+    public static int SHARES_REWARD_SUCCESSFUL = 2;
+
+    public static int ALL_SHARES  = 4;
+    public static int ALL_REWARD_PENDING_SHARES  = 1;
+    public static int ALL_REWARD_SUCCESSFUL_SHARES  = 2;
 
     public static ObservableList<SharesTransaction> getSharesTransactionsForAccountNo(String accountNo) throws Exception {
         return getSharesTransactionsForAccountNo(accountNo, ManageSharesTansaction.BOTH);
     }
 
-
+    /**
+     * Distribute Shares Across Accounts
+     * @param sharesTransactionObservableList
+     * @param monthlySharesTotal
+     * @param profit
+     * @param creditLocalDate
+     * @param DISTRIBUTION_TYPE
+     * @return
+     * @throws Exception
+     */
     public static boolean distributeSharesAmongThese(ObservableList<SharesTransaction> sharesTransactionObservableList, BigDecimal monthlySharesTotal, BigDecimal profit, LocalDate creditLocalDate, int DISTRIBUTION_TYPE) throws Exception{
         boolean complete = false;
         BigDecimal calculateAccountSharesBenefit, sum = BigDecimal.ZERO;
@@ -46,20 +61,41 @@ public class ManageSharesTansaction {
         }else{
 
             Iterator<SharesTransaction> iterator =  sharesTransactionObservableList.iterator();
-            while (iterator.hasNext()){
-                MathContext mathCntxt = new MathContext(7);
-                calculateAccountSharesBenefit = iterator.next().getAmount().divide(monthlySharesTotal, mathCntxt).multiply(profit, mathCntxt);
-                SharesTransaction tempST = iterator.next();
-                if(DISTRIBUTION_TYPE == AUTO_RENEW_SHARES){
-                    ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
-                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC);
 
-                }else{
+            MathContext mathCntxt = MathContext.DECIMAL64;
+            while (iterator.hasNext()){
+
+                SharesTransaction tempST = iterator.next();
+                calculateAccountSharesBenefit = tempST.getAmount().divide(monthlySharesTotal, mathCntxt).multiply(profit, mathCntxt);
+                if(DISTRIBUTION_TYPE == AUTO_RENEW_SHARES){
+
+                    //CREDIT ACCOUNT NO -- SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
                     ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
+                    //CREDIT SHARES WITH SAME ACCOUNT NO (SHARED PROFIT)-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Automated Purchase Of Shares For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
+
+                    //SELL or DEBIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Sell For Transfer To The Specified New Month", DEBIT_ACC, SHARES_REWARD_PENDING);
+
+                    //BUY or CREDIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), CREDIT_ACC, SHARES_REWARD_PENDING);
+
+                }else if(DISTRIBUTION_TYPE == MANUAL_RENEW_SHARES){
+
+                    //ONLY CREDIT ACCOUNT NO - SHARES BENEFIT FOR MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageAccountTansaction.creditOrDebitAccountNoWith(tempST.getAccountNo(), calculateAccountSharesBenefit, creditLocalDate, "Manual Shares Benefit For "+ tempST.getTransaction_date(), CREDIT_ACC);
+
+                    //DEBIT SHARES WITH SAME ACCOUNT NO (OLD AMOUNT AND )-- BUY SHARES FOR THE MONTH OF YEAR (USING CURRENT SPECIFIED DATE)
+                    ManageSharesTansaction.buySharesForAccounNoOfAmount(tempST.getAccountNo(), tempST.getAmount(), creditLocalDate, "Automated Shares Purchase For " + creditLocalDate.getMonth().name()+ " Of "+creditLocalDate.getYear(), DEBIT_ACC, SHARES_REWARD_PENDING);
+
                 }
 
-                CustomUtility.pln(String.format("SHARED: %s to AccountNo: %s", sum, iterator.next().getAccountNo()));
+                //UPDATE sharesTransaction Status  = 2 (GOTTEN SHARES)
+                ManageSharesTansaction.updateShareTransaction(tempST, SHARES_REWARD_SUCCESSFUL);
+
+                //TRACK THE SHARE DISTRIBUTED FOR THIS MONTH AND DISPLAY IT ON THE SIDE TABLE
                 sum = sum.add(calculateAccountSharesBenefit);
+                CustomUtility.pln(String.format("SHARED: %s to AccountNo: %s", calculateAccountSharesBenefit, tempST.getAccountNo()));
             }
 
             ManageSharesDistribution.addNewDistributedShares(monthlySharesTotal, profit, creditLocalDate.getMonth().name() + " Of " +creditLocalDate.getYear(), creditLocalDate, sharesTransactionObservableList.size());
@@ -70,10 +106,24 @@ public class ManageSharesTansaction {
         return complete;
     }
 
-    private static void buySharesForAccounNoOfAmount(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType) throws Exception {
+    private static void updateShareTransaction(SharesTransaction tempST, int sharesRewardSuccessful) {
+
+        Session session = CustomUtility.getSessionFactory().openSession();
+        Transaction transactionA = session.beginTransaction();
+        tempST.setStatus(sharesRewardSuccessful);
+        session.saveOrUpdate(tempST);
+        transactionA.commit();
+
+    }
+
+    private static void buySharesForAccounNoOfAmount(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType, int sharesRewardStatus) throws Exception {
 
         if(!transType.equalsIgnoreCase(CREDIT_ACC) && !transType.equalsIgnoreCase(DEBIT_ACC))
             throw new IllegalArgumentException("Transaction TYPE MUST BE CREDIT OR DEBIT");
+
+        if(sharesRewardStatus != SHARES_REWARD_PENDING && sharesRewardStatus != SHARES_REWARD_SUCCESSFUL){
+            throw new IllegalArgumentException("SHARES REWARD STATUS MUST BE EITHER SHARES_REWARD_PENDING OR SHARES_REWARD_SUCCESSFUL");
+        }
 
         SessionFactory sessionFactory = CustomUtility.getSessionFactory();
         Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
@@ -101,10 +151,11 @@ public class ManageSharesTansaction {
             sharesTransaction.setAmount(calculateAccountSharesBenefit);
             sharesTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
             sharesTransaction.setTransaction_type(CREDIT_ACC);
-            sharesTransaction.setStatus(1);
+            sharesTransaction.setStatus(sharesRewardStatus);
 
             session.save(sharesTransaction);
             transactionA.commit();
+
         }else if(transType == DEBIT_ACC){
             AccountTransaction newAccountTransaction = new AccountTransaction();
             newAccountTransaction.setAccountNo(accountNo);
@@ -122,7 +173,7 @@ public class ManageSharesTansaction {
             sharesTransaction.setAmount(calculateAccountSharesBenefit);
             sharesTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
             sharesTransaction.setTransaction_type(DEBIT_ACC);
-            sharesTransaction.setStatus(1);
+            sharesTransaction.setStatus(sharesRewardStatus);
 
             session.save(sharesTransaction);
             transactionA.commit();
@@ -142,7 +193,7 @@ public class ManageSharesTansaction {
         }
 
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-//        Session session = sessionFactory.getCurrentSession();
+
             Session session = sessionFactory.openSession();
 
             Transaction transactionA = session.beginTransaction();
@@ -160,12 +211,22 @@ public class ManageSharesTansaction {
 
     }
 
-    public static ObservableList<SharesTransaction> getSharesTransactionsForMonth(LocalDate localDate) throws Exception {
+    public static ObservableList<SharesTransaction> getSharesTransactionsForMonth(LocalDate localDate, int shareCategoryType) throws Exception {
         int month = localDate.getMonthValue();
         int year = localDate.getYear();
         String hql = "";
 
+        if(shareCategoryType != ALL_SHARES  && shareCategoryType != ALL_REWARD_PENDING_SHARES && shareCategoryType != ALL_REWARD_SUCCESSFUL_SHARES){
+            throw new Exception("Invalid Shares Status Specified. Please Specify Valid Ones");
+        }
+
+        if(shareCategoryType == ALL_REWARD_SUCCESSFUL_SHARES)
+            hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year + " and A.status= "+SHARES_REWARD_SUCCESSFUL;
+        else if(shareCategoryType == ALL_REWARD_PENDING_SHARES)
+            hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year + " and A.status= "+SHARES_REWARD_PENDING;
+        else
             hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year;
+
             CustomUtility.pln("ST: "+hql);
 
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
@@ -197,7 +258,7 @@ public class ManageSharesTansaction {
 
     public static BigDecimal getTotalDebited(String accountNo) throws Exception {
 
-        BigDecimal totalCredited = getTotal(getSharesSellsTransactions(accountNo));
+        BigDecimal totalCredited = getTotal(getSharesSellsTransactions(accountNo), ALL_SHARES);
         return totalCredited;
     }
 
@@ -215,7 +276,7 @@ public class ManageSharesTansaction {
      */
     public static BigDecimal getTotalCredited(String accountNo) throws Exception {
 
-        BigDecimal totalCredited = getTotal(getCreditTransactions(accountNo));
+        BigDecimal totalCredited = getTotal(getCreditTransactions(accountNo), ALL_SHARES);
         return totalCredited;
     }
 
@@ -226,27 +287,35 @@ public class ManageSharesTansaction {
     }
 
 
-    public static BigDecimal getTotal(ObservableList<SharesTransaction> sharesTransactions){
-
-//        CustomUtility.pln("TE-ST-1: " +sharesTransactions.size());
+    public static BigDecimal getTotal(ObservableList<SharesTransaction> sharesTransactions, int shareRewardCategory){
 
         BigDecimal sum = BigDecimal.ZERO;
 
-        if(sharesTransactions == null)
-            return sum;
+        if(shareRewardCategory != ALL_REWARD_SUCCESSFUL_SHARES && shareRewardCategory != ALL_REWARD_PENDING_SHARES && shareRewardCategory != ALL_SHARES){
 
-//        CustomUtility.pln("TE-ST-2: " +sharesTransactions.size());
-        /*sharesTransactions.forEach((temp)->{
-            sum = sum.add(temp.getCollectedAmount());
-        });*/
+            throw new IllegalArgumentException("Please sharedRewardCategoty Must Be ALL_REWARD_SUCCESSFUL_SHARES or ALL_REWARD_PENDING_SHARES or ALL_SHARES");
 
-        Iterator<SharesTransaction> iterator =  sharesTransactions.iterator();
-        while (iterator.hasNext()){
-            sum = sum.add(iterator.next().getAmount());
         }
 
-//        CustomUtility.pln("SUMATION: " + sum.toString());
-//        CustomUtility.pln("TE-ST-3: " +sharesTransactions.size());
+        if(sharesTransactions == null)
+            return sum;
+        Iterator<SharesTransaction> iterator =  sharesTransactions.iterator();
+        if(shareRewardCategory == ALL_SHARES) {
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getAmount());
+            }
+        }else if(shareRewardCategory == ALL_REWARD_PENDING_SHARES) {
+
+            while (iterator.hasNext()) {
+                if (iterator.next().getStatus() == SHARES_REWARD_PENDING)
+                    sum = sum.add(iterator.next().getAmount());
+            }
+        }else if( shareRewardCategory == ALL_REWARD_SUCCESSFUL_SHARES){
+            while (iterator.hasNext()) {
+                if (iterator.next().getStatus() == SHARES_REWARD_SUCCESSFUL)
+                    sum = sum.add(iterator.next().getAmount());
+            }
+        }
 
         return sum;
     }
@@ -289,5 +358,24 @@ public class ManageSharesTansaction {
     }
 
 
+    public static ObservableList<SharesDistributionTransaction> getAllMonthlyDistributedTransactionList() {
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession();
 
+        ObservableList<SharesDistributionTransaction> currentObserveSharesDistributionTransactionList = FXCollections.observableArrayList();
+
+        Transaction transactionA = session.beginTransaction();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<SharesDistributionTransaction> query = builder.createQuery(SharesDistributionTransaction.class);
+        query.from(SharesDistributionTransaction.class);
+
+        //get this information from the database
+        List<SharesDistributionTransaction> memberAccountList = session.createQuery(query).getResultList();
+        currentObserveSharesDistributionTransactionList.setAll(memberAccountList);
+
+
+        transactionA.commit();
+
+        return currentObserveSharesDistributionTransactionList;
+    }
 }

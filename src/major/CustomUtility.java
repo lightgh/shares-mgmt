@@ -178,7 +178,7 @@ public class CustomUtility{
                 CustomUtility.class.getResource("MultiConfirmAlert.fxml")
         );
 
-        Scene scene = new Scene((Parent) loader.load(), 363, 234);
+        Scene scene = new Scene((Parent) loader.load(), 563, 254);
 
         Stage dialogStage = new Stage();
 

@@ -48,8 +48,6 @@ public class ManageAccountTansaction {
 
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
 
-//        Session session = sessionFactory.getCurrentSession();
-
             Session session = sessionFactory.openSession();
 
             Transaction transactionA = session.beginTransaction();
@@ -174,7 +172,6 @@ public class ManageAccountTansaction {
 
         if(!transType.equalsIgnoreCase(CREDIT_ACC) && !transType.equalsIgnoreCase(DEBIT_ACC))
             throw new IllegalArgumentException("Transaction TYPE MUST BE CREDIT OR DEBIT");
-
         SessionFactory sessionFactory = CustomUtility.getSessionFactory();
         Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
         Transaction transactionA = session.beginTransaction();
@@ -185,6 +182,7 @@ public class ManageAccountTansaction {
         newAccountTransaction.setTransaction_type(transType);
         newAccountTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
         newAccountTransaction.setStatus(1);
+        newAccountTransaction.toString();
         session.save(newAccountTransaction);
         transactionA.commit();
     }

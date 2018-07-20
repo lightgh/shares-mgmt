@@ -31,7 +31,6 @@ import org.hibernate.Transaction;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -42,6 +41,7 @@ import java.util.ResourceBundle;
 
 import static major.CustomUtility.getLocalDateFromDate;
 import static major.CustomUtility.println;
+import static major.ManageSharesTansaction.ALL_SHARES;
 
 /** Controls the main application screen */
 public class MainViewDashboardController implements Initializable {
@@ -156,8 +156,16 @@ public class MainViewDashboardController implements Initializable {
     private DatePicker sharesDistributedLocalDate;
     @FXML private TextField sharesProfitAmountTextField;
     @FXML private TableView<SharesTransaction> shareslisttableview;
+    @FXML private TableView<SharesDistributionTransaction> sharedMonthlyAmountTableView;
     ObservableList<SharesTransaction> observeSharesTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
+    ObservableList<SharesDistributionTransaction> observeSharesDistributedTransactionListData = FXCollections.observableArrayList();
     private BigDecimal sharesMonthTotalAmount = BigDecimal.ZERO;
+
+
+    private static int ALL_SHARES_CAT = 4;
+    private static int ALL_PENDING_SHARES_CAT = 1;
+    private static int ALL_REWARDED_SHARES_CAT = 2;
+
     //END OF SHARES TABLE SECTION
 
 
@@ -187,7 +195,6 @@ public class MainViewDashboardController implements Initializable {
         String phoneNo = naPhoneNo.getText();
         String address = naAddress.getText();
         LocalDate openDate = naOpenDate.getValue();
-
 
         if(
                 firstName.equals(null) ||
@@ -497,8 +504,8 @@ public class MainViewDashboardController implements Initializable {
             currentMembershipAccount.setOtherName(otherName);
             currentMembershipAccount.setAccountNo(naAccountNo1.getText());
             currentMembershipAccount.setPhoneNo(phoneNo);
-            session.saveOrUpdate(currentMembershipAccount);
             currentMembershipAccount.setStatus(statusSelect1.getSelectionModel().getSelectedItem()=="Active"? 1 : 0);
+            session.saveOrUpdate(currentMembershipAccount);
             transactionA.commit();
 
             CustomUtility.AlertHelper("Update Account Information", "Account Update Information",
@@ -942,12 +949,12 @@ public class MainViewDashboardController implements Initializable {
             revenueAmount = new BigDecimal(sharesProfitAmountTextField.getText());
 
             if(revenueAmount.doubleValue() < sharesMonthTotalAmount.doubleValue()){
-                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Total Revenue", "Cannot Distribute Your Revenue Cannot Be Less Than Shares For the Month", "E").show();
+                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Total Revenue", "Your Revenue Cannot Be Less Than Month Total Shares", "E").show();
                 return;
             }
 
             if(localsharesDistributedLocalDate == null || localsharesDistributedLocalDate.isBefore(getLocalDateFromDate(this.observeSharesTransactionSpecifiedAccountListData.get(0).getTransaction_date()))){
-                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Shares Date", "Please SElECT Valid Date After Shares Were Bought. Not Before Shares Were Bought", "E").show();
+                CustomUtility.AlertHelper("ERROR Monthly Share Information", "ERROR IN Shares Date", "Only Dates After Shares Were Bought. Not Before", "E").show();
                 return;
             }
 
@@ -955,16 +962,18 @@ public class MainViewDashboardController implements Initializable {
 
             int ans = CustomUtility.ConfirmationWithOptionsAlertHelper("Shares Distribution Proceed Confirmation", "Are You Sure You Want To PROCEED? With Distributing the Profit Of "+ profit.setScale(2, RoundingMode.DOWN));
 
-            if(ans == CustomUtility.OK)
+            if(ans == CustomUtility.OK_PLUS)
                 ManageSharesTansaction.distributeSharesAmongThese(this.observeSharesTransactionSpecifiedAccountListData, sharesMonthTotalAmount, profit, localsharesDistributedLocalDate,  ManageSharesTansaction.AUTO_RENEW_SHARES);
-            else if(ans == CustomUtility.OK_PLUS)
+            else if(ans == CustomUtility.OK)
                 ManageSharesTansaction.distributeSharesAmongThese(this.observeSharesTransactionSpecifiedAccountListData, sharesMonthTotalAmount, profit, localsharesDistributedLocalDate, ManageSharesTansaction.MANUAL_RENEW_SHARES);
 
 
         }catch (NumberFormatException ex){
-
+            ex.printStackTrace();
         }
 
+        sharesDistributedLocalDate.setValue(null);
+        sharesProfitAmountTextField.setText("");
     }
 
     public void buttonPrintSharesTriggerAction(ActionEvent actionEvent) {
@@ -973,11 +982,12 @@ public class MainViewDashboardController implements Initializable {
     public void getAllSharesAction(ActionEvent actionEvent) {
 
         prepareSharesDisplayTable();
+        populateDisplayMonthlyDistributedShares();
 
         shareslisttableview.setItems(observeSharesTransactionSpecifiedAccountListData);
 
         observeSharesTransactionSpecifiedAccountListData.setAll(ManageSharesTansaction.getAllSharesTransactionList());
-        String totalSum =String.format("%,.2f",ManageSharesTansaction.getTotal(ManageSharesTansaction.getAllSharesTransactionList()).setScale(2, RoundingMode.DOWN));
+        String totalSum =String.format("%,.2f",ManageSharesTansaction.getTotal(ManageSharesTansaction.getAllSharesTransactionList(), ALL_SHARES).setScale(2, RoundingMode.DOWN));
         displayMonthShareTotalLabel.setText(totalSum);
         filteredSharedSumLabel.setText("FILTERED SUM: " +totalSum);
         filteredSharedSumLabel.setFont(Font.font("arial", FontWeight.EXTRA_BOLD,20 ));
@@ -990,21 +1000,32 @@ public class MainViewDashboardController implements Initializable {
     public void getAllLoansAction(ActionEvent actionEvent) {
     }
 
+
     public void buttonAddSharesFindMonthlyAction(ActionEvent actionEvent) throws Exception{
 
+        getAllSharesTransactionForSpecifiedMonth(ALL_SHARES);
+    }
+
+    private void getAllSharesTransactionForSpecifiedMonth(int sharesCategory) throws Exception{
         if(shareMonthDatePicker.getValue() == null){
             CustomUtility.AlertHelper("Error Getting Monthly Shares", "Error Getting Shares Transaction:", "Please SELECT Shares Date Before Clicking This Button", "I").show();
             return;
         }
 
+        if(sharesCategory != ALL_SHARES_CAT && sharesCategory != ALL_PENDING_SHARES_CAT && sharesCategory != ALL_REWARDED_SHARES_CAT){
+            throw new IllegalArgumentException("Please sharesCategory Must be ALL_SHARES Or ALL_PENDING_SHARES Or ALL_REWARDED_SHARES");
+        }
+
         LocalDate localDateMonth = shareMonthDatePicker.getValue();
 
         prepareSharesDisplayTable();
+        populateDisplayMonthlyDistributedShares();
 
         shareslisttableview.setItems(observeSharesTransactionSpecifiedAccountListData);
 
-        observeSharesTransactionSpecifiedAccountListData.setAll(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth));
-        sharesMonthTotalAmount = ManageSharesTansaction.getTotal(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth));
+        observeSharesTransactionSpecifiedAccountListData.setAll(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth, sharesCategory));
+        sharesMonthTotalAmount = ManageSharesTansaction.getTotal(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth, sharesCategory), ALL_SHARES);
+
         String sumTotal = String.format("%,.2f",sharesMonthTotalAmount.setScale(2, RoundingMode.DOWN));
         displayMonthShareTotalLabel.setText(sumTotal);
         filteredSharedSumLabel.setText("FILTERED SUM: " + sumTotal);
@@ -1014,36 +1035,76 @@ public class MainViewDashboardController implements Initializable {
             CustomUtility.AlertHelper("Shares Date Alert", "Shares Display Information", "No SHARES RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
             buttonAddSharesTrigger.setDisable(true);
         }else{
-            buttonAddSharesTrigger.setDisable(false);
+            if(sharesCategory == ALL_PENDING_SHARES_CAT)
+                buttonAddSharesTrigger.setDisable(false);
+            CustomUtility.AlertHelper("Shares Date Alert", "Shares Distribution Enabled Information", "DISTRIBUTING SHARES AMONG ALL PARTICIPANTS FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
 
-            CustomUtility.AlertHelper("Shares Date Alert", "Shares Distribution Enabled Information", "YOU CAN NOW DISTRIBUTE SHARES AMONG ALL PARTICIPANTS FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
         }
+    }
+
+    private void populateDisplayMonthlyDistributedShares(){
+        prepareSharesDisplayTable();
+        sharedMonthlyAmountTableView.setItems(observeSharesDistributedTransactionListData);
+
+        observeSharesDistributedTransactionListData.setAll(ManageSharesTansaction.getAllMonthlyDistributedTransactionList());
 
     }
 
     private void prepareSharesDisplayTable(){
 
-        if(!shareslisttableview.getColumns().isEmpty()) return;
+        if(shareslisttableview.getColumns().isEmpty()) {
 
-        TableColumn<SharesTransaction, String> sColId = new TableColumn<>("Id");
-        TableColumn<SharesTransaction, String> sColDesc = new TableColumn<>("Description") ;
-        TableColumn<SharesTransaction, String> sColTransactionDate = new TableColumn<>("Transaction Date");
-        TableColumn<SharesTransaction, String> sColTransactionType = new TableColumn<>("Transaction Type");
-        TableColumn<SharesTransaction, String> sColStatus = new TableColumn<>("Status");
-        TableColumn<SharesTransaction, String> sColAmount = new TableColumn<>("Shares Amount");
-        TableColumn<SharesTransaction, String> sColAccountNo = new TableColumn<>("Account No");
+            TableColumn<SharesTransaction, String> sColId = new TableColumn<>("Id");
+            TableColumn<SharesTransaction, String> sColDesc = new TableColumn<>("Description");
+            TableColumn<SharesTransaction, String> sColTransactionDate = new TableColumn<>("Transaction Date");
+            TableColumn<SharesTransaction, String> sColTransactionType = new TableColumn<>("Transaction Type");
+            TableColumn<SharesTransaction, String> sColStatus = new TableColumn<>("Status");
+            TableColumn<SharesTransaction, String> sColAmount = new TableColumn<>("Shares Amount");
+            TableColumn<SharesTransaction, String> sColAccountNo = new TableColumn<>("Account No");
 
-        sColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
-        sColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
-        sColTransactionDate.setCellValueFactory(new PropertyValueFactory<>("transaction_date"));
-        sColTransactionType.setCellValueFactory(new PropertyValueFactory<>("transaction_type"));
-        sColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
-        sColAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
-        sColAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+            sColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+            sColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+            sColTransactionDate.setCellValueFactory(new PropertyValueFactory<>("transaction_date"));
+            sColTransactionType.setCellValueFactory(new PropertyValueFactory<>("transaction_type"));
+            sColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+            sColAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+            sColAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
 
-        sColId.setVisible(false);
+            sColId.setVisible(false);
 
-        shareslisttableview.getColumns().setAll(sColId, sColAccountNo, sColAmount, sColTransactionType,  sColTransactionDate, sColDesc, sColStatus);
+            shareslisttableview.getColumns().setAll(sColId, sColAccountNo, sColAmount, sColTransactionType, sColTransactionDate, sColDesc, sColStatus);
+        }
+
+        // For the shared Monthly Amount Table View Details
+        if(sharedMonthlyAmountTableView.getColumns().isEmpty()) {
+
+
+            TableColumn<SharesDistributionTransaction, String> sTColId = new TableColumn<>("Id");
+            TableColumn<SharesDistributionTransaction, String> sTColDesc = new TableColumn<>("Description");
+            TableColumn<SharesDistributionTransaction, Date> sTColCreditedDate = new TableColumn<>("Shares Distribution Date");
+            TableColumn<SharesDistributionTransaction, BigDecimal> sTColTotalRevenue = new TableColumn<>("Total Revenue");
+            TableColumn<SharesDistributionTransaction, BigDecimal> sTColNoTrasactions = new TableColumn<>("No Shares Transactions");
+            TableColumn<SharesDistributionTransaction, Integer> sTColStatus = new TableColumn<>("Status");
+            TableColumn<SharesDistributionTransaction, BigDecimal> sTColTotalMonthlyShare = new TableColumn<>("Month Total Shares");
+            TableColumn<SharesDistributionTransaction, BigDecimal> sTColSharedProfit = new TableColumn<>("Shared Profit");
+            TableColumn<SharesDistributionTransaction, String> sTColMonthYear = new TableColumn<>("Share Month Year");
+
+            sTColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+            sTColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+            sTColCreditedDate.setCellValueFactory(new PropertyValueFactory<>("creditedDate"));
+            sTColMonthYear.setCellValueFactory(new PropertyValueFactory<>("monthYear"));
+            sTColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+            sTColTotalRevenue.setCellValueFactory(new PropertyValueFactory<>("totalRevenue"));
+            sTColTotalMonthlyShare.setCellValueFactory(new PropertyValueFactory<>("monthTotalShare"));
+            sTColSharedProfit.setCellValueFactory(new PropertyValueFactory<>("profit"));
+            sTColNoTrasactions.setCellValueFactory(new PropertyValueFactory<>("no_of_transactions"));
+
+            sTColId.setVisible(false);
+
+            sharedMonthlyAmountTableView.getColumns().setAll(sTColId, sTColMonthYear, sTColTotalRevenue, sTColTotalMonthlyShare, sTColNoTrasactions, sTColSharedProfit, sTColCreditedDate, sTColDesc, sTColStatus);
+
+        }
+
     }
 
     public void setFilterMonthlySharesList(KeyEvent keyEvent) {
@@ -1090,4 +1151,8 @@ public class MainViewDashboardController implements Initializable {
 
 
     public BigDecimal tempSumVal = BigDecimal.ZERO;
+
+    public void buttonAddSharesFindPendingMonthlyAction(ActionEvent actionEvent) throws Exception {
+        getAllSharesTransactionForSpecifiedMonth(ALL_PENDING_SHARES_CAT);
+    }
 }

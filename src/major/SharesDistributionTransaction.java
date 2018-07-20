@@ -30,7 +30,7 @@ public class SharesDistributionTransaction implements Serializable {
     @Column(name = "status")
     private int status;
 
-    @Column(name = "status")
+    @Column(name = "no_of_transactions")
     private int no_of_transactions;
 
     @Column(name = "total_revenue")
