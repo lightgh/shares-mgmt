@@ -160,12 +160,36 @@ public class MainViewDashboardController implements Initializable {
     private ObservableList<SharesDistributionTransaction> observeSharesDistributedTransactionListData = FXCollections.observableArrayList();
     private BigDecimal sharesMonthTotalAmount = BigDecimal.ZERO;
 
-
     private static int ALL_SHARES_CAT = 4;
     private static int ALL_PENDING_SHARES_CAT = 1;
     private static int ALL_REWARDED_SHARES_CAT = 2;
-
     //END OF SHARES TABLE SECTION
+
+    // TAKE LOAN SECTION TABLE
+    @FXML
+    private DatePicker viewMonthLoanDatePicker;
+    @FXML
+    private TableView<TakeLoanTransaction> loanTakenListTableView;
+    private SortedList<TakeLoanTransaction> takeLoanSortedList;
+    private ObservableList<TakeLoanTransaction> observeTakeLoanTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
+    private FilteredList<TakeLoanTransaction> takeLoanAccountFilterList;
+    @FXML Label totalMonthTakenLoanAmountLabel;
+    @FXML Label totalExpectedMonthReturnLoanAmountLabel;
+    @FXML Label totalFilteredMonthTakenLoanAmountLabel;
+    @FXML private TextField filterTakenLoanTextField;
+    // END TAKE LOAN SECTION TABLE
+
+    // RETURN LOAN SECTION TABLE
+    @FXML
+    private TableView<ReturnLoanTransaction> loanReturnListTableView;
+    private SortedList<ReturnLoanTransaction> returnLoanSortedList;
+    private ObservableList<ReturnLoanTransaction> observeReturnLoanTransactionSpecifiedAccountListData = FXCollections.observableArrayList();
+    private FilteredList<ReturnLoanTransaction> returnLoanAccountFilterList;
+    @FXML Label totalMonthReturnedLoanAmountLabel;
+    @FXML Label totalMonthReturnedLoanProfitAmountLabel;
+    @FXML Label totalFilteredMonthReturnLoanAmountLabel;
+    @FXML private TextField filterReturnLoanTextField;
+    // END RETURN LOAN SECTION TABLE
 
 
 
@@ -994,9 +1018,61 @@ public class MainViewDashboardController implements Initializable {
     }
 
     public void buttonFindAllMonthlyLoanAction(ActionEvent actionEvent) {
+        if(viewMonthLoanDatePicker.getValue() == null){
+            CustomUtility.AlertHelper("Error Getting Monthly Loan", "Error Getting Loan Transaction:", "Please SELECT Loan Date Before Clicking This Button", "I").show();
+            return;
+        }
+        LocalDate localDateMonth = viewMonthLoanDatePicker.getValue();
+
+        prepareLoanDisplayTable();
+
+        loanTakenListTableView.setItems(observeTakeLoanTransactionSpecifiedAccountListData);
+        loanReturnListTableView.setItems(observeReturnLoanTransactionSpecifiedAccountListData);
+
+        observeTakeLoanTransactionSpecifiedAccountListData.setAll(ManageLoanTransaction.getTakenLoanTransactionsForMonth(localDateMonth));
+
+        observeReturnLoanTransactionSpecifiedAccountListData.setAll(ManageLoanTransaction.getReturnLoanTransactionsForMonth(localDateMonth));
+
+        BigDecimal takenLoanMonthTotalAmount = ManageLoanTransaction.getTotalTakenLoan(ManageLoanTransaction.getTakenLoanTransactionsForMonth(localDateMonth), "COLLECTED_AMOUNT");
+        BigDecimal returnedELoanMonthTotalAmount = ManageLoanTransaction.getTotalTakenLoan(ManageLoanTransaction.getTakenLoanTransactionsForMonth(localDateMonth), "EXPECTED_RETURNED_AMOUNT");
+        BigDecimal returnedALoanMonthTotalAmount = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactionsForMonth(localDateMonth), "ACTUAL_RETURNED_AMOUNT");
+
+        BigDecimal returnedALoanProfitFromMonthTotalAmount = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactionsForMonth(localDateMonth), "PROFIT_EARNED_FROM_RETURNED_AMOUNT");
+
+        String sumTotal = String.format("%,.2f",takenLoanMonthTotalAmount.setScale(2, RoundingMode.DOWN));
+        String sumActualReturnTotal = String.format("%,.2f",returnedALoanMonthTotalAmount.setScale(2, RoundingMode.DOWN));
+        totalExpectedMonthReturnLoanAmountLabel.setText(String.format("%,.2f", returnedELoanMonthTotalAmount.setScale(2, RoundingMode.DOWN) ));
+        String sumActualReturnProfitTotal = String.format("%,.2f",returnedALoanProfitFromMonthTotalAmount.setScale(2, RoundingMode.DOWN));
+        totalMonthTakenLoanAmountLabel.setText(sumTotal);
+        totalMonthReturnedLoanAmountLabel.setText(sumActualReturnTotal);
+        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnTotal);
+
+        if(observeTakeLoanTransactionSpecifiedAccountListData.isEmpty() && observeReturnLoanTransactionSpecifiedAccountListData.isEmpty()) {
+            CustomUtility.AlertHelper("Loan Month Date Alert", "Loan Month Display Information", "No LOAN RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
+
+        }else{
+
+                CustomUtility.AlertHelper("Loan Record For Month Date Alert", "Loan Records Found Information", observeTakeLoanTransactionSpecifiedAccountListData.size() + " Taken Loans and " + observeReturnLoanTransactionSpecifiedAccountListData.size() + " Returned Loans RECORDS FOUND FOR " + localDateMonth.getMonth().toString() + " OF " + localDateMonth.getYear(), "I").show();
+            }
+
     }
 
     public void getAllLoansAction(ActionEvent actionEvent) {
+        prepareLoanDisplayTable();
+        loanTakenListTableView.setItems(observeTakeLoanTransactionSpecifiedAccountListData);
+        loanReturnListTableView.setItems(observeReturnLoanTransactionSpecifiedAccountListData);
+
+        observeTakeLoanTransactionSpecifiedAccountListData.setAll(ManageLoanTransaction.getTakenLoanTransactions());
+        observeReturnLoanTransactionSpecifiedAccountListData.setAll(ManageLoanTransaction.getReturnLoanTransactions());
+        String tMonthTLAL = ManageLoanTransaction.getTotalTakenLoan(ManageLoanTransaction.getTakenLoanTransactions(), "COLLECTED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
+        totalMonthTakenLoanAmountLabel.setText(tMonthTLAL);
+        String tEmonthTLAL = ManageLoanTransaction.getTotalTakenLoan(ManageLoanTransaction.getTakenLoanTransactions(), "EXPECTED_RETURNED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
+        totalExpectedMonthReturnLoanAmountLabel.setText(tEmonthTLAL);
+        String tMonthRLAL = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactions(), "ACTUAL_RETURNED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
+        totalMonthReturnedLoanAmountLabel.setText(tMonthRLAL);
+
+        totalFilteredMonthTakenLoanAmountLabel.setText("FILTERED: "+tMonthTLAL);
+        totalFilteredMonthReturnLoanAmountLabel.setText("FILTERED: " +tMonthRLAL);
     }
 
 
@@ -1034,7 +1110,6 @@ public class MainViewDashboardController implements Initializable {
             CustomUtility.AlertHelper("Shares Date Alert", "Shares Display Information", "No SHARES RECORDS FOUND  FOR " + localDateMonth.getMonth().toString() + " OF "+ localDateMonth.getYear(), "I").show();
             buttonAddSharesTrigger.setDisable(true);
         }else{
-
 
             if(sharesCategory == ALL_PENDING_SHARES_CAT) {
 
@@ -1082,7 +1157,6 @@ public class MainViewDashboardController implements Initializable {
         // For the shared Monthly Amount Table View Details
         if(sharedMonthlyAmountTableView.getColumns().isEmpty()) {
 
-
             TableColumn<SharesDistributionTransaction, String> sTColId = new TableColumn<>("Id");
             TableColumn<SharesDistributionTransaction, String> sTColDesc = new TableColumn<>("Description");
             TableColumn<SharesDistributionTransaction, Date> sTColCreditedDate = new TableColumn<>("Shares Distribution Date");
@@ -1106,6 +1180,68 @@ public class MainViewDashboardController implements Initializable {
             sTColId.setVisible(false);
 
             sharedMonthlyAmountTableView.getColumns().setAll(sTColId, sTColMonthYear, sTColTotalRevenue, sTColTotalMonthlyShare, sTColNoTrasactions, sTColSharedProfit, sTColCreditedDate, sTColDesc, sTColStatus);
+
+        }
+
+    }
+
+    private void prepareLoanDisplayTable(){
+
+        if(loanTakenListTableView.getColumns().isEmpty()){
+            TableColumn<TakeLoanTransaction, String> lTColId = new TableColumn<>("Id");
+            TableColumn<TakeLoanTransaction, String> lTColDesc = new TableColumn<>("Description");
+            TableColumn<TakeLoanTransaction, Date> lTColDateCollected = new TableColumn<>("Loan Collected Date");
+            TableColumn<TakeLoanTransaction, BigDecimal> lTColAmount = new TableColumn<>("Loan Amount");
+            TableColumn<TakeLoanTransaction, Integer> lTColInterestRate = new TableColumn<>("Loan Interest Rate");
+            TableColumn<TakeLoanTransaction, Integer> lTColStatus = new TableColumn<>("Status");
+            TableColumn<TakeLoanTransaction, Integer> lTColLoanPeriod = new TableColumn<>("Loan Period");
+            TableColumn<TakeLoanTransaction, String> lTColLedgerNo = new TableColumn<>("Loan Ledger No");
+            TableColumn<TakeLoanTransaction, String> lTColAccountNo = new TableColumn<>("Account No");
+
+            lTColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+            lTColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+            lTColDateCollected.setCellValueFactory(new PropertyValueFactory<>("dateCollected"));
+            lTColAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+            lTColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+            lTColAmount.setCellValueFactory(new PropertyValueFactory<>("amount"));
+            lTColLoanPeriod.setCellValueFactory(new PropertyValueFactory<>("loanPeriod"));
+            lTColLedgerNo.setCellValueFactory(new PropertyValueFactory<>("ledgerNo"));
+            lTColInterestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+
+            lTColId.setVisible(false);
+
+            loanTakenListTableView.getColumns().setAll(lTColId, lTColAccountNo, lTColAmount, lTColLoanPeriod, lTColInterestRate, lTColLedgerNo, lTColDateCollected, lTColDesc, lTColStatus);
+
+        }
+
+        if(loanReturnListTableView.getColumns().isEmpty()){
+            TableColumn<ReturnLoanTransaction, String> lRColId = new TableColumn<>("Id");
+            TableColumn<ReturnLoanTransaction, String> lRColDesc = new TableColumn<>("Description");
+            TableColumn<ReturnLoanTransaction, Date> lRColDateCollected = new TableColumn<>("Loan Collected Date");
+            TableColumn<ReturnLoanTransaction, BigDecimal> lRColCollectedAmount = new TableColumn<>("Loan Amount Collected");
+            TableColumn<ReturnLoanTransaction, BigDecimal> lRColExpectedAmount = new TableColumn<>("Loan Amount Returned");
+            TableColumn<ReturnLoanTransaction, Integer> lRColInterestRate = new TableColumn<>("Loan Interest Rate");
+            TableColumn<ReturnLoanTransaction, Integer> lRColStatus = new TableColumn<>("Status");
+            TableColumn<ReturnLoanTransaction, Integer> lRColLoanPeriod = new TableColumn<>("Loan Period");
+            TableColumn<ReturnLoanTransaction, String> lRColLedgerNo = new TableColumn<>("Loan Ledger No");
+            TableColumn<ReturnLoanTransaction, String> lRColAccountNo = new TableColumn<>("Account No");
+            TableColumn<ReturnLoanTransaction, String> lRColDatePaid = new TableColumn<>("Date Loan Was Returned");
+
+            lRColId.setCellValueFactory(new PropertyValueFactory<>("Id"));
+            lRColDesc.setCellValueFactory(new PropertyValueFactory<>("description"));
+            lRColDateCollected.setCellValueFactory(new PropertyValueFactory<>("dateCollected"));
+            lRColAccountNo.setCellValueFactory(new PropertyValueFactory<>("accountNo"));
+            lRColStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+            lRColCollectedAmount.setCellValueFactory(new PropertyValueFactory<>("collectedAmount"));
+            lRColExpectedAmount.setCellValueFactory(new PropertyValueFactory<>("expectedAmount"));
+            lRColLoanPeriod.setCellValueFactory(new PropertyValueFactory<>("loanPeriod"));
+            lRColLedgerNo.setCellValueFactory(new PropertyValueFactory<>("ledgerNo"));
+            lRColInterestRate.setCellValueFactory(new PropertyValueFactory<>("interestRate"));
+            lRColDatePaid.setCellValueFactory(new PropertyValueFactory<>("datePaid"));
+
+            lRColId.setVisible(false);
+
+            loanReturnListTableView.getColumns().setAll(lRColId, lRColAccountNo, lRColCollectedAmount, lRColLoanPeriod, lRColInterestRate, lRColExpectedAmount, lRColLedgerNo, lRColDateCollected, lRColDesc, lRColStatus);
 
         }
 
@@ -1158,5 +1294,111 @@ public class MainViewDashboardController implements Initializable {
 
     public void buttonAddSharesFindPendingMonthlyAction(ActionEvent actionEvent) throws Exception {
         getAllSharesTransactionForSpecifiedMonth(ALL_PENDING_SHARES_CAT);
+    }
+
+    public void setFilterMonthlyTakenLoanList(ActionEvent actionEvent) {
+        if(this.observeTakeLoanTransactionSpecifiedAccountListData.isEmpty()){
+            return;
+        }
+
+        takeLoanAccountFilterList = new FilteredList<TakeLoanTransaction>(observeTakeLoanTransactionSpecifiedAccountListData, p->true);
+        filterTakenLoanTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            takeLoanAccountFilterList.setPredicate(pere -> {
+                if(newValue == null || newValue.isEmpty()){
+                    return true;
+                }
+
+                String typedText = newValue.toLowerCase();
+
+                if(pere.getAccountNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getDateCollected().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getRepayDate().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getLedgerNo().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getInterestRate().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getAmount().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                return false;
+            });
+
+            takeLoanSortedList = new SortedList<>(takeLoanAccountFilterList);
+            takeLoanSortedList.comparatorProperty().bind(loanTakenListTableView.comparatorProperty());
+            loanTakenListTableView.setItems(takeLoanSortedList);
+            tempSumVal = BigDecimal.ZERO;
+            takeLoanSortedList.getSource().forEach(e ->{
+                tempSumVal = tempSumVal.add(e.getAmount());
+                totalFilteredMonthTakenLoanAmountLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+            });
+    });
+
+    }
+
+    public void setFilterMonthlyReturnLoanList(ActionEvent actionEvent) {
+        if(this.observeTakeLoanTransactionSpecifiedAccountListData.isEmpty()){
+            return;
+        }
+
+        returnLoanAccountFilterList = new FilteredList<ReturnLoanTransaction>(observeReturnLoanTransactionSpecifiedAccountListData, p->true);
+        filterReturnLoanTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            returnLoanAccountFilterList.setPredicate(pere -> {
+                if(newValue == null || newValue.isEmpty()){
+                    return true;
+                }
+
+                String typedText = newValue.toLowerCase();
+
+                if(pere.getAccountNo().toLowerCase().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getDateCollected().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getDatePaid().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getLedgerNo().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getInterestRate().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                if(pere.getExpectedAmount().toString().indexOf(typedText) != -1){
+                    return true;
+                }
+
+                return false;
+            });
+
+            returnLoanSortedList = new SortedList<>(returnLoanAccountFilterList);
+            returnLoanSortedList.comparatorProperty().bind(loanReturnListTableView.comparatorProperty());
+            loanReturnListTableView.setItems(returnLoanSortedList);
+            tempSumVal = BigDecimal.ZERO;
+            returnLoanSortedList.getSource().forEach(e ->{
+                tempSumVal = tempSumVal.add(e.getCollectedAmount());
+                totalFilteredMonthReturnLoanAmountLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+            });
+        });
+
     }
 }

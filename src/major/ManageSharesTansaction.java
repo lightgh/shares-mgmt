@@ -227,8 +227,6 @@ public class ManageSharesTansaction {
         else
             hql = "FROM SharesTransaction A WHERE month(A.transaction_date)="+month + " and year(A.transaction_date)="+year;
 
-            CustomUtility.pln("ST: "+hql);
-
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
 //        Session session = sessionFactory.getCurrentSession();
             Session session = sessionFactory.openSession();

@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Iterator;
 
 /**
@@ -210,5 +211,163 @@ public class ManageLoanTransaction {
 
     public static BigDecimal getCurrentLoanBalance(String accountNo) {
         return getTotalTakenLoanTransactions(accountNo).subtract(getTotalReturnedLoanTransactions(accountNo));
+    }
+
+    public static ObservableList<ReturnLoanTransaction> getReturnLoanTransactions() {
+        String hql = "FROM ReturnLoanTransaction";
+
+        Session session = CustomUtility.getSessionFactory().openSession();
+
+        Transaction transactionA = session.beginTransaction();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ReturnLoanTransaction> query = builder.createQuery(ReturnLoanTransaction.class);
+
+        Query<ReturnLoanTransaction> memQ = session.createQuery(hql, ReturnLoanTransaction.class);
+
+        ObservableList<ReturnLoanTransaction> returnLoanTransactionObservableList = FXCollections.observableArrayList();
+        returnLoanTransactionObservableList.setAll(memQ.getResultList());
+        transactionA.commit();
+
+        return returnLoanTransactionObservableList;
+    }
+
+    public static ObservableList<TakeLoanTransaction> getTakenLoanTransactions() {
+        String hql = "";
+        hql = "FROM TakeLoanTransaction ";
+
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession();
+
+        Transaction transactionA = session.beginTransaction();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<TakeLoanTransaction> query = builder.createQuery(TakeLoanTransaction.class);
+
+        Query<TakeLoanTransaction> memQ = session.createQuery(hql, TakeLoanTransaction.class);
+
+        ObservableList<TakeLoanTransaction> takeHLoanTransactionObservableList = FXCollections.observableArrayList();
+        takeHLoanTransactionObservableList.setAll(memQ.getResultList());
+        transactionA.commit();
+
+        return takeHLoanTransactionObservableList;
+    }
+
+    public static BigDecimal getTotalTakenLoan(ObservableList<TakeLoanTransaction> takenLoanTransactions, String sumation_target) {
+
+        BigDecimal sum = BigDecimal.ZERO;
+
+        if(takenLoanTransactions == null)
+            return null;
+
+        Iterator<TakeLoanTransaction> iterator =  takenLoanTransactions.iterator();
+
+        if(sumation_target.equalsIgnoreCase("COLLECTED_AMOUNT")){
+
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getAmount());
+            }
+
+            return sum;
+
+        }else if(sumation_target.equalsIgnoreCase("EXPECTED_RETURNED_AMOUNT")){
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getAmount().add(ManageLoanTransaction.getIncuredInterest(iterator.next().getAmount(), iterator.next().getLoanPeriod())));
+
+            }
+
+            return sum;
+        }
+
+        return sum;
+    }
+
+    public static BigDecimal getTotalReturnLoan(ObservableList<ReturnLoanTransaction> returnLoanTransactions, String sumation_target) {
+        BigDecimal sum = BigDecimal.ZERO;
+
+        if(returnLoanTransactions == null)
+            return null;
+
+        Iterator<ReturnLoanTransaction> iterator =  returnLoanTransactions.iterator();
+
+        if(sumation_target.equalsIgnoreCase("COLLECTED_AMOUNT")){
+
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getCollectedAmount());
+            }
+
+            return sum;
+
+        }else if(sumation_target.equalsIgnoreCase("EXPECTED_RETURNED_AMOUNT")){
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getExpectedAmount());
+            }
+
+            return sum;
+        }else if(sumation_target.equalsIgnoreCase("ACTUAL_RETURNED_AMOUNT")){
+            while (iterator.hasNext()) {
+                sum = sum.add(iterator.next().getCollectedAmount().add(ManageLoanTransaction.getIncuredInterest(iterator.next().getCollectedAmount(), iterator.next().getLoanPeriod())));
+            }
+
+            return sum;
+        }else if(sumation_target.equalsIgnoreCase("PROFIT_EARNED_FROM_RETURNED_AMOUNT")){
+            while (iterator.hasNext()) {
+                sum = sum.add(ManageLoanTransaction.getIncuredInterest(iterator.next().getCollectedAmount(), iterator.next().getLoanPeriod()));
+            }
+
+            return sum;
+        }
+
+        return sum;
+    }
+
+    public static ObservableList<TakeLoanTransaction> getTakenLoanTransactionsForMonth(LocalDate localDateMonth) {
+
+        int month = localDateMonth.getMonthValue();
+        int year = localDateMonth.getYear();
+
+        String hql = "FROM TakeLoanTransaction A WHERE month(A.dateCollected)="+month + " and year(A.dateCollected)="+year;
+
+
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession();
+
+        Transaction transactionA = session.beginTransaction();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<TakeLoanTransaction> query = builder.createQuery(TakeLoanTransaction.class);
+
+        Query<TakeLoanTransaction> memQ = session.createQuery(hql, TakeLoanTransaction.class);
+
+        ObservableList<TakeLoanTransaction> takeHLoanTransactionObservableList = FXCollections.observableArrayList();
+        takeHLoanTransactionObservableList.setAll(memQ.getResultList());
+        transactionA.commit();
+
+        return takeHLoanTransactionObservableList;
+    }
+
+     public static ObservableList<ReturnLoanTransaction> getReturnLoanTransactionsForMonth(LocalDate localDateMonth) {
+
+        int month = localDateMonth.getMonthValue();
+        int year = localDateMonth.getYear();
+
+        String hql = "FROM ReturnLoanTransaction A WHERE month(A.dateCollected)="+month + " and year(A.dateCollected)="+year;
+
+
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession();
+
+        Transaction transactionA = session.beginTransaction();
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<ReturnLoanTransaction> query = builder.createQuery(ReturnLoanTransaction.class);
+
+        Query<ReturnLoanTransaction> memQ = session.createQuery(hql, ReturnLoanTransaction.class);
+
+        ObservableList<ReturnLoanTransaction> takeHLoanTransactionObservableList = FXCollections.observableArrayList();
+        takeHLoanTransactionObservableList.setAll(memQ.getResultList());
+        transactionA.commit();
+
+        return takeHLoanTransactionObservableList;
     }
 }

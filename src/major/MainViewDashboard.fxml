@@ -383,7 +383,7 @@
                               </Pane>
                               <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
                                  <children>
-                                    <DatePicker fx:id="shareMonthDatePicker" layoutX="7.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
+                                    <DatePicker fx:id="shareMonthDatePicker" layoutX="6.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
                                     <Button fx:id="buttonAddSharesTrigger" disable="true" layoutX="6.0" layoutY="389.0" mnemonicParsing="false" onAction="#buttonAddSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Distribute Shares" />
                                     <TextField fx:id="sharesProfitAmountTextField" layoutX="7.0" layoutY="261.0" prefHeight="41.0" prefWidth="182.0" promptText="Enter Profit Amount" />
                                     <Label fx:id="displayMonthShareTotalLabel" alignment="CENTER" layoutX="5.0" layoutY="198.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
@@ -440,13 +440,28 @@
                               <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
                                  <children>
                                     <DatePicker fx:id="viewMonthLoanDatePicker" layoutX="7.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Loan Month" />
-                                    <Label fx:id="totalMonthLoanAmountLabel" alignment="CENTER" layoutX="3.0" layoutY="152.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                    <Label fx:id="totalMonthTakenLoanAmountLabel" alignment="CENTER" layoutX="5.0" layoutY="193.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
                                        <font>
                                           <Font name="System Bold" size="14.0" />
                                        </font>
                                     </Label>
                                     <Button fx:id="buttonMonthLoanFind" layoutX="9.0" layoutY="108.0" mnemonicParsing="false" onAction="#buttonFindAllMonthlyLoanAction" prefHeight="29.0" prefWidth="175.0" text="Find Loan" />
-                                    <Button layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#getAllLoansAction" prefHeight="26.0" prefWidth="173.0" text="Get All Loans" />
+                                    <Button layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#getAllLoansAction" prefHeight="26.0" prefWidth="181.0" text="Get All Loans" />
+                                    <Label fx:id="totalMonthReturnedLoanAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="303.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="totalExpectedMonthReturnLoanAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="242.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="totalMonthReturnedLoanProfitAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="350.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
                                  </children>
                               </Pane>
                               <Label alignment="CENTER" contentDisplay="CENTER" layoutX="269.0" layoutY="28.0" prefHeight="29.0" prefWidth="804.0" text="MANAGE GENERAL LOAN REPORT DISPLAY" textFill="#eeeeee">
@@ -454,24 +469,30 @@
                                     <Font size="24.0" />
                                  </font>
                               </Label>
-                              <SplitPane dividerPositions="0.5" layoutX="219.0" layoutY="113.0" prefHeight="667.0" prefWidth="1052.0" AnchorPane.leftAnchor="219.0" AnchorPane.topAnchor="113.0">
+                              <SplitPane dividerPositions="0.8318840579710145" layoutX="219.0" layoutY="113.0" prefHeight="655.0" prefWidth="1037.0" AnchorPane.leftAnchor="219.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="113.0">
                                 <items>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="644.0" prefWidth="347.0">
                                        <children>
-                                          <TabPane>
+                                          <TabPane layoutY="29.0" prefHeight="661.0" prefWidth="1060.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="3.0">
                                              <tabs>
                                                 <Tab closable="false" text="LOANS TAKEN">
                                                    <content>
-                                                      <TableView fx:id="loanTakenListTableView" prefHeight="657.0" prefWidth="1030.0" />
+                                                      <TableView fx:id="loanTakenListTableView" prefHeight="657.0" prefWidth="773.0" />
                                                    </content>
                                                 </Tab>
                                              </tabs>
                                           </TabPane>
+                                          <TextField fx:id="filterTakenLoanTextField" layoutX="1.0" layoutY="1.0" onAction="#setFilterMonthlyTakenLoanList" prefHeight="26.0" prefWidth="307.0" />
+                                          <Label fx:id="totalFilteredMonthTakenLoanAmountLabel" layoutX="338.0" prefHeight="29.0" prefWidth="468.0" style="-fx-background-color: orange;" text="FILTERED SUM: ">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
                                        </children>
                                     </AnchorPane>
                                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="602.0" prefWidth="603.0">
                                        <children>
-                                          <TabPane>
+                                          <TabPane layoutY="29.0" prefHeight="661.0" prefWidth="831.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="3.0">
                                              <tabs>
                                                 <Tab closable="false" text="LOANS RETURNED">
                                                    <content>
@@ -480,6 +501,12 @@
                                                 </Tab>
                                              </tabs>
                                           </TabPane>
+                                          <TextField fx:id="filterReturnLoanTextField" onAction="#setFilterMonthlyReturnLoanList" prefHeight="26.0" prefWidth="321.0" />
+                                          <Label fx:id="totalFilteredMonthReturnLoanAmountLabel" layoutX="347.0" layoutY="-1.0" prefHeight="29.0" prefWidth="345.0" style="-fx-background-color: orange;" text="FILTERED SUM">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
                                        </children>
                                     </AnchorPane>
                                 </items>
@@ -488,7 +515,7 @@
                         </AnchorPane>
                      </content>
                   </Tab>
-                  <Tab fx:id="manageSharesTab11" text="Backup Data">
+                  <Tab fx:id="backupDataTab" text="Backup Data">
                      <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                            <children>
