@@ -32,12 +32,6 @@ import static major.CustomUtility.println;
  */
 public class MakeDeposit {
 
-    //TODO - Eliminate these variables
-    /*public static String fullName;
-    public static String accountNumber;
-    public static int id;
-    */
-
     @FXML
     private ResourceBundle resources;
 
