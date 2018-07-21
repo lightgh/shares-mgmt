@@ -2,6 +2,8 @@
 package major;
 
 
+import com.smattme.MysqlExportService;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,13 +18,17 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.schema.TargetType;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -349,12 +355,101 @@ public class CustomUtility{
     private Statement statement = null;
     private ResultSet resultSet = null;
 
-    public static void main(String args [] ){
+    public static void main2(String args [] ) throws SQLException, IOException, ClassNotFoundException {
+
+
+
+
+
+    }
+    public static void main(String args [] ) throws SQLException, IOException, ClassNotFoundException {
 
         BigDecimal amount = new BigDecimal(5000);
         pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
         pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
 
+        try {
+
+            Map<String, String> settings = new HashMap<>();
+            settings.put("connection.driver_class", "com.mysql.jdbc.Driver");
+            settings.put("dialect", "org.hibernate.dialect.MySQL57InnoDBDialect");
+            settings.put("hibernate.connection.url", "jdbc:mysql://localhost/sharesdb?useSSL=false");
+            settings.put("hibernate.connection.username", "DATABASE_USERNAME");
+            settings.put("hibernate.connection.password", "DATABASE_PASSWORD");
+            settings.put("hibernate.hbm2ddl.auto", "create");
+            settings.put("show_sql", "true");
+
+            MetadataSources metadataSources = new MetadataSources(
+                    new StandardServiceRegistryBuilder()
+                            .applySettings(settings)
+                            .build());
+            metadataSources.addAnnotatedClass(MembershipAccount.class);
+            metadataSources.addAnnotatedClass(AccountTransaction.class);
+            metadataSources.addAnnotatedClass(SharesTransaction.class);
+            metadataSources.addAnnotatedClass(SharesDistributionTransaction.class);
+            metadataSources.addAnnotatedClass(TakeLoanTransaction.class);
+            metadataSources.addAnnotatedClass(ReturnLoanTransaction.class);
+            metadataSources.addAnnotatedClass(Task.class);
+
+            Metadata medata = metadataSources.buildMetadata();
+
+            File dropAndCreateDdlFile = new File("/home/chinakalight/Desktop/drop-and-create.ddl.sql");
+            deleteFileIfExists(dropAndCreateDdlFile);
+
+            SchemaExport schemaExport = new SchemaExport();
+//            schemaExport = SchemaExport.buildMetadataFromMainArgs(metadata);
+            schemaExport.setHaltOnError(true);
+            schemaExport.setFormat(true);
+            schemaExport.setDelimiter(";");
+            schemaExport.setOutputFile(dropAndCreateDdlFile.getAbsolutePath());
+//            schemaExport.setOutputFile(System.getenv("")+"db-schema.sql");
+            schemaExport.execute(EnumSet.of(TargetType.SCRIPT), SchemaExport.Action.BOTH, medata);
+
+            pln("COMPLETED SUCCESSFULLY");
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+
+        Properties properties = new Properties();
+        properties.setProperty(MysqlExportService.DB_NAME, "sharesdb");
+        properties.setProperty(MysqlExportService.DB_USERNAME, "homestead");
+        properties.setProperty(MysqlExportService.DB_PASSWORD, "secret");
+
+//properties relating to email config
+        properties.setProperty(MysqlExportService.EMAIL_HOST, "smtp.mailtrap.io");
+        properties.setProperty(MysqlExportService.EMAIL_PORT, "25");
+        properties.setProperty(MysqlExportService.EMAIL_USERNAME, "0c524f09a14ef6");
+        properties.setProperty(MysqlExportService.EMAIL_PASSWORD, "89e6f0d0ad4531");
+        properties.setProperty(MysqlExportService.EMAIL_FROM, "admin@payer.ng");
+        properties.setProperty(MysqlExportService.EMAIL_TO, "light@payer.ng");
+
+//set the outputs temp dir
+        File currentDirectory = new File(new File(".").getAbsolutePath());
+        String folderPath = currentDirectory.getCanonicalPath()+File.separator+"databaseBackUpFolder";
+
+        properties.setProperty(MysqlExportService.TEMP_DIR, new File(folderPath).getPath());
+
+        MysqlExportService mysqlExportService = new MysqlExportService(properties);
+        mysqlExportService.export();
+
+        AlertHelper("UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL", "I").showAndWait();
+
+    }
+
+    private static void deleteFileIfExists(File dropAndCreateDdlFile) {
+        if (dropAndCreateDdlFile.exists()) {
+            if (!dropAndCreateDdlFile.isFile()) {
+                String msg = MessageFormat.format("File is not a normal file {0}", dropAndCreateDdlFile);
+                throw new IllegalStateException(msg);
+            }
+
+            if (!dropAndCreateDdlFile.delete()) {
+                String msg = MessageFormat.format("Unable to delete file {0}", dropAndCreateDdlFile);
+                throw new IllegalStateException(msg);
+            }
+        }
     }
 
     public static String getAppropriateStringFormat(String dateString){
