@@ -763,7 +763,6 @@ public class ManageLoanController {
     public void collectedLoanDateUpdated(Event inputMethodEvent) {
         pln("UPDATE EXPECTED DATE FIELD");
 
-
         LocalDate selectedDate = nLoanCollectedDate.getValue();
 
         if(selectedDate == null){
@@ -776,7 +775,6 @@ public class ManageLoanController {
 
         nLoanRepayDate.setValue(expectedDate);
         nLoanExpectedRepayDateLabelDisplay.setText(CustomUtility.getStringFromLocalDate(expectedDate));
-
 
     }
 

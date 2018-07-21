@@ -1,6 +1,8 @@
 package major;
 
 
+import com.smattme.MysqlExportService;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -22,16 +24,20 @@ import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.schema.TargetType;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -61,7 +67,7 @@ public class MainViewDashboardController implements Initializable {
     @FXML private TabPane mainAppTabPane;
 
     @FXML private Button buttonBackupData;
-    @FXML private Button buttonExportDatabase;
+    @FXML private Label backupProcessDisplayLabel;
 
 
     @FXML private Tab accountListTabSection;
@@ -95,6 +101,7 @@ public class MainViewDashboardController implements Initializable {
 
     private TableMemberAccount currentTableMemberAccount;
     private MembershipAccount currentMembershipAccount;
+    public  boolean outcome_task = false;
 
 
 
@@ -957,62 +964,163 @@ public class MainViewDashboardController implements Initializable {
         mainAppTabPane.getSelectionModel().select(0);
     }
 
-    public void buttonExportDatabaseAction(ActionEvent actionEvent) {
+    public void buttonBackupDataAction(ActionEvent actionEvent) {
         //TODO complete this export Database CODE - NOT WORKING STILL BEING DEVELOPED
-        buttonExportDatabase.setDisable(true);
 
-        try {
+        buttonBackupData.setDisable(true);
+        Task<Boolean> task = new Task<Boolean>() {
 
-            Map<String, String> settings = new HashMap<>();
-            settings.put("connection.driver_class", "com.mysql.jdbc.Driver");
-            settings.put("dialect", "org.hibernate.dialect.MySQL57InnoDBDialect");
-            settings.put("hibernate.connection.url", "jdbc:mysql://localhost/testdb?useSSL=false");
-            settings.put("hibernate.connection.username", "root");
-            settings.put("hibernate.connection.password", "");
-            settings.put("hibernate.hbm2ddl.auto", "create");
-            settings.put("show_sql", "true");
+            @Override protected Boolean call() throws Exception {
 
-            MetadataSources metadata = new MetadataSources(
-                    new StandardServiceRegistryBuilder()
-                            .applySettings(settings)
-                            .build());
-            metadata.addAnnotatedClass(MembershipAccount.class);
-            metadata.addAnnotatedClass(AccountTransaction.class);
-            metadata.addAnnotatedClass(SharesTransaction.class);
-            metadata.addAnnotatedClass(SharesDistributionTransaction.class);
-            metadata.addAnnotatedClass(TakeLoanTransaction.class);
-            metadata.addAnnotatedClass(ReturnLoanTransaction.class);
-            metadata.addAnnotatedClass(Task.class);
 
-        /*SchemaExport schemaExport = new SchemaExport(
-                (MetadataImplementor) metadata.buildMetadata()
-        );*/
 
-            SchemaExport schemaExport = new SchemaExport();
-//        SchemaExport schemaExport = SchemaExport.buildMetadataFromMainArgs(metadata.);
-            schemaExport.setHaltOnError(true);
-            schemaExport.setFormat(true);
-            schemaExport.setDelimiter(";");
-            schemaExport.setOutputFile(System.getenv("")+"db-schema.sql");
-//        schemaExport.execute(true, true, false, true);
 
-        }catch (Exception ex){
-            ex.printStackTrace();
-        }
+                if(CustomUtility.netIsAvailable()) {
 
-        buttonExportDatabase.setDisable(false);
+                    Thread.sleep(500);
+                    //TODO  START A THREAD TASK THAT UPLOADS DATA TO THE INTERNET
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            backupProcessDisplayLabel.setText("Network Connection Detected");
+                        }
+                    });
+
+                    Thread.sleep(100);
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            backupProcessDisplayLabel.setText("BackUp Database Process Initiating...");
+                        }
+                    });
+
+
+                    try {
+
+                        Properties properties = new Properties();
+                        properties.setProperty(MysqlExportService.DB_NAME, "sharesdb");
+                        properties.setProperty(MysqlExportService.DB_USERNAME, "homestead");
+                        properties.setProperty(MysqlExportService.DB_PASSWORD, "secret");
+
+                        //properties relating to email config
+                        properties.setProperty(MysqlExportService.EMAIL_HOST, "smtp.mailtrap.io");
+                        properties.setProperty(MysqlExportService.EMAIL_PORT, "25");
+                        properties.setProperty(MysqlExportService.EMAIL_USERNAME, "0c524f09a14ef6");
+                        properties.setProperty(MysqlExportService.EMAIL_PASSWORD, "89e6f0d0ad4531");
+                        properties.setProperty(MysqlExportService.EMAIL_FROM, "sharesapp@payer.ng");
+                        properties.setProperty(MysqlExportService.EMAIL_TO, "light@payer.ng");
+
+                        //set the outputs temp dir
+                        File currentDirectory = new File(new File(".").getAbsolutePath());
+                        String folderPath = currentDirectory.getCanonicalPath() + File.separator + "databaseBackUpFolder";
+
+                        properties.setProperty(MysqlExportService.TEMP_DIR, new File(folderPath).getPath());
+
+                        Thread.sleep(500);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                backupProcessDisplayLabel.setText("BackUp Database is in .Processing...");
+                            }
+                        });
+
+                        MysqlExportService mysqlExportService = new MysqlExportService(properties);
+                        Thread.sleep(500);
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                backupProcessDisplayLabel.setText("Currently Uploading & Emailing Database Backup....");
+                            }
+                        });
+                        mysqlExportService.export();
+                        Thread.sleep(50);
+
+
+
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        Platform.runLater(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                backupProcessDisplayLabel.setText("Error Occured While Backing Up the Database. Please Try Again");
+                            }
+                        });
+                    }
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            backupProcessDisplayLabel.setText("DATABASE BACKUP WAS SUCCESSFULL");
+                            CustomUtility.pln(String.format("%s: %s - %s", "UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL"));
+                            CustomUtility.AlertHelper("UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL", "I").showAndWait();
+                            backupProcessDisplayLabel.setText("DATABASE BACKUP COMPLETED SUCCESSFULLY AT " + (new Date()));
+
+                            buttonBackupData.setDisable(false);
+                            outcome_task = true;
+                        }
+                    });
+
+                }else{
+
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            backupProcessDisplayLabel.setText("NO INTERNET CONNECTION - AVAILABLE CURRENTLY");
+                            CustomUtility.AlertHelper("BACKUP PROCESSING INFORMATION", "DATABASE BACKUP - INFO", "NO INTERNET CONNECTION - AVAILABLE CURRENTLY", "I").showAndWait();
+                            backupProcessDisplayLabel.setText("DATABASE BACKUP STATUS");
+                            buttonBackupData.setDisable(false);
+                            outcome_task = false;
+                        }
+                    });
+                }
+                return outcome_task;
+
+            }
+
+            @Override
+            protected void done() {
+
+
+            }
+
+            @Override protected void succeeded() {
+                super.succeeded();
+                println("WORKED!!");
+
+            }
+
+            @Override protected void cancelled() {
+                super.cancelled();
+            }
+
+            @Override protected void failed() {
+                super.failed();
+            }
+
+        };
+
+        new Thread(task).start();
 
     }
 
-    public void buttonBackupDataAction(ActionEvent actionEvent) {
-        if(CustomUtility.netIsAvailable()){
-            buttonBackupData.setDisable(true);
 
-            //TODO  START A THREAD TASK THAT UPLOADS DATA TO THE INTERNET
+    private void deleteFileIfExists(File dropAndCreateDdlFile) {
+        if (dropAndCreateDdlFile.exists()) {
+            if (!dropAndCreateDdlFile.isFile()) {
+                String msg = MessageFormat.format("File is not a normal file {0}", dropAndCreateDdlFile);
+                throw new IllegalStateException(msg);
+            }
 
-
-        }else{
-            buttonBackupData.setDisable(false);
+            if (!dropAndCreateDdlFile.delete()) {
+                String msg = MessageFormat.format("Unable to delete file {0}", dropAndCreateDdlFile);
+                throw new IllegalStateException(msg);
+            }
         }
     }
 

@@ -363,7 +363,11 @@ public class CustomUtility{
 
     }
     public static void main(String args [] ) throws SQLException, IOException, ClassNotFoundException {
-
+        if(CustomUtility.netIsAvailable()) {
+            pln("THERE IS CONNECTION");
+        }else{
+            pln("NO Connection");
+        }
         BigDecimal amount = new BigDecimal(5000);
         pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
         pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
@@ -461,10 +465,14 @@ public class CustomUtility{
 
     public static boolean netIsAvailable() {
         try {
-            final URL url = new URL("http://www.google.com");
-            final URLConnection conn = url.openConnection();
-            conn.connect();
-            conn.getInputStream().close();
+//            final URL url = new URL("http://www.google.com");
+            final URL url1 = new URL("http://www.mailtrap.io");
+//            final URLConnection conn = url.openConnection();
+            final URLConnection conn1 = url1.openConnection();
+//            conn.connect();
+            conn1.connect();
+            conn1.getInputStream().close();
+//            conn.getInputStream().close();
             return true;
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);

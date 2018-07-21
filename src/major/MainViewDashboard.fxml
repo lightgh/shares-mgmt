@@ -532,15 +532,28 @@
                               </Pane>
                               <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
                                  <children>
-                                    <Button fx:id="buttonExportDatabase" layoutX="7.0" layoutY="20.0" mnemonicParsing="false" onAction="#buttonExportDatabaseAction" prefHeight="29.0" prefWidth="175.0" text="Export Database" />
-                                    <Button fx:id="buttonBackupData" layoutX="7.0" layoutY="84.0" mnemonicParsing="false" onAction="#buttonBackupDataAction" prefHeight="29.0" prefWidth="175.0" text="Backup Data Online" />
+                                    <Button fx:id="buttonBackupData" contentDisplay="TOP" layoutX="7.0" layoutY="24.0" mnemonicParsing="false" onAction="#buttonBackupDataAction" prefHeight="186.0" prefWidth="176.0" text="Export Database And Backup Data Online" textAlignment="CENTER" wrapText="true">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                       <graphic>
+                                          <ImageView fitHeight="90.0" fitWidth="142.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic></Button>
                                  </children>
                               </Pane>
-                              <TableView fx:id="backUpTableListDisplay" layoutX="232.0" layoutY="105.0" prefHeight="657.0" prefWidth="1030.0" AnchorPane.leftAnchor="232.0" AnchorPane.topAnchor="105.0" />
+                              <TableView fx:id="backUpTableListDisplay" layoutX="232.0" layoutY="153.0" opacity="0.13" prefHeight="609.0" prefWidth="1030.0" AnchorPane.leftAnchor="232.0" AnchorPane.topAnchor="153.0" />
                               <Label alignment="CENTER" contentDisplay="CENTER" layoutX="269.0" layoutY="28.0" prefHeight="29.0" prefWidth="804.0" text="MANAGE DATA BACKUP" textFill="#eeeeee">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
+                              </Label>
+                              <Label fx:id="backupProcessDisplayLabel" layoutX="233.0" layoutY="98.0" prefHeight="60.0" prefWidth="1036.0" style="-fx-background-color: light-green;" text="DATABASE BACKUP STATUS" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <graphic>
+                                    <ImageView fitHeight="60.0" fitWidth="112.0" pickOnBounds="true" preserveRatio="true" />
+                                 </graphic>
                               </Label>
                            </children>
                         </AnchorPane>
