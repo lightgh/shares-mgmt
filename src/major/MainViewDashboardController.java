@@ -15,6 +15,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Font;
@@ -36,9 +40,12 @@ import org.hibernate.boot.spi.MetadataImplementor;
 import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.hibernate.tool.schema.TargetType;
 
+import javax.imageio.ImageIO;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,6 +55,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 
 import static major.CustomUtility.getLocalDateFromDate;
 import static major.CustomUtility.println;
@@ -572,9 +580,10 @@ public class MainViewDashboardController implements Initializable {
 
     public static void main(String[] args) {
 
-        Map paramenters = new HashMap<String, String>();
+        Map paramenters = new HashMap<Object, Object>();
         paramenters.put("title", "Registered Members Full Report List");
         paramenters.put("summary", "12 Members");
+        paramenters.put("logo", "Logo");
 
         paramenters.forEach((first, second) -> {
             CustomUtility.pln(first + " " + second);
@@ -587,6 +596,8 @@ public class MainViewDashboardController implements Initializable {
         try {
 
             InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/MemberListReport.jrxml");
+             String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
+            paramenters.put("logo", path);
             JasperReport jasperReport =  JasperCompileManager.compileReport(reportStream);
 //            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, new JREmptyDataSource());
             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
@@ -608,7 +619,6 @@ public class MainViewDashboardController implements Initializable {
         }catch (JRException ex){
             ex.printStackTrace();
         }
-
 
 
     }
@@ -1649,6 +1659,8 @@ public class MainViewDashboardController implements Initializable {
                 paramenters = new HashMap<String, String>();
                 paramenters.put("title", "Registered Members Full Report List");
                 paramenters.put("summary", accList.size()+" Members");
+                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
+                paramenters.put("logo", path);
                 JasperPrint jasperPrint = null;
                 try {
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
