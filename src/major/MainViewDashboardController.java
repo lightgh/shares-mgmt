@@ -2,6 +2,7 @@ package major;
 
 
 import com.smattme.MysqlExportService;
+import com.sun.deploy.uitoolkit.impl.fx.FXWindow;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +21,10 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.swing.JRViewer;
 import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -33,7 +38,10 @@ import org.hibernate.tool.schema.TargetType;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.swing.*;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
@@ -97,6 +105,8 @@ public class MainViewDashboardController implements Initializable {
     Session session = sessionFactory.openSession();
 
     private AppLoginManager loginManager;
+
+    static JFrame print = new JFrame("PrintOut");
 
 
     private TableMemberAccount currentTableMemberAccount;
@@ -198,6 +208,9 @@ public class MainViewDashboardController implements Initializable {
     @FXML Label totalFilteredMonthReturnLoanAmountLabel;
     @FXML private TextField filterReturnLoanTextField;
     // END RETURN LOAN SECTION TABLE
+
+    public BigDecimal tempSumVal = BigDecimal.ZERO;
+    Map paramenters;
 
 
     @Override
@@ -555,7 +568,50 @@ public class MainViewDashboardController implements Initializable {
         naOpenDate1.setValue(null);
     }
 
-    public static void main(String[] args) {}
+    private static JRViewer jrViewer;
+
+    public static void main(String[] args) {
+
+        Map paramenters = new HashMap<String, String>();
+        paramenters.put("title", "Registered Members Full Report List");
+        paramenters.put("summary", "12 Members");
+
+        paramenters.forEach((first, second) -> {
+            CustomUtility.pln(first + " " + second);
+        });
+
+
+
+        JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(ManageMembershipAccount.getMemberAccountFromAccountNo());
+
+        try {
+
+            InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/MemberListReport.jrxml");
+            JasperReport jasperReport =  JasperCompileManager.compileReport(reportStream);
+//            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, new JREmptyDataSource());
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
+            jrViewer = new JRViewer(jasperPrint);
+//            JasperExportManager.exportReportToPdf(jasperPrint);
+            jrViewer.setOpaque(true);
+            jrViewer.setVisible(true);
+            jrViewer.setSize(800, 800);
+
+            print = new JFrame("PrintOut");
+            print.add(jrViewer);
+            print.setSize(800, 800);
+            print.setVisible(true);
+            print.setLocationRelativeTo(null);
+//            print.setIconImage();
+            print.toFront();
+
+
+        }catch (JRException ex){
+            ex.printStackTrace();
+        }
+
+
+
+    }
 
     public void accountListTabTrigger(ActionEvent actionEvent) {
         addAccountTabSection.setDisable(true);
@@ -1457,8 +1513,6 @@ public class MainViewDashboardController implements Initializable {
     }
 
 
-    public BigDecimal tempSumVal = BigDecimal.ZERO;
-
     public void buttonAddSharesFindPendingMonthlyAction(ActionEvent actionEvent) throws Exception {
         getAllSharesTransactionForSpecifiedMonth(ALL_PENDING_SHARES_CAT);
     }
@@ -1571,5 +1625,71 @@ public class MainViewDashboardController implements Initializable {
             });
         });
 
+    }
+
+    public void printMemberListReport(ActionEvent actionEvent) {
+
+        buttonPrintAccountList.setDisable(true);
+
+        new Thread(new Task() {
+            @Override
+            protected Boolean call() {
+
+                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/MemberListReport.jrxml");
+                JasperReport jasperReport = null;
+                try {
+                    jasperReport = JasperCompileManager.compileReport(reportStream);
+                } catch (JRException e) {
+                    e.printStackTrace();
+                }
+
+                ObservableList<MembershipAccount> accList = ManageMembershipAccount.getMemberAccountFromAccountNo();
+
+                JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accList);
+                paramenters = new HashMap<String, String>();
+                paramenters.put("title", "Registered Members Full Report List");
+                paramenters.put("summary", accList.size()+" Members");
+                JasperPrint jasperPrint = null;
+                try {
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
+                } catch (JRException e) {
+                    e.printStackTrace();
+                }
+                jrViewer = new JRViewer(jasperPrint);
+                displayPrintPrompt();
+                return true;
+            }
+
+            @Override
+            public void done(){
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        buttonPrintAccountList.setDisable(false);
+                    }
+                });
+            }
+
+
+        }).start();
+    }
+
+    public void displayPrintPrompt(){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                if(print == null)
+                    print = new JFrame("PrintOut");
+
+                print.add(jrViewer);
+                print.setSize(900, 900);
+                print.setVisible(true);
+                print.setLocationRelativeTo(null);
+//            print.setIconImage();
+                print.toFront();
+                print.setAlwaysOnTop(true);
+                print.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            }
+        });
     }
 }

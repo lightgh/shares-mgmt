@@ -1,5 +1,7 @@
 package major;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.util.converter.LocalDateStringConverter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -227,6 +229,27 @@ public class ManageMembershipAccount {
         transactionA.commit();
 
         return membershipAccountNow;
+    }
+
+    public static ObservableList<MembershipAccount> getMemberAccountFromAccountNo(){
+
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+//        Session session = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.openSession();
+
+        Transaction transactionA = session.beginTransaction();
+
+        String hql = "FROM MembershipAccount";
+
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<MembershipAccount> query = builder.createQuery(MembershipAccount.class);
+        ObservableList<MembershipAccount> membershipAccountObservableList = FXCollections.observableArrayList();
+        Query<MembershipAccount> memQ = session.createQuery(hql, MembershipAccount.class);
+        membershipAccountObservableList.setAll(memQ.getResultList());
+
+        transactionA.commit();
+
+        return membershipAccountObservableList;
     }
 
 
