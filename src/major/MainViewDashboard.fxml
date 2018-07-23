@@ -11,6 +11,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -194,7 +195,7 @@
                                                                         <Font name="System Bold" size="16.0" />
                                                                      </font>
                                                                   </Label>
-                                                            <Button fx:id="buttonPrintAccountList" layoutX="561.0" layoutY="11.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="164.0" text="Print Account List" />
+                                                            <Button fx:id="buttonPrintAccountList" layoutX="561.0" layoutY="11.0" mnemonicParsing="false" onAction="#printMemberListReport" prefHeight="26.0" prefWidth="164.0" text="Print Account List" />
                                                             <HBox layoutX="21.0" layoutY="43.0" prefHeight="36.0" prefWidth="998.0" spacing="5.0">
                                                                <children>
                                                                   <Label text="Search Record:">
@@ -372,14 +373,192 @@
                            <children>
                               <Pane layoutX="2.0" layoutY="2.0" prefHeight="80.0" prefWidth="1275.0" style="-fx-background-color: #2F40DA;" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="2.0">
                                  <children>
-                                    <Button layoutX="128.0" layoutY="24.0" mnemonicParsing="false" prefHeight="29.0" prefWidth="110.0" text="Add Shares" />
                                     <Button fx:id="goMainSectionButton" contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" onAction="#goHomeMgmtAccountButtonAction" prefHeight="29.0" prefWidth="89.0" text="Home" />
+                                    <Label alignment="CENTER" contentDisplay="CENTER" layoutX="259.0" layoutY="18.0" prefHeight="29.0" prefWidth="804.0" text="MANAGE GENERAL SHARES BENEFITS DISTRIBUTION" textFill="#eeeeee">
+                                       <font>
+                                          <Font size="24.0" />
+                                       </font>
+                                    </Label>
                                  </children>
                               </Pane>
-                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0" />
+                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
+                                 <children>
+                                    <DatePicker fx:id="shareMonthDatePicker" layoutX="6.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
+                                    <Button fx:id="buttonAddSharesTrigger" disable="true" layoutX="6.0" layoutY="389.0" mnemonicParsing="false" onAction="#buttonAddSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Distribute Shares" />
+                                    <TextField fx:id="sharesProfitAmountTextField" layoutX="7.0" layoutY="261.0" prefHeight="41.0" prefWidth="182.0" promptText="Enter Profit Amount" />
+                                    <Label fx:id="displayMonthShareTotalLabel" alignment="CENTER" layoutX="5.0" layoutY="198.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="buttonAddSharesFind" layoutX="9.0" layoutY="94.0" mnemonicParsing="false" onAction="#buttonAddSharesFindMonthlyAction" prefHeight="43.0" prefWidth="175.0" text="Find Month Total Shares" textAlignment="CENTER" wrapText="true" />
+                                    <Button fx:id="buttonAddSharesTrigger2" disable="true" layoutX="6.0" layoutY="351.0" mnemonicParsing="false" onAction="#buttonPrintSharesTriggerAction" prefHeight="29.0" prefWidth="183.0" text="Print Shares" />
+                                    <Button layoutX="8.0" layoutY="3.0" mnemonicParsing="false" onAction="#getAllSharesAction" prefHeight="26.0" prefWidth="173.0" text="Get All Shares" />
+                                    <DatePicker fx:id="sharesDistributedLocalDate" layoutX="6.0" layoutY="309.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Share Month" />
+                                    <Button fx:id="buttonAddCreditableSharesFind" alignment="CENTER" layoutX="9.0" layoutY="148.0" mnemonicParsing="false" onAction="#buttonAddSharesFindPendingMonthlyAction" prefHeight="43.0" prefWidth="175.0" text="Find Only Pending Month Shares" textAlignment="CENTER" wrapText="true" />
+                                 </children></Pane>
+                              <SplitPane dividerPositions="0.5" layoutX="223.0" layoutY="135.0" prefHeight="638.0" prefWidth="1738.0" AnchorPane.leftAnchor="223.0" AnchorPane.topAnchor="135.0">
+                                 <items>
+                                    <TabPane>
+                                       <tabs>
+                                          <Tab closable="false" text="MONTH SHARES LIST ">
+                                             <content>
+                                                <TableView fx:id="shareslisttableview" editable="true" prefHeight="626.0" prefWidth="1038.0">
+                                                   <columnResizePolicy>
+                                                      <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                   </columnResizePolicy>
+                                                </TableView>
+                                             </content>
+                                          </Tab>
+                                       </tabs>
+                                    </TabPane>
+                                    <TabPane prefHeight="659.0" prefWidth="801.0">
+                                       <tabs>
+                                          <Tab text="SHARES SHARED INTEREST AMOUNT INFORMATION">
+                                             <content>
+                                                <TableView fx:id="sharedMonthlyAmountTableView" editable="true" prefHeight="616.0" prefWidth="397.0" />
+                                             </content>
+                                          </Tab>
+                                       </tabs>
+                                    </TabPane>
+                                 </items>
+                              </SplitPane>
+                              <TextField fx:id="filterAllShareDisplayListTextField" layoutX="224.0" layoutY="99.0" onKeyTyped="#setFilterMonthlySharesList" prefHeight="26.0" prefWidth="437.0" />
+                              <Label fx:id="filteredSharedSumLabel" layoutX="696.0" layoutY="91.0" prefHeight="29.0" prefWidth="386.0" text="FILTERED SUM: " />
                            </children></AnchorPane>
                         </content>
                       </Tab>
+                  <Tab fx:id="viewMonthLoanTab" text="Manage Loans">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Pane layoutX="2.0" layoutY="2.0" prefHeight="80.0" prefWidth="1275.0" style="-fx-background-color: #2F40DA;" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="2.0">
+                                 <children>
+                                    <Button fx:id="goMainSectionButton1" contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" onAction="#goHomeMgmtAccountButtonAction" prefHeight="29.0" prefWidth="89.0" text="Home" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
+                                 <children>
+                                    <DatePicker fx:id="viewMonthLoanDatePicker" layoutX="7.0" layoutY="47.0" prefHeight="36.0" prefWidth="182.0" promptText="Select Loan Month" />
+                                    <Label fx:id="totalMonthTakenLoanAmountLabel" alignment="CENTER" layoutX="5.0" layoutY="193.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Button fx:id="buttonMonthLoanFind" layoutX="9.0" layoutY="108.0" mnemonicParsing="false" onAction="#buttonFindAllMonthlyLoanAction" prefHeight="29.0" prefWidth="175.0" text="Find Loan" />
+                                    <Button layoutX="8.0" layoutY="6.0" mnemonicParsing="false" onAction="#getAllLoansAction" prefHeight="26.0" prefWidth="181.0" text="Get All Loans" />
+                                    <Label fx:id="totalMonthReturnedLoanAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="303.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="totalExpectedMonthReturnLoanAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="242.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="totalMonthReturnedLoanProfitAmountLabel" alignment="CENTER" layoutX="4.0" layoutY="350.0" prefHeight="38.0" prefWidth="182.0" style="-fx-background-color: orange;" text="TOTAL SUM HERE">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </Pane>
+                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="269.0" layoutY="28.0" prefHeight="29.0" prefWidth="804.0" text="MANAGE GENERAL LOAN REPORT DISPLAY" textFill="#eeeeee">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Label>
+                              <SplitPane dividerPositions="0.8318840579710145" layoutX="219.0" layoutY="113.0" prefHeight="655.0" prefWidth="1037.0" AnchorPane.leftAnchor="219.0" AnchorPane.rightAnchor="25.0" AnchorPane.topAnchor="113.0">
+                                <items>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="644.0" prefWidth="347.0">
+                                       <children>
+                                          <TabPane layoutY="29.0" prefHeight="661.0" prefWidth="1060.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="3.0">
+                                             <tabs>
+                                                <Tab closable="false" text="LOANS TAKEN">
+                                                   <content>
+                                                      <TableView fx:id="loanTakenListTableView" prefHeight="657.0" prefWidth="773.0">
+                                                         <columnResizePolicy>
+                                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                         </columnResizePolicy></TableView>
+                                                   </content>
+                                                </Tab>
+                                             </tabs>
+                                          </TabPane>
+                                          <TextField fx:id="filterTakenLoanTextField" layoutX="1.0" layoutY="1.0" onKeyTyped="#setFilterMonthlyTakenLoanList" prefHeight="26.0" prefWidth="307.0" />
+                                          <Label fx:id="totalFilteredMonthTakenLoanAmountLabel" layoutX="338.0" prefHeight="29.0" prefWidth="468.0" style="-fx-background-color: orange;" text="FILTERED SUM: ">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="602.0" prefWidth="603.0">
+                                       <children>
+                                          <TabPane layoutY="29.0" prefHeight="661.0" prefWidth="831.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="3.0">
+                                             <tabs>
+                                                <Tab closable="false" text="LOANS RETURNED">
+                                                   <content>
+                                                      <TableView fx:id="loanReturnListTableView" prefHeight="657.0" prefWidth="1030.0">
+                                                         <columnResizePolicy>
+                                                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                         </columnResizePolicy></TableView>
+                                                   </content>
+                                                </Tab>
+                                             </tabs>
+                                          </TabPane>
+                                          <TextField fx:id="filterReturnLoanTextField" onKeyTyped="#setFilterMonthlyReturnLoanList" prefHeight="26.0" prefWidth="321.0" />
+                                          <Label fx:id="totalFilteredMonthReturnLoanAmountLabel" layoutX="347.0" layoutY="-1.0" prefHeight="29.0" prefWidth="345.0" style="-fx-background-color: orange;" text="FILTERED SUM">
+                                             <font>
+                                                <Font name="System Bold" size="14.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                </items>
+                              </SplitPane>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
+                  <Tab fx:id="backupDataTab" text="Backup Data">
+                     <content>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <Pane layoutX="2.0" layoutY="2.0" prefHeight="80.0" prefWidth="1275.0" style="-fx-background-color: #2F40DA;" AnchorPane.leftAnchor="2.0" AnchorPane.rightAnchor="4.0" AnchorPane.topAnchor="2.0">
+                                 <children>
+                                    <Button fx:id="goMainSectionButton11" contentDisplay="CENTER" layoutX="23.0" layoutY="24.0" mnemonicParsing="false" onAction="#goHomeMgmtAccountButtonAction" prefHeight="29.0" prefWidth="89.0" text="Home" />
+                                 </children>
+                              </Pane>
+                              <Pane layoutX="7.0" layoutY="84.0" prefHeight="686.0" prefWidth="194.0" style="-fx-background-color: blue;" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="84.0">
+                                 <children>
+                                    <Button fx:id="buttonBackupData" contentDisplay="TOP" layoutX="7.0" layoutY="24.0" mnemonicParsing="false" onAction="#buttonBackupDataAction" prefHeight="186.0" prefWidth="176.0" text="Export Database And Backup Data Online" textAlignment="CENTER" wrapText="true">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                       <graphic>
+                                          <ImageView fitHeight="90.0" fitWidth="142.0" pickOnBounds="true" preserveRatio="true" />
+                                       </graphic></Button>
+                                 </children>
+                              </Pane>
+                              <TableView fx:id="backUpTableListDisplay" layoutX="232.0" layoutY="153.0" opacity="0.13" prefHeight="609.0" prefWidth="1030.0" AnchorPane.leftAnchor="232.0" AnchorPane.topAnchor="153.0" />
+                              <Label alignment="CENTER" contentDisplay="CENTER" layoutX="269.0" layoutY="28.0" prefHeight="29.0" prefWidth="804.0" text="MANAGE DATA BACKUP" textFill="#eeeeee">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="backupProcessDisplayLabel" layoutX="233.0" layoutY="98.0" prefHeight="60.0" prefWidth="1036.0" style="-fx-background-color: light-green;" text="DATABASE BACKUP STATUS" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                                 <graphic>
+                                    <ImageView fitHeight="60.0" fitWidth="112.0" pickOnBounds="true" preserveRatio="true" />
+                                 </graphic>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                     </content>
+                  </Tab>
                     </tabs>
                   </TabPane>
             </children>

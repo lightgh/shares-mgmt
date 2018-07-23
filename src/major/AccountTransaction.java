@@ -111,5 +111,9 @@ public class AccountTransaction implements Serializable {
         this.accountNo = accountNo;
     }
 
-
+    @Override
+    public String toString() {
+        return String.format("ID: %d | STATUS: %d | DESC: %s | ACC-NO: %s | Amount: %s | TRAN_DATE: %s | TRAN_TYPE: %s",
+                this.Id, this.status, this.description, this.accountNo, this.amount, this.transaction_date, this.transaction_type);
+    }
 }

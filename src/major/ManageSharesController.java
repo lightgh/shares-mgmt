@@ -1,5 +1,6 @@
 package major;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -15,14 +16,21 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.swing.*;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static major.CustomUtility.println;
@@ -191,6 +199,11 @@ public class ManageSharesController {
     private BigDecimal amount = null, amountDebit = null;
     private LocalDate transactionDate = null, transactionDebitDate = null;
     private String trasactionDescription = "", transactionDebitDescription = "";
+    private JRViewer jrViewer;
+    private Map<String, Object> paramenters;
+
+    @FXML
+    private Button btnPrintAccountDeposit;
 
 
     @FXML
@@ -608,48 +621,75 @@ public class ManageSharesController {
     }
 
     public void btnPrintAccountDeposit(ActionEvent actionEvent) {
-        Printer printer = Printer.getDefaultPrinter();
-        Stage dialogStage = new Stage(StageStyle.DECORATED);
-        PrinterJob printerJob = PrinterJob.createPrinterJob();
 
-        if (printerJob != null) {
-            boolean showDialog = printerJob.showPageSetupDialog(dialogStage);
-            if (showDialog) {
-                tableViewDeposits.setScaleX(0.60);
-                tableViewDeposits.setScaleY(0.60);
-                tableViewDeposits.setTranslateX(-220);
-                tableViewDeposits.setTranslateY(-70);
-                boolean success = printerJob.showPrintDialog(dialogStage);
-//                boolean success = printerJob.printPage(tableViewDeposits);
-                if (success) {
-                    printerJob.endJob();
-                    printerJob.showPrintDialog(dialogStage);
-//                    printerJob.
+        btnPrintAccountDeposit.setDisable(true);
+
+
+        new Thread(new Task() {
+            @Override
+            protected Boolean call() throws Exception {
+
+                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/SharesTransactionListReport.jrxml");
+
+                ObservableList<SharesTransaction> accountTransactionObservableList = ManageSharesTansaction.getSharesTransactionsForAccountNo((accountNumberDisplay.getText()));
+
+                paramenters = new HashMap<>();
+                paramenters.put("title", fullnameDisplay.getText()+" Shares Transaction Details: "+accountNumberDisplay.getText());
+                paramenters.put("summary", "Complete Shares Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
+                paramenters.put("accbal", "SharesBal: "+ String.format("N %,.2f", Double.parseDouble(ManageSharesTansaction.getSharesBalance(accountNumberDisplay.getText()).toString().trim()) ) );
+                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
+                paramenters.put("logo", path);
+                JasperReport jasperReport = null;
+                try {
+                    jasperReport = JasperCompileManager.compileReport(reportStream);
+                } catch (JRException e) {
+                    e.printStackTrace();
                 }
-                tableViewDeposits.setTranslateX(0);
-                tableViewDeposits.setTranslateY(0);
-                tableViewDeposits.setScaleX(1.0);
-                tableViewDeposits.setScaleY(1.0);
-            }
-        }
 
+                JasperPrint jasperPrint = null;
+                try {
+                    JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accountTransactionObservableList);
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
+                } catch (JRException e) {
+                    e.printStackTrace();
+                }
+                jrViewer = new JRViewer(jasperPrint);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JFrame print = new JFrame("PrintOut");
+                        print.add(jrViewer);
+                        print.setSize(900, 900);
+                        print.setVisible(true);
+                        print.setLocationRelativeTo(null);
+//            print.setIconImage();
+                        print.toFront();
+                        print.setAlwaysOnTop(true);
+                        print.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    }
+                });
+
+                return true;
+            }
+
+            @Override
+            public void done(){
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnPrintAccountDeposit.setDisable(false);
+                    }
+                });
+            }
+
+
+        }).start();
     }
 
     public void makeWithdrawalSelection(Event event) {
 
         tabpaneViewSection.getSelectionModel().select(1);
-
-/*        tabpaneActionSection;
-
-        makeDepostActionTab;
-
-        makeWithdrawalActionTab;
-
-        tabpaneViewSection;
-
-        makeDepostViewTab;
-
-        makeWithdrawalViewTab;*/
 
     }
 

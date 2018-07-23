@@ -2,6 +2,8 @@
 package major;
 
 
+import com.smattme.MysqlExportService;
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -16,10 +18,17 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
+import org.hibernate.tool.schema.TargetType;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.*;
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,7 +42,13 @@ public class CustomUtility{
 
 
     private static final SessionFactory sessionFactory;
+
+    public static final int OK = 1;
+    public static final int OK_PLUS = 2;
+    public static final int CANCEL = 0;
+
     private static boolean okAnswer = false;
+    private static int okMultiAnswer = CANCEL;
 
     private static ServiceRegistry serviceRegistry;
 
@@ -166,6 +181,50 @@ public class CustomUtility{
         return okAnswer;
     }
 
+    public static int ConfirmationWithOptionsAlertHelper(String title, String content) throws IOException {
+
+        FXMLLoader loader = new FXMLLoader(
+                CustomUtility.class.getResource("MultiConfirmAlert.fxml")
+        );
+
+        Scene scene = new Scene((Parent) loader.load(), 563, 254);
+
+        Stage dialogStage = new Stage();
+
+        dialogStage.setScene(scene);
+        dialogStage.setTitle("Alert " + title);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+
+        Label labelTitle = (Label)loader.getNamespace().get("alertTitleLabel");
+        Label labelContent = (Label)loader.getNamespace().get("alertContentLabel");
+
+        labelTitle.setText(title);
+        labelContent.setText(content);
+
+        Button btn_ok = (Button)loader.getNamespace().get("btnConfirmOk");
+        Button btn_ok_plus = (Button)loader.getNamespace().get("btnConfirmOkPlus");
+        Button btn_cancel = (Button)loader.getNamespace().get("btnConfirmCancel");
+
+        btn_ok.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = OK;
+        });
+
+        btn_ok_plus.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = OK_PLUS;
+        });
+
+        btn_cancel.setOnAction(arg0 -> {
+            dialogStage.hide();
+            okMultiAnswer = CANCEL;
+        });
+
+        dialogStage.showAndWait();
+
+        return okMultiAnswer;
+    }
+
 
     public static void print(String string){
         System.out.print(string);
@@ -296,101 +355,22 @@ public class CustomUtility{
     private Statement statement = null;
     private ResultSet resultSet = null;
 
-    public static void main(String args [] ){
+    public static void main2(String args [] ) throws SQLException, IOException, ClassNotFoundException {
 
+
+
+
+
+    }
+    public static void main(String args [] ) throws SQLException, IOException, ClassNotFoundException {
+        if(CustomUtility.netIsAvailable()) {
+            pln("THERE IS CONNECTION");
+        }else{
+            pln("NO Connection");
+        }
         BigDecimal amount = new BigDecimal(5000);
         pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
         pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
-
-        return;
-
-//        LocalDate dt = getLocalDateFromString("12-06-2018");
-//        LocalDate dt = getLocalDateFromString("2018-06-12");
-       /* LocalDate dt = getLocalDateFromString("2018/12/6");
-
-
-        Date td2 = getDateFromLocalDate(dt);
-        pln(td2.toString());
-        LocalDate dt2 = getLocalDateFromDate(td2);
-        pln("STR_FROM_LD: "+getStringFromLocalDate(dt2));
-
-        System.exit(0);*/
-
-//        java.util.logging.Logger.getLogger("org.hibernate").setLevel(Level.OFF);
-        /*AccountNumberGenerator accountNumberGenerator = new AccountNumberGenerator();
-        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();*/
-        /*Transaction transaction = session.beginTransaction();
-        MembershipAccount membA = new MembershipAccount();
-        membA.setAccountNo(accountNumberGenerator.getNewAccountNo(10));
-        membA.setFirstName("MusaJane");
-        membA.setLastName("Saminu");
-        membA.setOtherName("Kenw");
-        membA.setAddress("Opp Sch Of Agric");
-        membA.setClosing_date(new Date());
-        membA.setOpening_date(new Date());
-        membA.setPhoneNo("08031289230");
-        membA.setStatus(1);
-        session.save(membA);
-        transaction.commit();
-        CustomUtility.println("Successfully inserted");
-        sessionFactory.close();*/
-
-
-/*
-        String hql = "FROM MembershipAccount M WHERE M.accountNo='3501697105'";
-        String hql = "FROM MembershipAccount M WHERE M.firstName LIKE 'Chinaka'";
-
-        Transaction transactionA = session.beginTransaction();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<MembershipAccount> query = builder.createQuery(MembershipAccount.class);
-//        query.from(MembershipAccount.class);
-        Root<MembershipAccount> root = query.from(MembershipAccount.class);
-//        query.select(builder.construct(MembershipAccount.class, root.get("accountNo")));
-
-        Query<MembershipAccount> memQ = session.createQuery(hql, MembershipAccount.class);
-//        List memberAccountList = session.createQuery(query).getResultList();
-        List<MembershipAccount> memberAccountList = memQ.list();
-        MembershipAccount membershipAccount;
-
-        println("ACCOUNT_LISTING");
-        for (Object memberAccount:
-             memberAccountList) {
-            membershipAccount = (MembershipAccount)memberAccount;
-            print(membershipAccount.getId() + " ");
-            print(membershipAccount.getAccountNo() + " ");
-            println(membershipAccount.getFullName() + " ");
-        }
-*/
-
-
-
-//        query.select(root).where(builder.equal(root.get("accountNo"), "3501697105"));
-//                .where(builder.);
-
-
-
-        /*org.hibernate.query.Query<MembershipAccount> q= session.createQuery(query);
-        MembershipAccount membershipAccountNow = q.getSingleResult();
-        println(membershipAccountNow.getAccountNo());
-        println(membershipAccountNow.getFullName());
-        println(membershipAccountNow.getAddress());*/
-
-
-//        Query<Long> longQuery = session.createQuery(queryCount);
-
-//        long count = queryCount..getSingleResult();
-        /*List<Object[]> countObj = session.createNativeQuery(
-                "SELECT count(*) as number FROM account_info" )
-                .list();
-
-        println("Count = "+(countObj.get(0) ));*/
-
-//        List<MembershipAccount> =
-
-//        transactionA.commit();
-
-
 
     }
 
@@ -481,5 +461,23 @@ public class CustomUtility{
 
         return (int)ChronoUnit.DAYS.between(firstDate, secondDate);
 
+    }
+
+    public static boolean netIsAvailable() {
+        try {
+//            final URL url = new URL("http://www.google.com");
+            final URL url1 = new URL("http://www.mailtrap.io");
+//            final URLConnection conn = url.openConnection();
+            final URLConnection conn1 = url1.openConnection();
+//            conn.connect();
+            conn1.connect();
+            conn1.getInputStream().close();
+//            conn.getInputStream().close();
+            return true;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            return false;
+        }
     }
 }

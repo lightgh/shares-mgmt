@@ -67,7 +67,7 @@
                         <Pane layoutX="11.0" layoutY="123.0" prefHeight="26.0" prefWidth="384.0">
                            <children>
                               <Button fx:id="closeButton" layoutX="8.0" layoutY="2.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="180.0" text="Main Menu" />
-                              <Button fx:id="btnPrintAccountDeposti" layoutX="205.0" layoutY="2.0" mnemonicParsing="false" onAction="#btnPrintAccountDeposit" prefHeight="26.0" prefWidth="159.0" text="Print Loan Details" />
+                              <Button fx:id="btnPrintAccountDeposit" layoutX="205.0" layoutY="2.0" mnemonicParsing="false" onAction="#btnPrintAccountDeposit" prefHeight="26.0" prefWidth="159.0" text="Print Loan Details" />
                            </children>
                            <padding>
                               <Insets top="5.0" />

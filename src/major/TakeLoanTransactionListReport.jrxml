@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.4.0.final using JasperReports Library version 6.4.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MemberList" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e7eebaa4-068b-407f-bf7a-d4c2e72a1292">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<style name="Title" fontName="Arial" fontSize="26" isBold="true"/>
+	<style name="SubTitle" forecolor="#666666" fontName="Arial" fontSize="18"/>
+	<style name="Column header" forecolor="#666666" scaleImage="Clip" fontName="Arial" fontSize="12" isBold="true">
+		<pen lineWidth="2.0" lineStyle="Solid"/>
+		<box>
+			<pen lineWidth="1.0" lineStyle="Solid"/>
+			<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+			<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+			<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+			<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+		</box>
+		<paragraph lineSpacing="1_1_2"/>
+	</style>
+	<style name="Detail" fontName="Arial" fontSize="12"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="Loan Ledger No" class="java.lang.String">
+		<fieldDescription><![CDATA[ledgerNo]]></fieldDescription>
+	</field>
+	<field name="Amount" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[amount]]></fieldDescription>
+	</field>
+	<field name="Interest Rate" class="java.lang.Integer">
+		<fieldDescription><![CDATA[interestRate]]></fieldDescription>
+	</field>
+	<field name="Description" class="java.lang.String">
+		<fieldDescription><![CDATA[description]]></fieldDescription>
+	</field>
+	<field name="Date Collected" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[dateCollected]]></fieldDescription>
+	</field>
+	<field name="Expected Repay Date" class="java.sql.Timestamp">
+		<fieldDescription><![CDATA[repayDate]]></fieldDescription>
+	</field>
+	<field name="Status" class="java.lang.Integer">
+		<fieldDescription><![CDATA[status]]></fieldDescription>
+	</field>
+	<group name="Group1">
+		<groupExpression><![CDATA[(int)($V{REPORT_COUNT}/15)]]></groupExpression>
+		<groupFooter>
+			<band/>
+		</groupFooter>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<image scaleImage="FillFrame">
+				<reportElement x="463" y="0" width="85" height="66" uuid="d7cb9de5-f1d6-4e9a-8441-72f5e2127742"/>
+				<imageExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "logo" )]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement style="Title" x="0" y="2" width="270" height="28" uuid="3eb8e1ab-7e38-4368-89db-62b6501a8c67"/>
+				<textElement verticalAlignment="Middle">
+					<font size="24"/>
+				</textElement>
+				<text><![CDATA[BASHAKACS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="3" y="67" width="337" height="18" uuid="626fa956-588a-4801-b8c2-44162e0e6ae1"/>
+				<textFieldExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "title" )]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="SubTitle" x="0" y="36" width="417" height="22" uuid="199ae6ed-07a3-4dcf-ab55-4395fcc5359c"/>
+				<textFieldExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "summary" )]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="331" y="65" width="195" height="21" uuid="99d8e9ae-56fe-4f98-a781-4ccf1c9f38d3"/>
+				<textFieldExpression><![CDATA[$P{REPORT_PARAMETERS_MAP}.get( "totalLoan" )]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<staticText>
+				<reportElement x="0" y="0" width="93" height="36" uuid="36f76a06-f848-4573-a800-c1156dc81278"/>
+				<box>
+					<topPen lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<text><![CDATA[Loan Ledger No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="93" y="0" width="93" height="36" uuid="b6f5438d-bb39-495b-ad19-32ab1bb33c48"/>
+				<text><![CDATA[Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="186" y="0" width="93" height="36" uuid="88fd9384-8af8-40f8-94d2-3c8da3c3ffa6"/>
+				<text><![CDATA[Interest Rate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="279" y="0" width="92" height="36" uuid="888c61d9-c99c-495c-9f6c-ba2d54dc1931"/>
+				<text><![CDATA[Description]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="0" width="92" height="36" uuid="888c61d9-c99c-495c-9f6c-ba2d54dc1931"/>
+				<text><![CDATA[Date Collected]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="0" width="92" height="36" uuid="888c61d9-c99c-495c-9f6c-ba2d54dc1931"/>
+				<text><![CDATA[Expected Repay Date]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="36" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<textField>
+				<reportElement x="0" y="0" width="93" height="36" uuid="34c841da-a08d-4461-8f7c-16e1af96f7f6"/>
+				<textFieldExpression><![CDATA[$F{Loan Ledger No}]]></textFieldExpression>
+			</textField>
+			<textField pattern="N #,##0.###">
+				<reportElement x="93" y="0" width="93" height="36" uuid="bf5db995-72a9-4915-8481-1ef3acec4ea9"/>
+				<textFieldExpression><![CDATA[$F{Amount}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="186" y="0" width="93" height="36" uuid="34c841da-a08d-4461-8f7c-16e1af96f7f6"/>
+				<textFieldExpression><![CDATA[$F{Interest Rate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="279" y="0" width="92" height="36" uuid="9d833c22-6702-4ca0-90f7-c8784150eaa3"/>
+				<textFieldExpression><![CDATA[$F{Description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="371" y="0" width="92" height="36" uuid="57597f93-dd49-47a8-a9f4-be948a503885"/>
+				<textFieldExpression><![CDATA[$F{Date Collected}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMM d, yyyy">
+				<reportElement x="463" y="0" width="92" height="36" uuid="57597f93-dd49-47a8-a9f4-be948a503885"/>
+				<textFieldExpression><![CDATA[$F{Expected Repay Date}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="27" splitType="Stretch">
+			<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.grid.JSSGridBagLayout"/>
+			<line>
+				<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="555" height="27" uuid="02519f40-8679-4e40-a1f1-699bc025a206"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnFooter>
+	<pageFooter>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Column header" x="433" y="0" width="80" height="20" uuid="6f13e17d-4b46-4ede-ab63-9d2685ec9c16"/>
+				<textElement textAlignment="Right">
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement style="Column header" x="513" y="0" width="40" height="20" uuid="6857db7e-824a-4cda-b8dc-fe5c95aca145"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement style="Column header" x="0" y="0" width="197" height="20" uuid="ef9fc35f-c45f-4ec6-a5cc-ec2020109ea7"/>
+				<textElement>
+					<font size="10" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band splitType="Stretch"/>
+	</summary>
+</jasperReport>

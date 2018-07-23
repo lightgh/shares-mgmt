@@ -29,6 +29,11 @@ public class AppLoginController {
                 }
             }
         });
+
+        password.setOnAction(e->{
+            CustomUtility.pln("EXECUTING...");
+            loginButton.fire();
+        });
     }
 
     /**

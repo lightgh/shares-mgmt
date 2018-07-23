@@ -1,5 +1,6 @@
 package major;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -16,15 +17,22 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.swing.JRViewer;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.swing.*;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static major.CustomUtility.pln;
@@ -236,6 +244,13 @@ public class ManageLoanController {
 
     @FXML
     private TextField rLoanInterestRate;
+    private Map<String, Object> paramenters;
+    @FXML
+    private Button btnPrintAccountDeposit;
+    private JRViewer jrViewer;
+    private JRViewer jrViewer_Return;
+
+    Map<String, Object> paramenters_return_loan;
 
 
     @FXML
@@ -371,7 +386,7 @@ public class ManageLoanController {
             expectedReturnedLoan = new BigDecimal(rLoanTotalAmountExpected.getText().trim());
             String thisAccountNo = accountNumberDisplay.getText();
             loanPeriod = Integer.parseInt(rLoanPeriod.getText());
-            interestRate = Integer.parseInt(rLoanInterestRate.getText());
+            interestRate = Integer.valueOf((int)Double.parseDouble(rLoanInterestRate.getText()));
             pln("INTERRRRREEEEEEST-RATE: " + rLoanInterestRate.getText());
             returnLoanDate = rLoanReturnedDate.getValue();
             Date dateCollected = CustomUtility.getDateFromLocalDate(rLoanCollectedDate.getValue());
@@ -679,30 +694,93 @@ public class ManageLoanController {
     }
 
     public void btnPrintAccountDeposit(ActionEvent actionEvent) {
-        Printer printer = Printer.getDefaultPrinter();
-        Stage dialogStage = new Stage(StageStyle.DECORATED);
-        PrinterJob printerJob = PrinterJob.createPrinterJob();
+        btnPrintAccountDeposit.setDisable(true);
 
-        if (printerJob != null) {
-            boolean showDialog = printerJob.showPageSetupDialog(dialogStage);
-            if (showDialog) {
-                tableViewTakeLoans.setScaleX(0.60);
-                tableViewTakeLoans.setScaleY(0.60);
-                tableViewTakeLoans.setTranslateX(-220);
-                tableViewTakeLoans.setTranslateY(-70);
-                boolean success = printerJob.showPrintDialog(dialogStage);
-//                boolean success = printerJob.printPage(tableViewTakeLoans);
-                if (success) {
-                    printerJob.endJob();
-                    printerJob.showPrintDialog(dialogStage);
-//                    printerJob.
+        new Thread(new Task() {
+            @Override
+            protected Boolean call() throws Exception {
+
+                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/TakeLoanTransactionListReport.jrxml");
+                InputStream reportStream_return_loan = MainViewDashboardController.class.getClass().getResourceAsStream("/major/ReturnLoanTransactionListReport.jrxml");
+
+                ObservableList<TakeLoanTransaction> accountTransactionObservableList = ManageLoanTransaction.getTakenLoanTransactionsForAccount((accountNumberDisplay.getText()));
+                ObservableList<ReturnLoanTransaction> returnLoanTransactionObservableList = ManageLoanTransaction.getReturnedLoanTransactionsForAccount((accountNumberDisplay.getText()));
+
+                paramenters = new HashMap<>();
+                paramenters.put("title", fullnameDisplay.getText()+" Take Loan Transaction Details: "+accountNumberDisplay.getText());
+                paramenters.put("summary", "Complete Loan Taken Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
+                paramenters.put("totalLoan", "Total Loan Taken: "+ String.format("N %,.2f", Double.parseDouble(ManageLoanTransaction.getTotalTakenLoanTransactions(accountNumberDisplay.getText()).toString())));
+                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
+                paramenters.put("logo", path);
+
+                paramenters_return_loan = new HashMap<>();
+                paramenters_return_loan.put("title", fullnameDisplay.getText()+" Returned Loan Transaction Details: "+accountNumberDisplay.getText());
+                paramenters_return_loan.put("summary", "Complete Loan Returned Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
+                paramenters_return_loan.put("totalLoan", "Total Returned Loan: "+ String.format("N %,.2f", Double.parseDouble(ManageLoanTransaction.getTotalReturnedLoanTransactions(accountNumberDisplay.getText()).toString())));
+                paramenters_return_loan.put("logo", path);
+                JasperReport jasperReport = null, jasperReport_return_loan = null;
+                try {
+                    jasperReport = JasperCompileManager.compileReport(reportStream);
+                    jasperReport_return_loan = JasperCompileManager.compileReport(reportStream_return_loan);
+                } catch (JRException e) {
+                    e.printStackTrace();
                 }
-                tableViewTakeLoans.setTranslateX(0);
-                tableViewTakeLoans.setTranslateY(0);
-                tableViewTakeLoans.setScaleX(1.0);
-                tableViewTakeLoans.setScaleY(1.0);
+
+                JasperPrint jasperPrint = null, jasperPrint_ReturnLoan = null;
+                try {
+                    JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accountTransactionObservableList);
+                    jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
+                    JRBeanCollectionDataSource beanCollectionDataSource_Return_Loan = new JRBeanCollectionDataSource(returnLoanTransactionObservableList);
+                    jasperPrint_ReturnLoan = JasperFillManager.fillReport(jasperReport_return_loan, paramenters_return_loan, beanCollectionDataSource_Return_Loan);
+                } catch (JRException e) {
+                    e.printStackTrace();
+                }
+
+                jrViewer = new JRViewer(jasperPrint);
+                jrViewer_Return = new JRViewer(jasperPrint_ReturnLoan);
+
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JFrame print = new JFrame("PrintOut");
+                        print.add(jrViewer);
+                        print.setSize(900, 900);
+                        print.setVisible(true);
+                        print.setLocationRelativeTo(null);
+//            print.setIconImage();
+                        print.toFront();
+                        print.setAlwaysOnTop(true);
+                        print.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                        JFrame printReturn = new JFrame("PrintOut");
+
+                        printReturn.add(jrViewer_Return);
+                        printReturn.setSize(900, 900);
+                        printReturn.setVisible(true);
+                        printReturn.setLocationRelativeTo(null);
+//            printReturn.setIconImage();
+                        printReturn.toFront();
+                        printReturn.setAlwaysOnTop(true);
+                        printReturn.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+                    }
+                });
+
+                return true;
             }
-        }
+
+            @Override
+            public void done(){
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        btnPrintAccountDeposit.setDisable(false);
+                    }
+                });
+            }
+
+
+        }).start();
 
     }
 
@@ -763,7 +841,6 @@ public class ManageLoanController {
     public void collectedLoanDateUpdated(Event inputMethodEvent) {
         pln("UPDATE EXPECTED DATE FIELD");
 
-
         LocalDate selectedDate = nLoanCollectedDate.getValue();
 
         if(selectedDate == null){
@@ -776,7 +853,6 @@ public class ManageLoanController {
 
         nLoanRepayDate.setValue(expectedDate);
         nLoanExpectedRepayDateLabelDisplay.setText(CustomUtility.getStringFromLocalDate(expectedDate));
-
 
     }
 

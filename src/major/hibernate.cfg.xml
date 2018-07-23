@@ -33,6 +33,7 @@
         <mapping class="major.SharesTransaction" />
         <mapping class="major.TakeLoanTransaction" />
         <mapping class="major.ReturnLoanTransaction" />
+        <mapping class="major.SharesDistributionTransaction" />
 
     </session-factory>
 </hibernate-configuration>

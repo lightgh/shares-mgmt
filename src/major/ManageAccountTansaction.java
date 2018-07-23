@@ -10,8 +10,12 @@ import org.hibernate.query.Query;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.List;
+
+import static major.ManageSharesTansaction.CREDIT_ACC;
+import static major.ManageSharesTansaction.DEBIT_ACC;
 
 
 /**
@@ -43,8 +47,6 @@ public class ManageAccountTansaction {
         }
 
             SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-
-//        Session session = sessionFactory.getCurrentSession();
 
             Session session = sessionFactory.openSession();
 
@@ -105,25 +107,15 @@ public class ManageAccountTansaction {
 
     public static BigDecimal getTotal(ObservableList<AccountTransaction> accountTransactions){
 
-//        CustomUtility.pln("TE-ST-1: " +accountTransactions.size());
-
         BigDecimal sum = BigDecimal.ZERO;
 
         if(accountTransactions == null)
             return sum;
 
-//        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
-        /*accountTransactions.forEach((temp)->{
-            sum = sum.add(temp.getCollectedAmount());
-        });*/
-
         Iterator<AccountTransaction> iterator =  accountTransactions.iterator();
         while (iterator.hasNext()){
             sum = sum.add(iterator.next().getAmount());
         }
-
-//        CustomUtility.pln("SUMATION: " + sum.toString());
-//        CustomUtility.pln("TE-ST-3: " +accountTransactions.size());
 
         return sum;
     }
@@ -166,5 +158,23 @@ public class ManageAccountTansaction {
     }
 
 
+    public static void creditOrDebitAccountNoWith(String accountNo, BigDecimal calculateAccountSharesBenefit, LocalDate creditLocalDate, String transactionDesc, String transType) throws IllegalArgumentException {
+
+        if(!transType.equalsIgnoreCase(CREDIT_ACC) && !transType.equalsIgnoreCase(DEBIT_ACC))
+            throw new IllegalArgumentException("Transaction TYPE MUST BE CREDIT OR DEBIT");
+        SessionFactory sessionFactory = CustomUtility.getSessionFactory();
+        Session session = sessionFactory.openSession(); //sessionFactory.getCurrentSession();
+        Transaction transactionA = session.beginTransaction();
+        AccountTransaction newAccountTransaction = new AccountTransaction();
+        newAccountTransaction.setAccountNo(accountNo);
+        newAccountTransaction.setAmount(calculateAccountSharesBenefit);
+        newAccountTransaction.setDescription(transactionDesc);
+        newAccountTransaction.setTransaction_type(transType);
+        newAccountTransaction.setTransaction_date(CustomUtility.getDateFromLocalDate(creditLocalDate));
+        newAccountTransaction.setStatus(1);
+        newAccountTransaction.toString();
+        session.save(newAccountTransaction);
+        transactionA.commit();
+    }
 
 }
