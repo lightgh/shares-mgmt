@@ -3,6 +3,8 @@ package major;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -16,7 +18,7 @@ public class SharesManagementApplication extends Application {
     public void start(Stage stage) throws IOException {
             Scene scene = new Scene(new StackPane());
 
-            AppLoginManager appLoginManager = new AppLoginManager(scene, stage);
+        AppLoginManager appLoginManager = new AppLoginManager(scene, stage);
 
 //TODO uncomment this line
             appLoginManager.showLoginScreen();
@@ -41,6 +43,8 @@ public class SharesManagementApplication extends Application {
                     e1.printStackTrace();
                 }
             });
+
+            stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/major/images/co-op-stronger-together.jpg")));
             stage.setScene(scene);
             stage.show();
 

@@ -256,7 +256,7 @@ public class ManageSharesTansaction {
 
     public static BigDecimal getTotalDebited(String accountNo) throws Exception {
 
-        BigDecimal totalCredited = getTotal(getSharesSellsTransactions(accountNo), ALL_SHARES);
+        BigDecimal totalCredited = getTotal(getDebitTransactions(accountNo), ALL_SHARES);
         return totalCredited;
     }
 
@@ -281,6 +281,12 @@ public class ManageSharesTansaction {
     public static ObservableList<SharesTransaction> getCreditTransactions(String accountNo) throws Exception{
         ObservableList<SharesTransaction> observableListCredit = FXCollections.observableArrayList();
         observableListCredit.setAll(ManageSharesTansaction.getSharesTransactionsForAccountNo(accountNo, ManageSharesTansaction.CREDIT));
+        return observableListCredit;
+    }
+
+    public static ObservableList<SharesTransaction> getDebitTransactions(String accountNo) throws Exception{
+        ObservableList<SharesTransaction> observableListCredit = FXCollections.observableArrayList();
+        observableListCredit.setAll(ManageSharesTansaction.getSharesTransactionsForAccountNo(accountNo, ManageSharesTansaction.DEBIT));
         return observableListCredit;
     }
 

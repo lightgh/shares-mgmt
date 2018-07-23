@@ -107,25 +107,15 @@ public class ManageAccountTansaction {
 
     public static BigDecimal getTotal(ObservableList<AccountTransaction> accountTransactions){
 
-//        CustomUtility.pln("TE-ST-1: " +accountTransactions.size());
-
         BigDecimal sum = BigDecimal.ZERO;
 
         if(accountTransactions == null)
             return sum;
 
-//        CustomUtility.pln("TE-ST-2: " +accountTransactions.size());
-        /*accountTransactions.forEach((temp)->{
-            sum = sum.add(temp.getCollectedAmount());
-        });*/
-
         Iterator<AccountTransaction> iterator =  accountTransactions.iterator();
         while (iterator.hasNext()){
             sum = sum.add(iterator.next().getAmount());
         }
-
-//        CustomUtility.pln("SUMATION: " + sum.toString());
-//        CustomUtility.pln("TE-ST-3: " +accountTransactions.size());
 
         return sum;
     }

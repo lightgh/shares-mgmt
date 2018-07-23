@@ -220,7 +220,6 @@ public class MainViewDashboardController implements Initializable {
     public BigDecimal tempSumVal = BigDecimal.ZERO;
     Map paramenters;
 
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
@@ -1690,9 +1689,7 @@ public class MainViewDashboardController implements Initializable {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                if(print == null)
-                    print = new JFrame("PrintOut");
-
+                print = new JFrame("PrintOut");
                 print.add(jrViewer);
                 print.setSize(900, 900);
                 print.setVisible(true);
