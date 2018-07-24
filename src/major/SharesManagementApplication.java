@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 /** Shares Management Application class Entry Section */
@@ -44,7 +46,9 @@ public class SharesManagementApplication extends Application {
                 }
             });
 
-            stage.getIcons().add(new Image(this.getClass().getResourceAsStream("/major/images/co-op-stronger-together.jpg")));
+//            BufferedImage image = ImageIO.read(this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
+
+            stage.getIcons().add(new Image(this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg")));
             stage.setScene(scene);
             stage.show();
 

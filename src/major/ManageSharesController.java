@@ -23,7 +23,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -627,30 +630,32 @@ public class ManageSharesController {
 
         new Thread(new Task() {
             @Override
-            protected Boolean call() throws Exception {
+            protected Boolean call() {
 
-                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/SharesTransactionListReport.jrxml");
-
-                ObservableList<SharesTransaction> accountTransactionObservableList = ManageSharesTansaction.getSharesTransactionsForAccountNo((accountNumberDisplay.getText()));
-
-                paramenters = new HashMap<>();
-                paramenters.put("title", fullnameDisplay.getText()+" Shares Transaction Details: "+accountNumberDisplay.getText());
-                paramenters.put("summary", "Complete Shares Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
-                paramenters.put("accbal", "SharesBal: "+ String.format("N %,.2f", Double.parseDouble(ManageSharesTansaction.getSharesBalance(accountNumberDisplay.getText()).toString().trim()) ) );
-                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
-                paramenters.put("logo", path);
+                InputStream reportStream = ManageSharesController.this.getClass().getResourceAsStream("SharesTransactionListReport.jrxml");
                 JasperReport jasperReport = null;
-                try {
-                    jasperReport = JasperCompileManager.compileReport(reportStream);
-                } catch (JRException e) {
-                    e.printStackTrace();
-                }
-
                 JasperPrint jasperPrint = null;
-                try {
+
+                try{
+                    ObservableList<SharesTransaction> accountTransactionObservableList = ManageSharesTansaction.getSharesTransactionsForAccountNo((accountNumberDisplay.getText()));
+
+                    paramenters = new HashMap<>();
+                    paramenters.put("title", fullnameDisplay.getText()+" Shares Transaction Details: "+accountNumberDisplay.getText());
+                    paramenters.put("summary", "Complete Shares Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
+                    paramenters.put("accbal", "SharesBal: "+ String.format("N %,.2f", Double.parseDouble(ManageSharesTansaction.getSharesBalance(accountNumberDisplay.getText()).toString().trim()) ) );
+                    BufferedImage image = ImageIO.read(ManageSharesController.this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
+                    paramenters.put("logo", image);
+
+                    jasperReport = JasperCompileManager.compileReport(reportStream);
+
                     JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accountTransactionObservableList);
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
+
                 } catch (JRException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 jrViewer = new JRViewer(jasperPrint);

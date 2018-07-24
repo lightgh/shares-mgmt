@@ -1643,14 +1643,13 @@ public class MainViewDashboardController implements Initializable {
         new Thread(new Task() {
             @Override
             protected Boolean call() {
-
-                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/MemberListReport.jrxml");
+                CustomUtility.pln("RUNNING MEMBER REPORT");
+                InputStream reportStream = MainViewDashboardController.this.getClass().getResourceAsStream("MemberListReport.jrxml");
                 JasperReport jasperReport = null;
+                JasperPrint jasperPrint = null;
                 try {
                     jasperReport = JasperCompileManager.compileReport(reportStream);
-                } catch (JRException e) {
-                    e.printStackTrace();
-                }
+
 
                 ObservableList<MembershipAccount> accList = ManageMembershipAccount.getMemberAccountFromAccountNo();
 
@@ -1658,16 +1657,22 @@ public class MainViewDashboardController implements Initializable {
                 paramenters = new HashMap<String, String>();
                 paramenters.put("title", "Registered Members Full Report List");
                 paramenters.put("summary", accList.size()+" Members");
-                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
-                paramenters.put("logo", path);
-                JasperPrint jasperPrint = null;
-                try {
+                String path = "";
+
+                BufferedImage image = ImageIO.read(MainViewDashboardController.this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
+
+                paramenters.put("logo", image);
+
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
                 } catch (JRException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
+
                 jrViewer = new JRViewer(jasperPrint);
                 displayPrintPrompt();
+                CustomUtility.pln("RUNNING MEMBER REPORT2");
                 return true;
             }
 

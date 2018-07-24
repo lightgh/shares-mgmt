@@ -25,7 +25,9 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -700,8 +702,8 @@ public class ManageLoanController {
             @Override
             protected Boolean call() throws Exception {
 
-                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/TakeLoanTransactionListReport.jrxml");
-                InputStream reportStream_return_loan = MainViewDashboardController.class.getClass().getResourceAsStream("/major/ReturnLoanTransactionListReport.jrxml");
+                InputStream reportStream = ManageLoanController.this.getClass().getResourceAsStream("TakeLoanTransactionListReport.jrxml");
+                InputStream reportStream_return_loan = ManageLoanController.this.getClass().getResourceAsStream("ReturnLoanTransactionListReport.jrxml");
 
                 ObservableList<TakeLoanTransaction> accountTransactionObservableList = ManageLoanTransaction.getTakenLoanTransactionsForAccount((accountNumberDisplay.getText()));
                 ObservableList<ReturnLoanTransaction> returnLoanTransactionObservableList = ManageLoanTransaction.getReturnedLoanTransactionsForAccount((accountNumberDisplay.getText()));
@@ -710,14 +712,14 @@ public class ManageLoanController {
                 paramenters.put("title", fullnameDisplay.getText()+" Take Loan Transaction Details: "+accountNumberDisplay.getText());
                 paramenters.put("summary", "Complete Loan Taken Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
                 paramenters.put("totalLoan", "Total Loan Taken: "+ String.format("N %,.2f", Double.parseDouble(ManageLoanTransaction.getTotalTakenLoanTransactions(accountNumberDisplay.getText()).toString())));
-                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
-                paramenters.put("logo", path);
+                BufferedImage image = ImageIO.read(ManageLoanController.this.getClass().getResourceAsStream("/major/images/co-op-stronger-together.jpg"));
+                paramenters.put("logo", image);
 
                 paramenters_return_loan = new HashMap<>();
                 paramenters_return_loan.put("title", fullnameDisplay.getText()+" Returned Loan Transaction Details: "+accountNumberDisplay.getText());
                 paramenters_return_loan.put("summary", "Complete Loan Returned Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
                 paramenters_return_loan.put("totalLoan", "Total Returned Loan: "+ String.format("N %,.2f", Double.parseDouble(ManageLoanTransaction.getTotalReturnedLoanTransactions(accountNumberDisplay.getText()).toString())));
-                paramenters_return_loan.put("logo", path);
+                paramenters_return_loan.put("logo", image);
                 JasperReport jasperReport = null, jasperReport_return_loan = null;
                 try {
                     jasperReport = JasperCompileManager.compileReport(reportStream);

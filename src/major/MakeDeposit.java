@@ -23,7 +23,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -593,29 +596,31 @@ public class MakeDeposit {
 
         new Thread(new Task() {
             @Override
-            protected Boolean call() throws Exception {
+            protected Boolean call(){
+                CustomUtility.pln("MK-DEPO: - START");
+                JasperReport jasperReport = null;
+                JasperPrint jasperPrint = null;
+                InputStream reportStream = MakeDeposit.this.getClass().getResourceAsStream("AccountTransactionListReport.jrxml");
 
-                InputStream reportStream = MainViewDashboardController.class.getClass().getResourceAsStream("/major/AccountTransactionListReport.jrxml");
+                try {
 
                 ObservableList<AccountTransaction> accountTransactionObservableList = ManageAccountTansaction.getAccountTransactionsForAccountNo(accountNumberDisplay.getText());
                 paramenters = new HashMap<>();
                 paramenters.put("title", fullnameDisplay.getText()+" Account Transaction Details: "+accountNumberDisplay.getText());
                 paramenters.put("summary", "Complete Transaction Statement. "+ accountTransactionObservableList.size()+" Transactions" );
                 paramenters.put("accbal", "AccBal: "+ String.format("N %,.2f", Double.parseDouble(accountBalance.getText().trim()) ) );
-                String path = MainViewDashboardController.class.getClass().getResource("/major/images/co-op-stronger-together.jpg").getPath();
-                paramenters.put("logo", path);
-                JasperReport jasperReport = null;
-                try {
-                    jasperReport = JasperCompileManager.compileReport(reportStream);
-                } catch (JRException e) {
-                    e.printStackTrace();
-                }
+                BufferedImage image = ImageIO.read(MakeDeposit.this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
 
-                JasperPrint jasperPrint = null;
-                try {
+                paramenters.put("logo", image);
+                    jasperReport = JasperCompileManager.compileReport(reportStream);
+
                     JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accountTransactionObservableList);
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
                 } catch (JRException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 jrViewer = new JRViewer(jasperPrint);
@@ -634,6 +639,8 @@ public class MakeDeposit {
                         print.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     }
                 });
+
+                CustomUtility.pln("MK-DEPO: - STOP");
 
                 return true;
             }
