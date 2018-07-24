@@ -19,6 +19,7 @@ import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.swing.JRViewer;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -44,6 +45,12 @@ import static major.MainViewDashboardController.print;
  * Created by chinakalight on 7/7/18.
  */
 public class MakeDeposit {
+
+    final static Logger logger = Logger.getLogger(MakeDeposit.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(MakeDeposit.class);
+    }
 
     @FXML
     public Button btnPrintAccountDeposit;

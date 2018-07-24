@@ -2,6 +2,7 @@ package major;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -19,6 +20,12 @@ import java.util.Iterator;
  * Created by chinakalight on 7/12/18.
  */
 public class ManageLoanTransaction {
+
+    final static Logger logger = Logger.getLogger(ManageLoanTransaction.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(ManageLoanTransaction.class);
+    }
 
     public static final int TAKEN_LOAN_SUCCESS = 1;
     public static final int TAKEN_LOAN_RETURNED = 2;

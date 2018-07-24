@@ -19,6 +19,7 @@ import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.swing.JRViewer;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -43,11 +44,11 @@ import static major.CustomUtility.println;
  */
 public class ManageSharesController {
 
-    //TODO - Eliminate these variables
-    /*public static String fullName;
-    public static String accountNumber;
-    public static int id;
-    */
+    final static Logger logger = Logger.getLogger(ManageSharesController.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(ManageSharesController.class);
+    }
 
     @FXML
     private ResourceBundle resources;

@@ -39,5 +39,6 @@
     </orderEntry>
     <orderEntry type="library" name="com.smattme:mysql-backup4j:1.0.0" level="project" />
     <orderEntry type="library" name="net.sf.jasperreports:jasperreports:6.6.0" level="project" />
+    <orderEntry type="library" name="log4j:log4j:1.2.17" level="project" />
   </component>
 </module>

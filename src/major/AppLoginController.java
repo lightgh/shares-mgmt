@@ -7,9 +7,17 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import org.apache.log4j.Logger;
 
 /** Controls the login screen */
 public class AppLoginController {
+
+    final static Logger logger = Logger.getLogger(AppLoginController.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(AppLoginController.class);
+    }
+
     @FXML private TextField username;
     @FXML private TextField password;
     @FXML private Button loginButton;

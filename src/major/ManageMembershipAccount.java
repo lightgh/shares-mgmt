@@ -3,6 +3,7 @@ package major;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.util.converter.LocalDateStringConverter;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -25,6 +26,12 @@ import static major.CustomUtility.println;
  * Created by chinakalight on 6/15/18.
  */
 public class ManageMembershipAccount {
+
+    final static Logger logger = Logger.getLogger(ManageMembershipAccount.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(ManageMembershipAccount.class);
+    }
 
     private int Id;
 

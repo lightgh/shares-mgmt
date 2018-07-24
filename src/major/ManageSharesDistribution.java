@@ -2,6 +2,7 @@ package major;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -21,6 +22,12 @@ import java.util.List;
  * Created by chinakalight on 6/15/18.
  */
 public class ManageSharesDistribution {
+
+    final static Logger logger = Logger.getLogger(ManageSharesDistribution.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(ManageSharesDistribution.class);
+    }
 
 
     public static boolean addNewDistributedShares(BigDecimal monthTotalShare, BigDecimal profit, String monthYear, LocalDate creditLocalDate, int noOfTransactions){

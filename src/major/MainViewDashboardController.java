@@ -29,6 +29,7 @@ import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.swing.JRViewer;
+import org.apache.log4j.Logger;
 import org.controlsfx.control.table.TableFilter;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -65,10 +66,18 @@ import static major.ManageSharesTansaction.ALL_SHARES;
  * @author: Chinaka Light
  * Created On: 6/20/18.
  * Purpose: To Handle the Main View Of This Application
- * MainViewDashboard Controller
+ * MainViewDashboardController
  *
  * Controls the main application screen */
 public class MainViewDashboardController implements Initializable {
+
+    final static Logger logger = Logger.getLogger(MainViewDashboardController.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(MainViewDashboardController.class);
+    }
+
+
     @FXML private Button logoutButton;
     @FXML private Button naAddButton;
 

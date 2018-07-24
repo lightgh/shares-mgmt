@@ -16,6 +16,13 @@ import java.util.logging.Logger;
 
 /** Manages control flow for logins */
 public class AppLoginManager {
+
+    final static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(AppLoginManager.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(AppLoginManager.class);
+    }
+
     private Scene scene;
     private Stage stage;
 

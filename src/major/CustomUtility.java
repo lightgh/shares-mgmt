@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -42,6 +43,12 @@ public class CustomUtility{
 
 
     private static final SessionFactory sessionFactory;
+
+    final static Logger logger = Logger.getLogger(CustomUtility.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(CustomUtility.class);
+    }
 
     public static final int OK = 1;
     public static final int OK_PLUS = 2;

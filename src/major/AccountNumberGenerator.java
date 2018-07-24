@@ -1,5 +1,7 @@
 package major;
 
+import org.apache.log4j.Logger;
+
 import static major.CustomUtility.print;
 import static major.CustomUtility.randIntegerBetween;
 
@@ -8,6 +10,12 @@ import static major.CustomUtility.randIntegerBetween;
  * Created by chinakalight on 6/15/18.
  */
 public class AccountNumberGenerator {
+
+    final static Logger logger = Logger.getLogger(AccountNumberGenerator.class.getName());
+
+    static {
+        SystemOutToLog4.enableForClass(AccountNumberGenerator.class);
+    }
 
     /**
      * Generate and Return A Unique Length of Stringed Numbers
