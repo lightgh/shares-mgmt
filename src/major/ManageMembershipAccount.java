@@ -186,7 +186,7 @@ public class ManageMembershipAccount {
                 count++;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace(e);
         }
 
         if(count == 0)

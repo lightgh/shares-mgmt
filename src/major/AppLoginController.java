@@ -39,7 +39,7 @@ public class AppLoginController {
         });
 
         password.setOnAction(e->{
-            CustomUtility.pln("EXECUTING...");
+            logger.info("EXECUTING...");
             loginButton.fire();
         });
     }

@@ -266,7 +266,7 @@ public class CustomUtility{
             statement = connection.createStatement();
 
         }catch (SQLException sqlException){
-            sqlException.printStackTrace();
+            logger.trace(sqlException);
         }
 
         return this;
@@ -287,7 +287,7 @@ public class CustomUtility{
                query
             );
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace(e);
         }
 
         return thisResultSet;
@@ -308,7 +308,7 @@ public class CustomUtility{
             result_Set = this.buildDBConnection().statement.executeUpdate(query, Statement.CLOSE_ALL_RESULTS
             );
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace(e);
         }
 
         return result_Set != 0;
@@ -325,9 +325,9 @@ public class CustomUtility{
             while(rs.next()){
                 count++;
             }
-            CustomUtility.println(""+count);
+            logger.info(""+count);
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.trace(e);
         }
 
         if(count == 0){
@@ -349,7 +349,7 @@ public class CustomUtility{
             return (clean = true);
 
         }catch (SQLException sqlException){
-            sqlException.printStackTrace();
+            logger.trace(sqlException);
         }
 
         return clean;
@@ -362,13 +362,6 @@ public class CustomUtility{
     private Statement statement = null;
     private ResultSet resultSet = null;
 
-    public static void main2(String args [] ) throws SQLException, IOException, ClassNotFoundException {
-
-
-
-
-
-    }
     public static void main(String args [] ) throws SQLException, IOException, ClassNotFoundException {
         if(CustomUtility.netIsAvailable()) {
             pln("THERE IS CONNECTION");

@@ -594,7 +594,7 @@ public class MainViewDashboardController implements Initializable {
         paramenters.put("logo", "Logo");
 
         paramenters.forEach((first, second) -> {
-            CustomUtility.pln(first + " " + second);
+            logger.info(first + " " + second);
         });
 
 
@@ -625,7 +625,7 @@ public class MainViewDashboardController implements Initializable {
 
 
         }catch (JRException ex){
-            ex.printStackTrace();
+            logger.trace(ex);
         }
 
 
@@ -646,7 +646,7 @@ public class MainViewDashboardController implements Initializable {
     }
 
     public void viewRegisteredAccount(KeyEvent keyEvent) {
-        CustomUtility.println(tableViewAccountList.getSelectionModel().getTableView().getItems().getClass().getName());
+        logger.info(tableViewAccountList.getSelectionModel().getTableView().getItems().getClass().getName());
     }
 
 
@@ -1116,7 +1116,7 @@ public class MainViewDashboardController implements Initializable {
 
 
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        logger.trace(ex);
                         Platform.runLater(new Runnable() {
                             @Override
                             public void run() {
@@ -1130,7 +1130,7 @@ public class MainViewDashboardController implements Initializable {
                         public void run() {
 
                             backupProcessDisplayLabel.setText("DATABASE BACKUP WAS SUCCESSFULL");
-                            CustomUtility.pln(String.format("%s: %s - %s", "UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL"));
+                            logger.info(String.format("%s: %s - %s", "UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL"));
                             CustomUtility.AlertHelper("UPLOAD REPORT", "DATABASE BACKUP PROCESS INFORMATION", "DATABASE BACKUP SUCCESSFULL", "I").showAndWait();
                             backupProcessDisplayLabel.setText("DATABASE BACKUP COMPLETED SUCCESSFULLY AT " + (new Date()));
 
@@ -1227,7 +1227,7 @@ public class MainViewDashboardController implements Initializable {
 
 
         }catch (NumberFormatException ex){
-            ex.printStackTrace();
+            logger.trace(ex);
         }
 
         sharesDistributedLocalDate.setValue(null);
@@ -1652,7 +1652,7 @@ public class MainViewDashboardController implements Initializable {
         new Thread(new Task() {
             @Override
             protected Boolean call() {
-                CustomUtility.pln("RUNNING MEMBER REPORT");
+                logger.info("RUNNING MEMBER REPORT");
                 InputStream reportStream = MainViewDashboardController.this.getClass().getResourceAsStream("MemberListReport.jrxml");
                 JasperReport jasperReport = null;
                 JasperPrint jasperPrint = null;
@@ -1674,14 +1674,14 @@ public class MainViewDashboardController implements Initializable {
 
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
                 } catch (JRException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 }
 
                 jrViewer = new JRViewer(jasperPrint);
                 displayPrintPrompt();
-                CustomUtility.pln("RUNNING MEMBER REPORT2");
+                logger.info("RUNNING MEMBER REPORT2");
                 return true;
             }
 

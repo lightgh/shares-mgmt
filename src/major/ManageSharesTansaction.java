@@ -102,12 +102,12 @@ public class ManageSharesTansaction {
 
                 //TRACK THE SHARE DISTRIBUTED FOR THIS MONTH AND DISPLAY IT ON THE SIDE TABLE
                 sum = sum.add(calculateAccountSharesBenefit);
-                CustomUtility.pln(String.format("SHARED: %s to AccountNo: %s", calculateAccountSharesBenefit, tempST.getAccountNo()));
+                logger.info(String.format("SHARED: %s to AccountNo: %s", calculateAccountSharesBenefit, tempST.getAccountNo()));
             }
 
             ManageSharesDistribution.addNewDistributedShares(monthlySharesTotal, profit, creditLocalDate.getMonth().name() + " Of " +creditLocalDate.getYear(), creditLocalDate, sharesTransactionObservableList.size());
 
-            CustomUtility.pln("TOTAL-SUMMED: " + sum);
+            logger.info("TOTAL-SUMMED: " + sum);
 
         }
         return complete;
@@ -249,8 +249,6 @@ public class ManageSharesTansaction {
             currentObserveAccountTransactionList.setAll(memQ.getResultList());
             transactionA.commit();
 
-//        CustomUtility.pln("ST: "+currentObserveAccountTransactionList.size());
-
             return currentObserveAccountTransactionList;
 
     }
@@ -383,7 +381,6 @@ public class ManageSharesTansaction {
         //get this information from the database
         List<SharesDistributionTransaction> memberAccountList = session.createQuery(query).getResultList();
         currentObserveSharesDistributionTransactionList.setAll(memberAccountList);
-
 
         transactionA.commit();
 

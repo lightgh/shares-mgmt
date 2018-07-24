@@ -299,7 +299,7 @@ public class ManageLoanController {
             }
         }
         catch(NumberFormatException ex){
-            ex.printStackTrace();
+            logger.trace(ex);
                 error = true;
         }
 
@@ -732,7 +732,7 @@ public class ManageLoanController {
                     jasperReport = JasperCompileManager.compileReport(reportStream);
                     jasperReport_return_loan = JasperCompileManager.compileReport(reportStream_return_loan);
                 } catch (JRException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 }
 
                 JasperPrint jasperPrint = null, jasperPrint_ReturnLoan = null;

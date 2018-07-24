@@ -220,7 +220,7 @@ public class MakeDeposit {
 
         prepareAccountTransactionListTable();
         updateAccountTransactionList(accountNumberDisplay.getText());
-        CustomUtility.pln("TESTING - TESTING-AccountNo-: " + accountNumberDisplay.getText());
+        logger.info("TESTING - TESTING-AccountNo-: " + accountNumberDisplay.getText());
     }
 
 
@@ -248,7 +248,7 @@ public class MakeDeposit {
             }
         }
         catch(java.lang.NumberFormatException ex){
-            ex.printStackTrace();
+            logger.trace(ex);
                 error = true;
         }
 
@@ -354,7 +354,7 @@ public class MakeDeposit {
             CustomUtility.AlertHelper("Withdrawal Information", "Error:\nPlease Recheck the Amount and details And DATE of Transaction you wish to withdraw",
                     "Please The Form Fields Are Required", "I").show();
 
-            CustomUtility.pln("EXECUTED-HERE");
+            logger.info("EXECUTED-HERE");
 
         }
 
@@ -604,7 +604,7 @@ public class MakeDeposit {
         new Thread(new Task() {
             @Override
             protected Boolean call(){
-                CustomUtility.pln("MK-DEPO: - START");
+                logger.info("MAKE-DEPOSIT: - START");
                 JasperReport jasperReport = null;
                 JasperPrint jasperPrint = null;
                 InputStream reportStream = MakeDeposit.this.getClass().getResourceAsStream("AccountTransactionListReport.jrxml");
@@ -624,11 +624,11 @@ public class MakeDeposit {
                     JRBeanCollectionDataSource beanCollectionDataSource = new JRBeanCollectionDataSource(accountTransactionObservableList);
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
                 } catch (JRException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 }
                 jrViewer = new JRViewer(jasperPrint);
 
@@ -647,7 +647,7 @@ public class MakeDeposit {
                     }
                 });
 
-                CustomUtility.pln("MK-DEPO: - STOP");
+                logger.info("MAKE-DEPOSIT: - STOP");
 
                 return true;
             }

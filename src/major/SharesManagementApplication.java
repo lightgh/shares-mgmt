@@ -61,7 +61,7 @@ public class SharesManagementApplication extends Application {
                     }
 
                 } catch (IOException e1) {
-                    e1.printStackTrace();
+                    logger.trace(e1);
                 }
             });
 
@@ -75,14 +75,14 @@ public class SharesManagementApplication extends Application {
     public void init() throws Exception {
         super.init();
         img = new Image(this.getClass().getResourceAsStream("images/co-op-stronger-together_icon.png"));
-        CustomUtility.println("INITIALIZING");
+        logger.info("INITIALIZING");
     }
 
     @Override
     public void stop() throws Exception {
         CustomUtility.AlertHelper("Close Application Confirmation", "Closing Application Confirmation",
                 "Are You Sure That You Want To Exit", Alert.AlertType.CONFIRMATION).show();
-        CustomUtility.println("CLOSING");
+        logger.info("CLOSING");
 //        super.stop();
     }
 }

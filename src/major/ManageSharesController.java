@@ -222,7 +222,7 @@ public class ManageSharesController {
 
         prepareSharesTransactionListTable();
         updateSharesTransactionList(accountNumberDisplay.getText());
-        CustomUtility.pln("TESTING - TESTING-AccountNo-: " + accountNumberDisplay.getText());
+        logger.info("TESTING - TESTING-AccountNo-: " + accountNumberDisplay.getText());
     }
 
 
@@ -250,7 +250,7 @@ public class ManageSharesController {
             }
         }
         catch(NumberFormatException ex){
-            ex.printStackTrace();
+            logger.trace(ex);
                 error = true;
         }
 
@@ -373,7 +373,7 @@ public class ManageSharesController {
             CustomUtility.AlertHelper("Withdrawal Information", "Error:\nPlease Recheck the Amount and details And DATE of Transaction you wish to withdraw",
                     "Please The Form Fields Are Required", "I").show();
 
-            CustomUtility.pln("EXECUTED-HERE");
+            logger.info("EXECUTED-HERE");
 
         }
 
@@ -653,11 +653,11 @@ public class ManageSharesController {
                     jasperPrint = JasperFillManager.fillReport(jasperReport, paramenters, beanCollectionDataSource);
 
                 } catch (JRException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.trace(e);
                 }
                 jrViewer = new JRViewer(jasperPrint);
 
