@@ -17,6 +17,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import static javafx.application.Platform.exit;
 import static major.CustomUtility.println;
@@ -170,8 +172,15 @@ public class ManageMembershipAccount {
         this.accountNo = accountNo;
     }
 
-    public ArrayList<ManageMembershipAccount> getAllAccount(){
-        return null;
+    public static List<MembershipAccount> getAllAccount(){
+
+        Iterator<MembershipAccount> iterator = getMemberAccountFromAccountNo().iterator();
+        List<MembershipAccount> membershipAccountList = new ArrayList<>();
+        while (iterator.hasNext()){
+            MembershipAccount mA = iterator.next();
+           membershipAccountList.add(mA);
+        }
+        return membershipAccountList;
     }
 
     public static boolean exists(String accountNo){
@@ -241,7 +250,6 @@ public class ManageMembershipAccount {
     public static ObservableList<MembershipAccount> getMemberAccountFromAccountNo(){
 
         SessionFactory sessionFactory = CustomUtility.getSessionFactory();
-//        Session session = sessionFactory.getCurrentSession();
         Session session = sessionFactory.openSession();
 
         Transaction transactionA = session.beginTransaction();

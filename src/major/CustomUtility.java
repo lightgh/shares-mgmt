@@ -25,11 +25,13 @@ import org.hibernate.tool.schema.TargetType;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.*;
 import java.text.MessageFormat;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -480,4 +482,15 @@ public class CustomUtility{
             return false;
         }
     }
+
+    public static String getCurrency(String value){
+        if(localeNigeria == null)
+            localeNigeria = new Locale("en", "NG");
+
+        NumberFormat nf = NumberFormat.getCurrencyInstance(localeNigeria);
+        String b = nf.format(new BigDecimal(value));
+        return b;
+    }
+
+    private static Locale localeNigeria;
 }

@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
 import java.util.Iterator;
+import java.util.List;
+
+import static major.ManageMembershipAccount.getAllAccount;
 
 /**
  * Created by chinakalight on 7/12/18.
@@ -164,11 +167,29 @@ public class ManageLoanTransaction {
     }
 
     @NotNull
-    public static BigDecimal getAvailableAmount() {
-
+    public static BigDecimal getTotalAvailableAmount(){
         //TODO Calculate the amount that is available
-        return new BigDecimal(100000);
+        List<MembershipAccount> thisMemList = ManageMembershipAccount.getAllAccount();
+        Iterator<MembershipAccount> allAccountIterator = thisMemList.iterator();
+        BigDecimal totalAmt = BigDecimal.ZERO;
+        while(allAccountIterator.hasNext()){
+            String accountNo = allAccountIterator.next().getAccountNo();
+            try {
+                totalAmt = totalAmt.add(ManageAccountTansaction.getAccountBalance(accountNo));
+            }catch (Exception e) {
+                e.printStackTrace();
+//                return new BigDecimal(100000);
+            }
+        }
+        return totalAmt;
     }
+
+    public static void main(String[] args) throws Exception{
+        BigDecimal thisBig = getTotalAvailableAmount();
+        CustomUtility.pln("TOTAL_SUM: " + thisBig.toString());
+        CustomUtility.pln("CURRENCY " + CustomUtility.getCurrency(thisBig.toString()));
+    }
+
 
     public static BigDecimal getIncuredInterest(BigDecimal loanAmount, Integer period){
 

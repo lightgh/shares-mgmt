@@ -9,14 +9,10 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
-import javafx.print.Printer;
-import javafx.print.PrinterJob;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.swing.JRViewer;
@@ -24,7 +20,6 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -33,10 +28,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static major.CustomUtility.pln;
 import static major.CustomUtility.println;
@@ -303,8 +295,8 @@ public class ManageLoanController {
                 error = true;
         }
 
-        BigDecimal totalAvailableAmount = ManageLoanTransaction.getAvailableAmount();
-        BigDecimal availableAccountBalance = ManageAccountTansaction.getAccountBalance(this.accountNumberDisplay.getText());
+        BigDecimal totalAvailableAmount = ManageLoanTransaction.getTotalAvailableAmount();
+//        BigDecimal availableAccountBalance = ManageAccountTansaction.getAccountBalance(this.accountNumberDisplay.getText());
 
         if(amount.doubleValue() > totalAvailableAmount.doubleValue()){
             CustomUtility.AlertHelper("Loan Taking Information", "Error:\nSUCH AMOUNT OF MONEY IS CURRENTLY UNAVAILABLE",
@@ -315,14 +307,14 @@ public class ManageLoanController {
             return;
         }
 
-        if(amount.doubleValue() > availableAccountBalance.doubleValue()){
+      /*  if(amount.doubleValue() > availableAccountBalance.doubleValue()){
             CustomUtility.AlertHelper("Shares Buying Information", "Error:\nINSUFFICIENT FUNDS IN YOUR ACCOUNT",
                     "Amount To Buy Shares Exceeds Available Amount In Your Account Balance ", "I").show();
 
             naAddButton.setDisable(false);
 
             return;
-        }
+        }*/
 
 
         if(error){
@@ -516,8 +508,9 @@ public class ManageLoanController {
 
         totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN SO FAR IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(takeLoanTransacions.getAccountNo()).doubleValue()));
         totalLoanReturnedLabel.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageLoanTransaction.getTotalReturnedLoanTransactions(takeLoanTransacions.getAccountNo()).doubleValue()));
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(takeLoanTransacions.getAccountNo()).doubleValue()));
-        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageSharesTansaction.getSharesBalance(takeLoanTransacions.getAccountNo()).doubleValue()));
+        accountBalance.setText(String.format(CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(takeLoanTransacions.getAccountNo()).toString())));
+//        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageLoanTransaction.getCurrentLoanBalance(takeLoanTransacions.getAccountNo()).doubleValue()));
+        totalCollectedLoanBalance.setText(CustomUtility.getCurrency(ManageLoanTransaction.getCurrentLoanBalance(takeLoanTransacions.getAccountNo()).toString()));
 
     }
 
@@ -562,7 +555,6 @@ public class ManageLoanController {
      * popultate Account Transaction List Table Method
      */
     private void prepareTakeLoanTransactionListTable() {
-
 
         colId.setCellValueFactory(new PropertyValueFactory<>("Id"));
         colSN.setCellValueFactory(new PropertyValueFactory<>("Id"));
@@ -913,6 +905,5 @@ public class ManageLoanController {
             rLoanAddButton.setDisable(true);
         }
     }
-
 
 }
