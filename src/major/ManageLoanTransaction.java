@@ -198,7 +198,6 @@ public class ManageLoanTransaction {
         BigDecimal expectedAmount;
         BigDecimal percentage = getPercentage(period);
 
-
         expectedAmount = percentage.divide(ONE_HUNDRED, MathContext.DECIMAL64).multiply(loanAmount, MathContext.DECIMAL64);
 
         return expectedAmount;
@@ -212,27 +211,42 @@ public class ManageLoanTransaction {
      * @return
      */
     public static BigDecimal getPercentage(Integer period){
-
+        // default percentage for a month
         Double percentage = 15.0;
 
-        Integer whole = period/30;
-        Integer remiander = period % 30;
-        Integer noOfMonths = 1;
+        if(period > 35) {
 
-        if(remiander == period && whole == 0) percentage = percentage;
-        else if(whole == 0 && remiander > 0 ) percentage = percentage;
-        else if (whole > 0 && remiander == 0 ){
+            CustomUtility.pln("PERIOD OF "+ period);
 
-            noOfMonths = ( whole - 1 );
+            Integer remaining_days = period - 35;
+            Double firstPercent = percentage;
 
-            percentage = percentage + (5 * noOfMonths);
 
-        }else if(whole > 0 && remiander > 0 ){
-            noOfMonths = ( whole - 1 );
+            Integer noOfMonths = remaining_days / 30;
+            Integer additional_days = remaining_days % 30;
 
-            if(remiander > 5) noOfMonths++;
 
-            percentage = percentage + (5 * noOfMonths);
+            if (noOfMonths > 0 && additional_days == 0) {
+
+                Double sum = 0.0;
+
+                for (int eachMonthCount = 1; eachMonthCount <= noOfMonths; eachMonthCount++){
+                    sum += (percentage + (5 * eachMonthCount));
+                }
+
+                percentage = firstPercent + sum;
+
+            } else if (noOfMonths > 0 && additional_days > 0) {
+
+                Double sum = 0.0;
+                noOfMonths += 1;
+
+                for (int eachMonthCount = 1; eachMonthCount <= noOfMonths; eachMonthCount++){
+                    sum += (percentage + (5 * eachMonthCount));
+                }
+
+                percentage = firstPercent + sum;
+            }
         }
 
         return new BigDecimal(String.valueOf(percentage));

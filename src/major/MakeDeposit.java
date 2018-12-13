@@ -345,7 +345,7 @@ public class MakeDeposit {
 
         if(amountDebit.doubleValue() > currentAvailableAmount.doubleValue()){
                     CustomUtility.AlertHelper("Withdrawal Information", "Error:\nINSUFFICIENT FUNDS CURRENTLY AVAILABLE. CAN'T EXCEED ",
-                            "Error:\nINSUFFICIENT FUNDS CURRENTLY AVAILABLE. CAN'T EXCEED " + String.format("N %.2f ", currentAvailableAmount.doubleValue()), "I").show();
+                            "Error:\nINSUFFICIENT FUNDS CURRENTLY AVAILABLE. CAN'T EXCEED " + CustomUtility.getCurrency(currentAvailableAmount.toString()), "I").show();
                     return;
         }
 
@@ -458,9 +458,9 @@ public class MakeDeposit {
         naAddButton.setDisable(false);
 
 
-        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", ManageAccountTansaction.getTotalCredited(accountTransaction.getAccountNo()).doubleValue()));
-        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL SUM WITHDRAWN IS: ", ManageAccountTansaction.getTotalDebited(accountTransaction.getAccountNo()).doubleValue()));
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(accountTransaction.getAccountNo()).doubleValue()));
+        totalLabelSumDeposit.setText(String.format("%s%s","TOTAL DEPOSITED SUM IS: ", CustomUtility.getCurrency(ManageAccountTansaction.getTotalCredited(accountTransaction.getAccountNo()).toString())));
+        totalLabelSumWithdrawn.setText(String.format("%s%s","TOTAL SUM WITHDRAWN IS: ", CustomUtility.getCurrency(ManageAccountTansaction.getTotalDebited(accountTransaction.getAccountNo()).toString())));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(accountTransaction.getAccountNo()).toString())));
 
 
     }
@@ -615,7 +615,7 @@ public class MakeDeposit {
                 paramenters = new HashMap<>();
                 paramenters.put("title", fullnameDisplay.getText()+" Account Transaction Details: "+accountNumberDisplay.getText());
                 paramenters.put("summary", "Complete Transaction Statement. "+ accountTransactionObservableList.size()+" Transactions" );
-                paramenters.put("accbal", "AccBal: "+ String.format("N %,.2f", Double.parseDouble(accountBalance.getText().trim()) ) );
+                paramenters.put("accbal", "AccBal: "+ CustomUtility.getCurrency(String.format("%s", Double.parseDouble(accountBalance.getText().trim()) ) ) );
                 BufferedImage image = ImageIO.read(MakeDeposit.this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
 
                 paramenters.put("logo", image);

@@ -364,7 +364,7 @@ public class ManageSharesController {
 
         if(amountDebit.doubleValue() > currentAvailableShares.doubleValue()){
                     CustomUtility.AlertHelper("Shares Sales Error Information", "Error:\nYOU CANNOT SALE SHARES WORTH MORE THAN YOUR PURCHASED ACTIVE SHARES",
-                            "Error:\nYOU CAN'T SALE SHARES WORTH MORE THAN WHAT'S CURRENTLY AVAILABLE. CAN'T EXCEED " + String.format("N %.2f ", currentAvailableShares.doubleValue()), "I").show();
+                            "Error:\nYOU CAN'T SALE SHARES WORTH MORE THAN WHAT'S CURRENTLY AVAILABLE. CAN'T EXCEED " + CustomUtility.getCurrency(currentAvailableShares.toString()), "I").show();
                     return;
         }
 
@@ -487,10 +487,10 @@ public class ManageSharesController {
         naAddButton.setDisable(false);
 
 
-        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL SHARES PURCHASED IS: ", ManageSharesTansaction.getTotalCredited(accountTransaction.getAccountNo()).doubleValue()));
-        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageSharesTansaction.getTotalDebited(accountTransaction.getAccountNo()).doubleValue()));
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(accountTransaction.getAccountNo()).doubleValue()));
-        accountBalance1.setText(String.format("%s%.3f","", ManageSharesTansaction.getSharesBalance(accountTransaction.getAccountNo()).doubleValue()));
+        totalLabelSumDeposit.setText(String.format("%s%s","TOTAL SHARES PURCHASED IS: ", CustomUtility.getCurrency(ManageSharesTansaction.getTotalCredited(accountTransaction.getAccountNo()).toString())));
+        totalLabelSumWithdrawn.setText(String.format("%s%s","TOTAL SHARES SOLD IS: ", CustomUtility.getCurrency(ManageSharesTansaction.getTotalDebited(accountTransaction.getAccountNo()).toString())));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(accountTransaction.getAccountNo()).toString())));
+        accountBalance1.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageSharesTansaction.getSharesBalance(accountTransaction.getAccountNo()).toString())));
 
 
     }
@@ -643,7 +643,7 @@ public class ManageSharesController {
                     paramenters = new HashMap<>();
                     paramenters.put("title", fullnameDisplay.getText()+" Shares Transaction Details: "+accountNumberDisplay.getText());
                     paramenters.put("summary", "Complete Shares Transaction. "+ accountTransactionObservableList.size()+" Transactions" );
-                    paramenters.put("accbal", "SharesBal: "+ String.format("N %,.2f", Double.parseDouble(ManageSharesTansaction.getSharesBalance(accountNumberDisplay.getText()).toString().trim()) ) );
+                    paramenters.put("accbal", "SharesBal: "+ CustomUtility.getCurrency(String.format("N %,.2f", Double.parseDouble(ManageSharesTansaction.getSharesBalance(accountNumberDisplay.getText()).toString().trim()) ) ));
                     BufferedImage image = ImageIO.read(ManageSharesController.this.getClass().getResourceAsStream("images/co-op-stronger-together.jpg"));
                     paramenters.put("logo", image);
 
@@ -688,7 +688,6 @@ public class ManageSharesController {
                     }
                 });
             }
-
 
         }).start();
     }

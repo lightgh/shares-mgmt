@@ -370,9 +370,10 @@ public class CustomUtility{
         }else{
             pln("NO Connection");
         }
-        BigDecimal amount = new BigDecimal(5000);
-        pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,60));
-        pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,60)));
+        BigDecimal amount = new BigDecimal(12000);
+        pln("AMOUNT: " + amount.doubleValue());
+        pln("INTEREST: " + ManageLoanTransaction.getIncuredInterest(amount,90));
+        pln("EXPECTED AMOUNT: " + amount.add(ManageLoanTransaction.getIncuredInterest(amount,90)));
 
     }
 
@@ -488,6 +489,15 @@ public class CustomUtility{
             localeNigeria = new Locale("en", "NG");
 
         NumberFormat nf = NumberFormat.getCurrencyInstance(localeNigeria);
+        String b = nf.format(new BigDecimal(value));
+        return b;
+    }
+
+    public static String getNumberFormat(String value){
+        if(localeNigeria == null)
+            localeNigeria = new Locale("en", "NG");
+
+        NumberFormat nf = NumberFormat.getInstance(localeNigeria);
         String b = nf.format(new BigDecimal(value));
         return b;
     }

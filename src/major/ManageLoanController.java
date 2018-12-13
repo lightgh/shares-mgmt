@@ -506,8 +506,8 @@ public class ManageLoanController {
         rLoanAddButton.setDisable(false);
 
 
-        totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN SO FAR IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(takeLoanTransacions.getAccountNo()).doubleValue()));
-        totalLoanReturnedLabel.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageLoanTransaction.getTotalReturnedLoanTransactions(takeLoanTransacions.getAccountNo()).doubleValue()));
+        totalLoanTakenLabel.setText(String.format("%s%s","TOTAL LOAN TAKEN SO FAR IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalTakenLoanTransactions(takeLoanTransacions.getAccountNo()).toString())));
+        totalLoanReturnedLabel.setText(String.format("%s%s","TOTAL SHARES SOLD IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalReturnedLoanTransactions(takeLoanTransacions.getAccountNo()).toString())));
         accountBalance.setText(String.format(CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(takeLoanTransacions.getAccountNo()).toString())));
 //        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageLoanTransaction.getCurrentLoanBalance(takeLoanTransacions.getAccountNo()).doubleValue()));
         totalCollectedLoanBalance.setText(CustomUtility.getCurrency(ManageLoanTransaction.getCurrentLoanBalance(takeLoanTransacions.getAccountNo()).toString()));
@@ -543,11 +543,10 @@ public class ManageLoanController {
         nLGiveLoanButton.setDisable(false);
         rLoanAddButton.setDisable(false);
 
-
-        totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN SO FAR IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(returnLoanTransaction.getAccountNo()).doubleValue()));
-        totalLoanReturnedLabel.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageLoanTransaction.getTotalReturnedLoanTransactions(returnLoanTransaction.getAccountNo()).doubleValue()));
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(returnLoanTransaction.getAccountNo()).doubleValue()));
-        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageSharesTansaction.getSharesBalance(returnLoanTransaction.getAccountNo()).doubleValue()));
+        totalLoanTakenLabel.setText(String.format("%s%s","TOTAL LOAN TAKEN SO FAR IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalTakenLoanTransactions(returnLoanTransaction.getAccountNo()).toString())));
+        totalLoanReturnedLabel.setText(String.format("%s%s","TOTAL SHARES SOLD IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalReturnedLoanTransactions(returnLoanTransaction.getAccountNo()).toString())));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(returnLoanTransaction.getAccountNo()).toString())));
+        totalCollectedLoanBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageSharesTansaction.getSharesBalance(returnLoanTransaction.getAccountNo()).toString())));
 
     }
 

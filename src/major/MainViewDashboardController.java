@@ -782,10 +782,10 @@ public class MainViewDashboardController implements Initializable {
         tableViewWithdrawals.setItems(ManageAccountTansaction.getDebitTransactions(this.currentMembershipAccount.getAccountNo()));
 
 
-        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL DEPOSITED SUM IS: ", ManageAccountTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
-        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL WITHDRAWN SUM IS: ", ManageAccountTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLabelSumDeposit.setText(String.format("%s%s","TOTAL DEPOSITED SUM IS: ", CustomUtility.getCurrency(ManageAccountTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).toString())));
+        totalLabelSumWithdrawn.setText(String.format("%s%s","TOTAL WITHDRAWN SUM IS: ", CustomUtility.getCurrency(ManageAccountTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).toString())));
 
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).toString())));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 
@@ -887,11 +887,11 @@ public class MainViewDashboardController implements Initializable {
         tableViewWithdrawals.setItems(ManageSharesTansaction.getSharesSellsTransactions(this.currentMembershipAccount.getAccountNo()));
 
 
-        totalLabelSumDeposit.setText(String.format("%s%.3f","TOTAL SHARES BOUGHT SUM IS: ", ManageSharesTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
-        totalLabelSumWithdrawn.setText(String.format("%s%.3f","TOTAL SHARES SOLD IS: ", ManageSharesTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLabelSumDeposit.setText(String.format("%s%s","TOTAL SHARES BOUGHT SUM IS: ", CustomUtility.getCurrency(ManageSharesTansaction.getTotalCredited(this.currentMembershipAccount.getAccountNo()).toString())));
+        totalLabelSumWithdrawn.setText(String.format("%s%s","TOTAL SHARES SOLD IS: ", CustomUtility.getCurrency(ManageSharesTansaction.getTotalDebited(this.currentMembershipAccount.getAccountNo()).toString())));
 
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
-        shareBalance.setText(String.format("%s%.3f","", ManageSharesTansaction.getSharesBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).toString())));
+        shareBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageSharesTansaction.getSharesBalance(this.currentMembershipAccount.getAccountNo()).toString())));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 
@@ -1012,11 +1012,11 @@ public class MainViewDashboardController implements Initializable {
         tableViewReturnedLoans.setItems(ManageLoanTransaction.getReturnedLoanTransactionsForAccount(this.currentMembershipAccount.getAccountNo()));
 
 
-        totalLoanTakenLabel.setText(String.format("%s%.3f","TOTAL LOAN TAKEN IS: ", ManageLoanTransaction.getTotalTakenLoanTransactions(this.currentMembershipAccount.getAccountNo()).doubleValue()));
-        totalLoanReturnedLabel.setText(String.format("%s%.3f","TOTAL LOAN RETURNED IS: ", ManageLoanTransaction.getTotalReturnedLoanTransactions(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        totalLoanTakenLabel.setText(String.format("%s%s","TOTAL LOAN TAKEN IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalTakenLoanTransactions(this.currentMembershipAccount.getAccountNo()).toString())));
+        totalLoanReturnedLabel.setText(String.format("%s%s","TOTAL LOAN RETURNED IS: ", CustomUtility.getCurrency(ManageLoanTransaction.getTotalReturnedLoanTransactions(this.currentMembershipAccount.getAccountNo()).toString())));
 
-        accountBalance.setText(String.format("%s%.3f","", ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
-        totalCollectedLoanBalance.setText(String.format("%s%.3f","", ManageLoanTransaction.getCurrentLoanBalance(this.currentMembershipAccount.getAccountNo()).doubleValue()));
+        accountBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageAccountTansaction.getAccountBalance(this.currentMembershipAccount.getAccountNo()).toString())));
+        totalCollectedLoanBalance.setText(String.format("%s%s","", CustomUtility.getCurrency(ManageLoanTransaction.getCurrentLoanBalance(this.currentMembershipAccount.getAccountNo()).toString())));
 
         Button closeButton = (Button)loader.getNamespace().get("closeButton");
 
@@ -1045,9 +1045,6 @@ public class MainViewDashboardController implements Initializable {
         Task<Boolean> task = new Task<Boolean>() {
 
             @Override protected Boolean call() throws Exception {
-
-
-
 
                 if(CustomUtility.netIsAvailable()) {
 
@@ -1159,7 +1156,6 @@ public class MainViewDashboardController implements Initializable {
 
             @Override
             protected void done() {
-
 
             }
 
@@ -1276,11 +1272,11 @@ public class MainViewDashboardController implements Initializable {
 
         String sumTotal = String.format("%,.2f",takenLoanMonthTotalAmount.setScale(2, RoundingMode.DOWN));
         String sumActualReturnTotal = String.format("%,.2f",returnedALoanMonthTotalAmount.setScale(2, RoundingMode.DOWN));
-        totalExpectedMonthReturnLoanAmountLabel.setText(String.format("%,.2f", returnedELoanMonthTotalAmount.setScale(2, RoundingMode.DOWN) ));
+        totalExpectedMonthReturnLoanAmountLabel.setText(CustomUtility.getCurrency(String.format("%,.2f", returnedELoanMonthTotalAmount.setScale(2, RoundingMode.DOWN) )));
         String sumActualReturnProfitTotal = String.format("%,.2f",returnedALoanProfitFromMonthTotalAmount.setScale(2, RoundingMode.DOWN));
-        totalMonthTakenLoanAmountLabel.setText(sumTotal);
-        totalMonthReturnedLoanAmountLabel.setText(sumActualReturnTotal);
-        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnProfitTotal);
+        totalMonthTakenLoanAmountLabel.setText(CustomUtility.getCurrency(sumTotal));
+        totalMonthReturnedLoanAmountLabel.setText(CustomUtility.getCurrency(sumActualReturnTotal));
+        totalMonthReturnedLoanProfitAmountLabel.setText(CustomUtility.getCurrency(sumActualReturnProfitTotal));
 
 
         if(observeTakeLoanTransactionSpecifiedAccountListData.isEmpty() && observeReturnLoanTransactionSpecifiedAccountListData.isEmpty()) {
@@ -1305,15 +1301,15 @@ public class MainViewDashboardController implements Initializable {
         String tEmonthTLAL = ManageLoanTransaction.getTotalTakenLoan(ManageLoanTransaction.getTakenLoanTransactions(), "EXPECTED_RETURNED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
         totalExpectedMonthReturnLoanAmountLabel.setText(tEmonthTLAL);
         String tMonthRLAL = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactions(), "ACTUAL_RETURNED_AMOUNT").setScale(2, RoundingMode.DOWN).toString();
-        totalMonthReturnedLoanAmountLabel.setText(tMonthRLAL);
+        totalMonthReturnedLoanAmountLabel.setText(CustomUtility.getCurrency(tMonthRLAL));
         BigDecimal returnedALoanProfitFromMonthTotalAmount = ManageLoanTransaction.getTotalReturnLoan(ManageLoanTransaction.getReturnLoanTransactions(), "PROFIT_EARNED_FROM_RETURNED_AMOUNT");
 
         String sumActualReturnProfitTotal = String.format("%,.2f",returnedALoanProfitFromMonthTotalAmount.setScale(2, RoundingMode.DOWN));
-        totalMonthReturnedLoanProfitAmountLabel.setText(sumActualReturnProfitTotal);
+        totalMonthReturnedLoanProfitAmountLabel.setText(CustomUtility.getCurrency(sumActualReturnProfitTotal));
 
 
-        totalFilteredMonthTakenLoanAmountLabel.setText("FILTERED: "+tMonthTLAL);
-        totalFilteredMonthReturnLoanAmountLabel.setText("FILTERED: " +tMonthRLAL);
+        totalFilteredMonthTakenLoanAmountLabel.setText("FILTERED: "+ CustomUtility.getCurrency(tMonthTLAL));
+        totalFilteredMonthReturnLoanAmountLabel.setText("FILTERED: " + CustomUtility.getCurrency(tMonthRLAL));
     }
 
 
@@ -1343,8 +1339,8 @@ public class MainViewDashboardController implements Initializable {
         sharesMonthTotalAmount = ManageSharesTansaction.getTotal(ManageSharesTansaction.getSharesTransactionsForMonth(localDateMonth, sharesCategory), ALL_SHARES);
 
         String sumTotal = String.format("%,.2f",sharesMonthTotalAmount.setScale(2, RoundingMode.DOWN));
-        displayMonthShareTotalLabel.setText(sumTotal);
-        filteredSharedSumLabel.setText("FILTERED SUM: " + sumTotal);
+        displayMonthShareTotalLabel.setText(CustomUtility.getCurrency(sumTotal));
+        filteredSharedSumLabel.setText("FILTERED SUM: " + CustomUtility.getCurrency(sumTotal));
         filteredSharedSumLabel.setFont(Font.font("arial", FontWeight.EXTRA_BOLD,20 ));
 
         if(observeSharesTransactionSpecifiedAccountListData.isEmpty()) {
@@ -1524,7 +1520,7 @@ public class MainViewDashboardController implements Initializable {
             tempSumVal = BigDecimal.ZERO;
             sharesSortedList.getSource().forEach(e ->{
                 tempSumVal = tempSumVal.add(e.getAmount());
-                filteredSharedSumLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+                filteredSharedSumLabel.setText(CustomUtility.getCurrency(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN))));
             });
 
         });
@@ -1582,7 +1578,7 @@ public class MainViewDashboardController implements Initializable {
             tempSumVal = BigDecimal.ZERO;
             takeLoanSortedList.getSource().forEach(e ->{
                 tempSumVal = tempSumVal.add(e.getAmount());
-                totalFilteredMonthTakenLoanAmountLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+                totalFilteredMonthTakenLoanAmountLabel.setText(CustomUtility.getCurrency(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN))));
             });
     });
 
@@ -1639,7 +1635,7 @@ public class MainViewDashboardController implements Initializable {
             tempSumVal = BigDecimal.ZERO;
             returnLoanSortedList.getSource().forEach(e ->{
                 tempSumVal = tempSumVal.add(e.getCollectedAmount());
-                totalFilteredMonthReturnLoanAmountLabel.setText(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN)));
+                totalFilteredMonthReturnLoanAmountLabel.setText(CustomUtility.getCurrency(String.format("FILTERED SUM: %,.2f", tempSumVal.setScale(2, RoundingMode.DOWN))));
             });
         });
 
